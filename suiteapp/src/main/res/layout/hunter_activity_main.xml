@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#071426">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Görsel Avcısı" android:textColor="#F4C430" android:textStyle="bold" android:textSize="34sp" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+            android:text="İsim veya arama terimi yaz. Açık web kaynaklarını tarar, fotoğrafları toplar ve video kaynaklarını ayrı kaydeder."
+            android:textColor="#D5DCE8" android:textSize="17sp" />
+
+        <EditText android:id="@+id/query" android:layout_width="match_parent" android:layout_height="58dp" android:layout_marginTop="24dp"
+            android:background="#14243A" android:hint="Örn: Pelin Akil" android:paddingHorizontal="16dp" android:singleLine="true"
+            android:textColor="#FFFFFF" android:textColorHint="#8794A8" android:textSize="18sp" />
+        <EditText android:id="@+id/aliases" android:layout_width="match_parent" android:layout_height="58dp" android:layout_marginTop="10dp"
+            android:background="#14243A" android:hint="Ek adlar / yazımlar (virgülle, isteğe bağlı)" android:paddingHorizontal="16dp" android:singleLine="true"
+            android:textColor="#FFFFFF" android:textColorHint="#8794A8" android:textSize="15sp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="22dp"
+            android:text="Tarama modu" android:textColor="#F4C430" android:textStyle="bold" android:textSize="16sp" />
+        <Spinner android:id="@+id/mode" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="6dp" android:background="#5E6167" android:paddingHorizontal="12dp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp"
+            android:text="Kaydetme" android:textColor="#F4C430" android:textStyle="bold" android:textSize="16sp" />
+        <Spinner android:id="@+id/outputMode" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="6dp" android:background="#5E6167" android:paddingHorizontal="12dp" />
+
+        <Button android:id="@+id/start" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="22dp"
+            android:backgroundTint="#F4C430" android:text="AVLAMAYI BAŞLAT" android:textColor="#071426" android:textStyle="bold" android:textSize="18sp" />
+        <Button android:id="@+id/stop" android:layout_width="match_parent" android:layout_height="58dp" android:layout_marginTop="10dp"
+            android:backgroundTint="#3D4654" android:enabled="false" android:text="DURDUR" android:textColor="#FFFFFF" android:textSize="17sp" />
+
+        <ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="8dp"
+            android:layout_marginTop="24dp" android:indeterminate="true" android:visibility="gone" />
+        <TextView android:id="@+id/status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:text="Hazır" android:textColor="#FFFFFF" android:textSize="18sp" />
+        <TextView android:id="@+id/counts" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+            android:text="Bulunan fotoğraf: 0\nVideo kaynağı: 0\nKaydedilen: 0\nTekrar: 0\nAtlanan/Hata: 0" android:textColor="#D5DCE8" android:textSize="16sp" />
+        <TextView android:id="@+id/source" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:paddingBottom="30dp"
+            android:text="Kaynak: -" android:textColor="#8FA0B8" android:textSize="14sp" />
+    </LinearLayout>
+</ScrollView>
