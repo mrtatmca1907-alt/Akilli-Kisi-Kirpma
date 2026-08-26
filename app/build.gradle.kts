@@ -10,8 +10,8 @@ android {
         applicationId = "com.akillikisikirpma"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.1.0"
     }
 
     buildTypes {
@@ -32,7 +32,6 @@ android {
 
 dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
-    implementation("com.google.mlkit:face-detection:16.1.7")
     implementation("org.tensorflow:tensorflow-lite-task-vision:0.4.4")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
 }
