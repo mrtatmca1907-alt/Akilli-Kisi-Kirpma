@@ -19,7 +19,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".StableBrowserActivity"
             android:exported="true"
             android:screenOrientation="unspecified">
             <intent-filter>
