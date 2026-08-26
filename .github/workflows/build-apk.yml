@@ -39,8 +39,8 @@ jobs:
         with:
           gradle-version: '8.11.1'
 
-      - name: Uc APKyi derle
-        run: gradle :app:assembleDebug :videoapp:assembleDebug :downloaderapp:assembleDebug --stacktrace
+      - name: Dort APKyi derle
+        run: gradle :app:assembleDebug :videoapp:assembleDebug :downloaderapp:assembleDebug :filemanagerapp:assembleDebug --stacktrace
 
       - name: Kisi Kirpma APK yukle
         uses: actions/upload-artifact@v4
@@ -61,4 +61,11 @@ jobs:
         with:
           name: Coklu-Video-Indirici-APK
           path: downloaderapp/build/outputs/apk/debug/downloaderapp-debug.apk
+          if-no-files-found: error
+
+      - name: ATMACA Dosyalar APK yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ATMACA-Dosyalar-APK
+          path: filemanagerapp/build/outputs/apk/debug/filemanagerapp-debug.apk
           if-no-files-found: error
