@@ -14,13 +14,6 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Size;
 
-import com.google.android.gms.tasks.Tasks;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.face.Face;
-import com.google.mlkit.vision.face.FaceDetection;
-import com.google.mlkit.vision.face.FaceDetector;
-import com.google.mlkit.vision.face.FaceDetectorOptions;
-
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.label.Category;
 import org.tensorflow.lite.task.vision.detector.Detection;
@@ -29,24 +22,18 @@ import org.tensorflow.lite.task.vision.detector.ObjectDetector;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 final class PersonCropEngine implements AutoCloseable {
     static final class ProcessResult {
         int detected;
         int saved;
-        int blocked;
+        int skipped;
         int failed;
     }
 
     private final Context context;
     private final ObjectDetector personDetector;
-    private final FaceDetector faceDetector;
-    private final AgeClassifier ageClassifier;
 
     PersonCropEngine(Context context) throws Exception {
         this.context = context.getApplicationContext();
@@ -59,13 +46,6 @@ final class PersonCropEngine implements AutoCloseable {
                 "efficientdet-lite0.tflite",
                 options
         );
-
-        FaceDetectorOptions faceOptions = new FaceDetectorOptions.Builder()
-                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
-                .setMinFaceSize(0.08f)
-                .build();
-        faceDetector = FaceDetection.getClient(faceOptions);
-        ageClassifier = new AgeClassifier(this.context);
     }
 
     ProcessResult process(Uri uri) {
@@ -86,19 +66,12 @@ final class PersonCropEngine implements AutoCloseable {
                 personNo++;
 
                 Rect cropRect = expandedRect(detection.getBoundingBox(), bitmap.getWidth(), bitmap.getHeight());
-                if (cropRect.width() < 80 || cropRect.height() < 120) {
-                    result.blocked++;
+                if (cropRect.width() < 24 || cropRect.height() < 36) {
+                    result.skipped++;
                     continue;
                 }
 
                 Bitmap person = Bitmap.createBitmap(bitmap, cropRect.left, cropRect.top, cropRect.width(), cropRect.height());
-                boolean allow = passesAdultGate(person);
-                if (!allow) {
-                    result.blocked++;
-                    person.recycle();
-                    continue;
-                }
-
                 String sourceBase = sourceBaseName(uri);
                 if (saveBitmap(person, sourceBase, personNo)) result.saved++;
                 else result.failed++;
@@ -128,36 +101,6 @@ final class PersonCropEngine implements AutoCloseable {
         int top = Math.max(0, Math.round(box.top - bh * 0.12f));
         int bottom = Math.min(height, Math.round(box.bottom + bh * 0.16f));
         return new Rect(left, top, right, bottom);
-    }
-
-    private boolean passesAdultGate(Bitmap person) {
-        try {
-            List<Face> faces = Tasks.await(
-                    faceDetector.process(InputImage.fromBitmap(person, 0)),
-                    25,
-                    TimeUnit.SECONDS
-            );
-            if (faces == null || faces.isEmpty()) return false;
-
-            Face largest = Collections.max(faces, Comparator.comparingInt(f -> f.getBoundingBox().width() * f.getBoundingBox().height()));
-            Rect faceBox = largest.getBoundingBox();
-            if (faceBox.width() < 48 || faceBox.height() < 48) return false;
-
-            int padX = Math.round(faceBox.width() * 0.25f);
-            int padY = Math.round(faceBox.height() * 0.25f);
-            int l = Math.max(0, faceBox.left - padX);
-            int t = Math.max(0, faceBox.top - padY);
-            int r = Math.min(person.getWidth(), faceBox.right + padX);
-            int b = Math.min(person.getHeight(), faceBox.bottom + padY);
-            if (r <= l || b <= t) return false;
-
-            Bitmap face = Bitmap.createBitmap(person, l, t, r - l, b - t);
-            AgeClassifier.Result age = ageClassifier.classify(face);
-            face.recycle();
-            return age.adult;
-        } catch (Throwable t) {
-            return false;
-        }
     }
 
     private Bitmap decodeBitmap(Uri uri) throws Exception {
@@ -227,7 +170,5 @@ final class PersonCropEngine implements AutoCloseable {
 
     @Override public void close() {
         try { personDetector.close(); } catch (Throwable ignored) {}
-        try { faceDetector.close(); } catch (Throwable ignored) {}
-        try { ageClassifier.close(); } catch (Throwable ignored) {}
     }
 }
