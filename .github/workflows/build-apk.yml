@@ -1,0 +1,54 @@
+name: Build Akilli Kisi Kirpma APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Kodu al
+        uses: actions/checkout@v5
+
+      - name: Java 17 kur
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK kur
+        uses: android-actions/setup-android@v3
+
+      - name: API 37 kur
+        run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+
+      - name: Yapay zeka modellerini indir
+        run: |
+          mkdir -p app/src/main/assets
+          curl -L --fail --retry 3 \
+            "https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_efficientdet_lite0_detection_metadata_1.tflite" \
+            -o app/src/main/assets/efficientdet-lite0.tflite
+          curl -L --fail --retry 3 \
+            "https://raw.githubusercontent.com/radualexandrub/Android-Age-Classification/master/AndroidAge_quant.tflite" \
+            -o app/src/main/assets/AndroidAge_quant.tflite
+          test -s app/src/main/assets/efficientdet-lite0.tflite
+          test -s app/src/main/assets/AndroidAge_quant.tflite
+
+      - name: Gradle 9.5 kur
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.5.0'
+
+      - name: Debug APK derle
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: APK artifact yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: Akilli-Kisi-Kirpma-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
