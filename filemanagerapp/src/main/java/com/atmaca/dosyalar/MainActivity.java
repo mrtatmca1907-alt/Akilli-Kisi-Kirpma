@@ -1,28 +1,37 @@
 package com.atmaca.dosyalar;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
+import android.os.Environment;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
@@ -41,37 +50,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends Activity {
     private static final int NAVY = Color.rgb(8, 20, 38);
-    private static final int NAVY_2 = Color.rgb(18, 35, 56);
+    private static final int NAVY_2 = Color.rgb(24, 42, 64);
     private static final int YELLOW = Color.rgb(244, 196, 48);
-    private static final int REQUEST_LOCAL = 101;
     private static final int REQUEST_CLOUD = 102;
-
+    private static final int REQUEST_STORAGE = 103;
     private static final String PREFS = "atmaca_files";
-    private static final String KEY_LOCAL = "local_root";
     private static final String KEY_CLOUD = "cloud_root";
 
     private final ExecutorService io = Executors.newSingleThreadExecutor();
-    private final AtomicInteger loadGeneration = new AtomicInteger();
+    private final AtomicInteger generation = new AtomicInteger();
     private final ArrayDeque<DocumentFile> navStack = new ArrayDeque<>();
     private final List<DocumentFile> items = new ArrayList<>();
     private final Set<String> selected = new LinkedHashSet<>();
     private final List<DocumentFile> clipboard = new ArrayList<>();
 
     private SharedPreferences prefs;
-    private Uri localRootUri;
     private Uri cloudRootUri;
-    private boolean showingCloud;
-    private boolean moveClipboard;
-
     private DocumentFile currentDir;
-    private FileAdapter adapter;
+    private boolean showingCloud = false;
+    private boolean moveClipboard = false;
+    private File pendingLocalDir;
+
+    private LinearLayout root;
+    private LinearLayout content;
     private TextView title;
-    private TextView path;
+    private TextView subtitle;
     private TextView status;
     private ListView list;
+    private FileAdapter adapter;
     private Button pasteButton;
-    private Button phoneButton;
-    private Button cloudButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,352 +86,375 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(NAVY);
         getWindow().setNavigationBarColor(NAVY);
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
-        localRootUri = parseUri(prefs.getString(KEY_LOCAL, null));
-        cloudRootUri = parseUri(prefs.getString(KEY_CLOUD, null));
-        buildUi();
-
-        if (localRootUri != null) {
-            switchRoot(false);
-        } else if (cloudRootUri != null) {
-            switchRoot(true);
-        } else {
-            status.setText("İlk kurulum: TELEFON'a basıp telefon depolamasının kökünü seç. Bulut için BULUT'a bas.");
+        String savedCloud = prefs.getString(KEY_CLOUD, null);
+        if (savedCloud != null && !savedCloud.isBlank()) {
+            try { cloudRootUri = Uri.parse(savedCloud); } catch (Exception ignored) { }
         }
+        buildBaseUi();
+        showHome();
     }
 
-    private void buildUi() {
-        LinearLayout root = new LinearLayout(this);
+    private void buildBaseUi() {
+        root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(NAVY);
+        root.setBackgroundColor(Color.rgb(247, 247, 247));
 
-        LinearLayout header = new LinearLayout(this);
-        header.setOrientation(LinearLayout.VERTICAL);
-        header.setPadding(dp(12), dp(8), dp(12), dp(8));
-        header.setBackgroundColor(NAVY);
+        LinearLayout bar = new LinearLayout(this);
+        bar.setOrientation(LinearLayout.VERTICAL);
+        bar.setPadding(dp(16), dp(10), dp(16), dp(10));
+        bar.setBackgroundColor(NAVY);
 
         title = new TextView(this);
         title.setText("ATMACA Dosyalar");
-        title.setTextSize(25);
+        title.setTextSize(24);
         title.setTextColor(YELLOW);
         title.setGravity(Gravity.START);
-        header.addView(title);
+        bar.addView(title);
 
-        path = new TextView(this);
-        path.setText("Kök seçilmedi");
-        path.setTextColor(Color.LTGRAY);
-        path.setTextSize(12);
-        path.setSingleLine(true);
-        header.addView(path);
+        subtitle = new TextView(this);
+        subtitle.setText("Basit • hızlı • tarama yapmaz");
+        subtitle.setTextSize(12);
+        subtitle.setTextColor(Color.LTGRAY);
+        bar.addView(subtitle);
+        root.addView(bar);
 
-        root.addView(header, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setBackgroundColor(Color.rgb(247, 247, 247));
+        root.addView(content, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+        setContentView(root);
+    }
 
-        LinearLayout sourceRow = new LinearLayout(this);
-        sourceRow.setOrientation(LinearLayout.HORIZONTAL);
-        sourceRow.setPadding(dp(6), dp(4), dp(6), dp(4));
+    private void showHome() {
+        generation.incrementAndGet();
+        currentDir = null;
+        showingCloud = false;
+        navStack.clear();
+        selected.clear();
+        content.removeAllViews();
+        title.setText("ATMACA Dosyalar");
+        subtitle.setText("İstediğine bas, direkt açılsın");
 
-        phoneButton = actionButton("TELEFON");
-        cloudButton = actionButton("BULUT");
-        Button up = actionButton("↑ ÜST");
-        Button refresh = actionButton("YENİLE");
-        Button newFolder = actionButton("+ KLASÖR");
+        GridLayout grid = new GridLayout(this);
+        grid.setColumnCount(2);
+        grid.setPadding(dp(10), dp(14), dp(10), dp(10));
+        grid.setUseDefaultMargins(false);
 
-        addEqual(sourceRow, phoneButton);
-        addEqual(sourceRow, cloudButton);
-        addEqual(sourceRow, up);
-        addEqual(sourceRow, refresh);
-        addEqual(sourceRow, newFolder);
-        root.addView(sourceRow);
+        addHomeTile(grid, "📁", "Ana bellek", "Tüm klasörler", () -> openLocal(Environment.getExternalStorageDirectory()));
+        addHomeTile(grid, "⬇", "İndirilenler", "Download", () -> openLocal(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)));
+        addHomeTile(grid, "🖼", "Görüntüler", "Pictures", () -> openLocal(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)));
+        addHomeTile(grid, "▶", "Videolar", "Movies", () -> openLocal(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)));
+        addHomeTile(grid, "📄", "Belgeler", "Documents", () -> openLocal(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)));
+        addHomeTile(grid, "☁", "Bulut", "Drive / OneDrive vb.", this::openCloud);
 
-        HorizontalScrollView shortcutsScroll = new HorizontalScrollView(this);
-        shortcutsScroll.setHorizontalScrollBarEnabled(false);
-        LinearLayout shortcuts = new LinearLayout(this);
-        shortcuts.setOrientation(LinearLayout.HORIZONTAL);
-        shortcuts.setPadding(dp(6), dp(2), dp(6), dp(4));
-        shortcutsScroll.addView(shortcuts);
-        addShortcut(shortcuts, "ReelDrop", new String[]{"Download", "ReelDrop"});
-        addShortcut(shortcuts, "Kişi Kırpma", new String[]{"Pictures", "AkilliKisiKirpma"});
-        addShortcut(shortcuts, "Video Kareleri", new String[]{"Pictures", "VideoKareleri"});
-        addShortcut(shortcuts, "Video İndirici", new String[]{"Movies", "CokluVideoIndirici"});
-        addShortcut(shortcuts, "İndirilenler", new String[]{"Download"});
-        root.addView(shortcutsScroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        content.addView(grid, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        TextView note = new TextView(this);
+        note.setText("Bellek analizi, yeni dosyalar taraması, gereksiz sayaçlar yok. Uygulama sadece açtığın klasörü listeler.");
+        note.setTextColor(Color.DKGRAY);
+        note.setTextSize(13);
+        note.setPadding(dp(20), dp(16), dp(20), dp(10));
+        content.addView(note);
+    }
+
+    private void addHomeTile(GridLayout grid, String icon, String name, String small, Runnable action) {
+        LinearLayout tile = new LinearLayout(this);
+        tile.setOrientation(LinearLayout.VERTICAL);
+        tile.setGravity(Gravity.CENTER);
+        tile.setPadding(dp(8), dp(16), dp(8), dp(16));
+        tile.setBackground(roundRect(Color.WHITE, dp(18), Color.rgb(220, 220, 220)));
+
+        TextView i = new TextView(this);
+        i.setText(icon);
+        i.setTextSize(36);
+        i.setGravity(Gravity.CENTER);
+        tile.addView(i);
+
+        TextView n = new TextView(this);
+        n.setText(name);
+        n.setTextSize(18);
+        n.setTextColor(NAVY);
+        n.setGravity(Gravity.CENTER);
+        tile.addView(n);
+
+        TextView s = new TextView(this);
+        s.setText(small);
+        s.setTextSize(11);
+        s.setTextColor(Color.GRAY);
+        s.setGravity(Gravity.CENTER);
+        tile.addView(s);
+
+        GridLayout.LayoutParams p = new GridLayout.LayoutParams();
+        p.width = 0;
+        p.height = dp(142);
+        p.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+        p.setMargins(dp(6), dp(6), dp(6), dp(6));
+        grid.addView(tile, p);
+        tile.setOnClickListener(v -> action.run());
+    }
+
+    private GradientDrawable roundRect(int fill, int radius, int stroke) {
+        GradientDrawable d = new GradientDrawable();
+        d.setColor(fill);
+        d.setCornerRadius(radius);
+        d.setStroke(dp(1), stroke);
+        return d;
+    }
+
+    private void openLocal(File dir) {
+        pendingLocalDir = dir;
+        if (!hasStorageAccess()) {
+            requestStorageAccess();
+            return;
+        }
+        if (dir == null || (!dir.exists() && !dir.mkdirs())) {
+            Toast.makeText(this, "Klasör açılamadı", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        showingCloud = false;
+        navStack.clear();
+        DocumentFile rootDoc = DocumentFile.fromFile(Environment.getExternalStorageDirectory());
+        navStack.add(rootDoc);
+        if (!dir.equals(Environment.getExternalStorageDirectory())) {
+            DocumentFile target = DocumentFile.fromFile(dir);
+            navStack.add(target);
+            currentDir = target;
+        } else {
+            currentDir = rootDoc;
+        }
+        selected.clear();
+        showBrowser();
+    }
+
+    private boolean hasStorageAccess() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) return Environment.isExternalStorageManager();
+        return checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestStorageAccess() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                Intent i = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivity(i);
+            } catch (Exception e) {
+                startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+            }
+        } else {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (pendingLocalDir != null && hasStorageAccess() && currentDir == null) {
+            File wanted = pendingLocalDir;
+            pendingLocalDir = null;
+            openLocal(wanted);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_STORAGE && hasStorageAccess() && pendingLocalDir != null) {
+            File wanted = pendingLocalDir;
+            pendingLocalDir = null;
+            openLocal(wanted);
+        }
+    }
+
+    private void openCloud() {
+        if (cloudRootUri == null) {
+            pickCloud();
+            return;
+        }
+        DocumentFile rootDoc = DocumentFile.fromTreeUri(this, cloudRootUri);
+        if (rootDoc == null || !rootDoc.exists()) {
+            cloudRootUri = null;
+            prefs.edit().remove(KEY_CLOUD).apply();
+            pickCloud();
+            return;
+        }
+        showingCloud = true;
+        navStack.clear();
+        navStack.add(rootDoc);
+        currentDir = rootDoc;
+        selected.clear();
+        showBrowser();
+    }
+
+    private void pickCloud() {
+        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        startActivityForResult(i, REQUEST_CLOUD);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_CLOUD || resultCode != RESULT_OK || data == null || data.getData() == null) return;
+        Uri uri = data.getData();
+        int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        try { getContentResolver().takePersistableUriPermission(uri, flags); } catch (Exception ignored) { }
+        cloudRootUri = uri;
+        prefs.edit().putString(KEY_CLOUD, uri.toString()).apply();
+        openCloud();
+    }
+
+    private void showBrowser() {
+        content.removeAllViews();
+        title.setText(showingCloud ? "Bulut" : "Dosyalar");
+        subtitle.setText(breadcrumb());
+
+        LinearLayout top = new LinearLayout(this);
+        top.setOrientation(LinearLayout.HORIZONTAL);
+        top.setPadding(dp(6), dp(5), dp(6), dp(5));
+        Button home = smallButton("⌂ ANA");
+        Button up = smallButton("↑ ÜST");
+        Button refresh = smallButton("YENİLE");
+        Button folder = smallButton("+ KLASÖR");
+        addEqual(top, home);
+        addEqual(top, up);
+        addEqual(top, refresh);
+        addEqual(top, folder);
+        content.addView(top);
 
         status = new TextView(this);
-        status.setTextColor(Color.LTGRAY);
+        status.setTextColor(Color.DKGRAY);
         status.setTextSize(12);
-        status.setPadding(dp(12), dp(5), dp(12), dp(5));
-        status.setText("Hazır");
-        root.addView(status);
+        status.setPadding(dp(12), dp(4), dp(12), dp(6));
+        status.setText("Açılıyor…");
+        content.addView(status);
 
         list = new ListView(this);
         list.setDividerHeight(1);
-        list.setBackgroundColor(Color.rgb(12, 26, 44));
+        list.setBackgroundColor(Color.WHITE);
         adapter = new FileAdapter();
         list.setAdapter(adapter);
-        root.addView(list, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+        content.addView(list, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
 
-        LinearLayout actions1 = new LinearLayout(this);
-        actions1.setOrientation(LinearLayout.HORIZONTAL);
-        actions1.setPadding(dp(6), dp(4), dp(6), dp(2));
-        Button copy = actionButton("KOPYALA");
-        Button move = actionButton("TAŞI");
-        pasteButton = actionButton("YAPIŞTIR");
-        addEqual(actions1, copy);
-        addEqual(actions1, move);
-        addEqual(actions1, pasteButton);
-        root.addView(actions1);
-
-        LinearLayout actions2 = new LinearLayout(this);
-        actions2.setOrientation(LinearLayout.HORIZONTAL);
-        actions2.setPadding(dp(6), dp(2), dp(6), dp(6));
-        Button share = actionButton("PAYLAŞ");
-        Button delete = actionButton("SİL");
-        Button selectAll = actionButton("TÜMÜ");
-        addEqual(actions2, share);
-        addEqual(actions2, delete);
-        addEqual(actions2, selectAll);
-        root.addView(actions2);
-
-        setContentView(root);
+        LinearLayout actions = new LinearLayout(this);
+        actions.setOrientation(LinearLayout.HORIZONTAL);
+        actions.setPadding(dp(6), dp(4), dp(6), dp(6));
+        Button copy = smallButton("KOPYALA");
+        Button move = smallButton("TAŞI");
+        pasteButton = smallButton("YAPIŞTIR");
+        Button share = smallButton("PAYLAŞ");
+        Button delete = smallButton("SİL");
+        addEqual(actions, copy);
+        addEqual(actions, move);
+        addEqual(actions, pasteButton);
+        addEqual(actions, share);
+        addEqual(actions, delete);
+        content.addView(actions);
         refreshPasteButton();
 
-        phoneButton.setOnClickListener(v -> {
-            if (localRootUri == null) pickTree(REQUEST_LOCAL);
-            else switchRoot(false);
-        });
-        phoneButton.setOnLongClickListener(v -> { pickTree(REQUEST_LOCAL); return true; });
-        cloudButton.setOnClickListener(v -> {
-            if (cloudRootUri == null) pickTree(REQUEST_CLOUD);
-            else switchRoot(true);
-        });
-        cloudButton.setOnLongClickListener(v -> { pickTree(REQUEST_CLOUD); return true; });
+        home.setOnClickListener(v -> showHome());
         up.setOnClickListener(v -> goUp());
         refresh.setOnClickListener(v -> loadCurrent());
-        newFolder.setOnClickListener(v -> createFolderDialog());
+        folder.setOnClickListener(v -> createFolderDialog());
+        copy.setOnClickListener(v -> setClipboard(false));
+        move.setOnClickListener(v -> setClipboard(true));
+        pasteButton.setOnClickListener(v -> paste());
+        share.setOnClickListener(v -> shareSelected());
+        delete.setOnClickListener(v -> deleteSelected());
 
         list.setOnItemClickListener((parent, view, position, id) -> {
             if (position < 0 || position >= items.size()) return;
-            DocumentFile file = items.get(position);
-            if (!selected.isEmpty()) {
-                toggle(file);
-                return;
-            }
-            if (file.isDirectory()) openDirectory(file);
-            else openFile(file);
+            DocumentFile f = items.get(position);
+            if (!selected.isEmpty()) toggle(f);
+            else if (f.isDirectory()) openDirectory(f);
+            else openFile(f);
         });
         list.setOnItemLongClickListener((parent, view, position, id) -> {
             if (position >= 0 && position < items.size()) toggle(items.get(position));
             return true;
         });
 
-        copy.setOnClickListener(v -> setClipboard(false));
-        move.setOnClickListener(v -> setClipboard(true));
-        pasteButton.setOnClickListener(v -> paste());
-        share.setOnClickListener(v -> shareSelected());
-        delete.setOnClickListener(v -> deleteSelected());
-        selectAll.setOnClickListener(v -> {
-            if (items.isEmpty()) return;
-            if (selected.size() == items.size()) selected.clear();
-            else {
-                selected.clear();
-                for (DocumentFile f : items) selected.add(f.getUri().toString());
-            }
-            updateSelectionStatus();
-            adapter.notifyDataSetChanged();
-        });
+        loadCurrent();
     }
 
-    private Button actionButton(String text) {
+    private Button smallButton(String text) {
         Button b = new Button(this);
         b.setText(text);
-        b.setTextSize(11);
+        b.setTextSize(10);
         b.setTextColor(NAVY);
-        b.setBackgroundColor(YELLOW);
+        b.setBackground(roundRect(YELLOW, dp(8), YELLOW));
         b.setAllCaps(false);
         b.setPadding(dp(2), 0, dp(2), 0);
         return b;
     }
 
-    private void addEqual(LinearLayout row, View view) {
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, dp(46), 1f);
+    private void addEqual(LinearLayout row, View v) {
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, dp(44), 1f);
         p.setMargins(dp(2), 0, dp(2), 0);
-        row.addView(view, p);
-    }
-
-    private void addShortcut(LinearLayout row, String label, String[] segments) {
-        Button b = actionButton(label);
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(dp(125), dp(40));
-        p.setMargins(dp(2), 0, dp(2), 0);
-        row.addView(b, p);
-        b.setOnClickListener(v -> openQuickPath(segments));
-    }
-
-    private void pickTree(int requestCode) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
-                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
-        startActivityForResult(intent, requestCode);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
-        if (requestCode != REQUEST_LOCAL && requestCode != REQUEST_CLOUD) return;
-
-        Uri uri = data.getData();
-        int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        try { getContentResolver().takePersistableUriPermission(uri, flags); } catch (Exception ignored) { }
-
-        if (requestCode == REQUEST_LOCAL) {
-            localRootUri = uri;
-            prefs.edit().putString(KEY_LOCAL, uri.toString()).apply();
-            switchRoot(false);
-        } else {
-            cloudRootUri = uri;
-            prefs.edit().putString(KEY_CLOUD, uri.toString()).apply();
-            switchRoot(true);
-        }
-    }
-
-    private void switchRoot(boolean cloud) {
-        Uri uri = cloud ? cloudRootUri : localRootUri;
-        if (uri == null) {
-            pickTree(cloud ? REQUEST_CLOUD : REQUEST_LOCAL);
-            return;
-        }
-        DocumentFile root = DocumentFile.fromTreeUri(this, uri);
-        if (root == null || !root.exists()) {
-            Toast.makeText(this, "Bu bağlantı artık açılamıyor. Yeniden seç.", Toast.LENGTH_LONG).show();
-            if (cloud) pickTree(REQUEST_CLOUD); else pickTree(REQUEST_LOCAL);
-            return;
-        }
-        showingCloud = cloud;
-        navStack.clear();
-        navStack.addLast(root);
-        currentDir = root;
-        selected.clear();
-        updateSourceButtons();
-        loadCurrent();
-    }
-
-    private void updateSourceButtons() {
-        phoneButton.setText(showingCloud ? "TELEFON" : "● TELEFON");
-        cloudButton.setText(showingCloud ? "● BULUT" : "BULUT");
+        row.addView(v, p);
     }
 
     private void openDirectory(DocumentFile dir) {
-        if (!dir.isDirectory()) return;
         navStack.addLast(dir);
         currentDir = dir;
         selected.clear();
+        subtitle.setText(breadcrumb());
         loadCurrent();
     }
 
     private void goUp() {
         if (navStack.size() <= 1) {
-            Toast.makeText(this, "Köktesin", Toast.LENGTH_SHORT).show();
+            showHome();
             return;
         }
         navStack.removeLast();
         currentDir = navStack.peekLast();
         selected.clear();
+        subtitle.setText(breadcrumb());
         loadCurrent();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!selected.isEmpty()) {
-            selected.clear();
-            updateSelectionStatus();
-            adapter.notifyDataSetChanged();
-        } else if (navStack.size() > 1) {
-            goUp();
-        } else {
-            super.onBackPressed();
+    private String breadcrumb() {
+        if (navStack.isEmpty()) return "";
+        StringBuilder b = new StringBuilder(showingCloud ? "Bulut" : "Telefon");
+        for (DocumentFile f : navStack) {
+            String n = safeName(f);
+            if (n.equalsIgnoreCase("emulated") || n.equals("0")) continue;
+            b.append(" / ").append(n);
         }
+        return b.toString();
     }
 
     private void loadCurrent() {
         DocumentFile dir = currentDir;
         if (dir == null) return;
-        int generation = loadGeneration.incrementAndGet();
+        int g = generation.incrementAndGet();
         status.setText("Klasör açılıyor…");
-        path.setText((showingCloud ? "Bulut" : "Telefon") + " / " + breadcrumb());
         io.execute(() -> {
             DocumentFile[] files;
-            try {
-                files = dir.listFiles();
-            } catch (Exception e) {
-                files = new DocumentFile[0];
-            }
+            try { files = dir.listFiles(); }
+            catch (Exception e) { files = new DocumentFile[0]; }
             Arrays.sort(files, Comparator
                     .comparing((DocumentFile f) -> !f.isDirectory())
                     .thenComparing(f -> safeName(f).toLowerCase(Locale.getDefault())));
             List<DocumentFile> loaded = Arrays.asList(files);
             runOnUiThread(() -> {
-                if (generation != loadGeneration.get() || currentDir != dir) return;
+                if (g != generation.get() || currentDir != dir) return;
                 items.clear();
                 items.addAll(loaded);
                 selected.retainAll(uriSet(items));
                 adapter.notifyDataSetChanged();
-                status.setText(items.size() + " öğe • sadece bu klasör listelendi, arka planda tarama yok");
+                status.setText(items.size() + " öğe • arka planda tarama yok");
             });
         });
     }
 
-    private String breadcrumb() {
-        StringBuilder b = new StringBuilder();
-        boolean first = true;
-        for (DocumentFile f : navStack) {
-            if (!first) b.append(" / ");
-            b.append(safeName(f));
-            first = false;
-        }
-        return b.toString();
-    }
-
-    private void openQuickPath(String[] segments) {
-        if (localRootUri == null) {
-            Toast.makeText(this, "Önce TELEFON kökünü bağla", Toast.LENGTH_SHORT).show();
-            pickTree(REQUEST_LOCAL);
-            return;
-        }
-        DocumentFile root = DocumentFile.fromTreeUri(this, localRootUri);
-        if (root == null) return;
-        List<DocumentFile> stack = new ArrayList<>();
-        stack.add(root);
-        DocumentFile cursor = root;
-        for (String segment : segments) {
-            DocumentFile next = cursor.findFile(segment);
-            if (next == null || !next.isDirectory()) {
-                Toast.makeText(this, segment + " klasörü bulunamadı", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            cursor = next;
-            stack.add(cursor);
-        }
-        showingCloud = false;
-        navStack.clear();
-        navStack.addAll(stack);
-        currentDir = cursor;
-        selected.clear();
-        updateSourceButtons();
-        loadCurrent();
-    }
-
-    private void toggle(DocumentFile file) {
-        String key = file.getUri().toString();
+    private void toggle(DocumentFile f) {
+        String key = f.getUri().toString();
         if (selected.contains(key)) selected.remove(key); else selected.add(key);
-        updateSelectionStatus();
+        status.setText(selected.isEmpty() ? items.size() + " öğe" : selected.size() + " öğe seçili");
         adapter.notifyDataSetChanged();
-    }
-
-    private void updateSelectionStatus() {
-        if (selected.isEmpty()) {
-            status.setText(items.size() + " öğe");
-        } else {
-            status.setText(selected.size() + " öğe seçili");
-        }
     }
 
     private List<DocumentFile> selectedFiles() {
@@ -445,7 +475,7 @@ public class MainActivity extends Activity {
         selected.clear();
         adapter.notifyDataSetChanged();
         refreshPasteButton();
-        status.setText(clipboard.size() + " öğe " + (move ? "taşınacak" : "kopyalanacak") + " • hedef klasöre git ve YAPIŞTIR'a bas");
+        status.setText(clipboard.size() + " öğe " + (move ? "taşınacak" : "kopyalanacak") + " • hedefe git, YAPIŞTIR de");
     }
 
     private void refreshPasteButton() {
@@ -463,7 +493,6 @@ public class MainActivity extends Activity {
         }
         List<DocumentFile> work = new ArrayList<>(clipboard);
         boolean move = moveClipboard;
-        status.setText("İşlem hazırlanıyor…");
         pasteButton.setEnabled(false);
         io.execute(() -> {
             int ok = 0;
@@ -472,27 +501,20 @@ public class MainActivity extends Activity {
                 DocumentFile src = work.get(i);
                 boolean done = false;
                 try {
-                    if (sameDocument(src, target)) {
-                        done = false;
-                    } else {
+                    if (!src.getUri().equals(target.getUri())) {
                         done = copyRecursive(src, target);
                         if (done && move) done = src.delete();
                     }
                 } catch (Exception ignored) { }
                 if (done) ok++; else fail++;
-                final int progress = i + 1;
-                final int total = work.size();
-                runOnUiThread(() -> status.setText(progress + " / " + total + " işleniyor…"));
+                int p = i + 1;
+                runOnUiThread(() -> status.setText(p + " / " + work.size() + " işleniyor…"));
             }
-            final int good = ok;
-            final int bad = fail;
+            int good = ok;
+            int bad = fail;
             runOnUiThread(() -> {
-                if (bad == 0) {
-                    clipboard.clear();
-                    refreshPasteButton();
-                } else {
-                    pasteButton.setEnabled(true);
-                }
+                if (bad == 0) clipboard.clear();
+                refreshPasteButton();
                 Toast.makeText(this, good + " tamamlandı" + (bad > 0 ? " • " + bad + " hata" : ""), Toast.LENGTH_LONG).show();
                 loadCurrent();
             });
@@ -503,31 +525,39 @@ public class MainActivity extends Activity {
         if (!src.exists()) return false;
         String name = uniqueName(targetDir, safeName(src), src.isDirectory());
         if (src.isDirectory()) {
-            DocumentFile created = targetDir.createDirectory(name);
-            if (created == null) return false;
-            for (DocumentFile child : src.listFiles()) {
-                if (!copyRecursive(child, created)) return false;
-            }
+            DocumentFile made = targetDir.createDirectory(name);
+            if (made == null) return false;
+            for (DocumentFile child : src.listFiles()) if (!copyRecursive(child, made)) return false;
             return true;
         }
-
         String mime = src.getType();
         if (mime == null || mime.isBlank()) mime = "application/octet-stream";
-        DocumentFile outFile = targetDir.createFile(mime, name);
-        if (outFile == null) return false;
+        DocumentFile out = targetDir.createFile(mime, name);
+        if (out == null) return false;
         boolean ok = false;
-        try (InputStream in = getContentResolver().openInputStream(src.getUri());
-             OutputStream out = getContentResolver().openOutputStream(outFile.getUri(), "w")) {
-            if (in == null || out == null) return false;
-            byte[] buffer = new byte[256 * 1024];
+        try (InputStream in = openInput(src); OutputStream os = openOutput(out)) {
+            if (in == null || os == null) return false;
+            byte[] buffer = new byte[512 * 1024];
             int n;
-            while ((n = in.read(buffer)) != -1) out.write(buffer, 0, n);
-            out.flush();
+            while ((n = in.read(buffer)) != -1) os.write(buffer, 0, n);
+            os.flush();
             ok = true;
+            return true;
         } finally {
-            if (!ok) runCatchingDelete(outFile);
+            if (!ok) try { out.delete(); } catch (Exception ignored) { }
         }
-        return ok;
+    }
+
+    private InputStream openInput(DocumentFile f) throws Exception {
+        Uri u = f.getUri();
+        if ("file".equalsIgnoreCase(u.getScheme())) return new FileInputStream(new File(u.getPath()));
+        return getContentResolver().openInputStream(u);
+    }
+
+    private OutputStream openOutput(DocumentFile f) throws Exception {
+        Uri u = f.getUri();
+        if ("file".equalsIgnoreCase(u.getScheme())) return new FileOutputStream(new File(u.getPath()));
+        return getContentResolver().openOutputStream(u, "w");
     }
 
     private String uniqueName(DocumentFile dir, String original, boolean folder) {
@@ -542,35 +572,38 @@ public class MainActivity extends Activity {
             }
         }
         for (int i = 1; i < 10000; i++) {
-            String candidate = base + " (" + i + ")" + ext;
-            if (dir.findFile(candidate) == null) return candidate;
+            String n = base + " (" + i + ")" + ext;
+            if (dir.findFile(n) == null) return n;
         }
         return base + " " + System.currentTimeMillis() + ext;
-    }
-
-    private boolean sameDocument(DocumentFile a, DocumentFile b) {
-        return a != null && b != null && a.getUri().equals(b.getUri());
     }
 
     private void shareSelected() {
         List<DocumentFile> chosen = selectedFiles();
         ArrayList<Uri> uris = new ArrayList<>();
-        for (DocumentFile f : chosen) if (f.isFile()) uris.add(f.getUri());
+        for (DocumentFile f : chosen) {
+            if (!f.isFile()) continue;
+            Uri u = f.getUri();
+            if ("file".equalsIgnoreCase(u.getScheme())) {
+                try {
+                    u = FileProvider.getUriForFile(this, getPackageName() + ".files", new File(u.getPath()));
+                } catch (Exception ignored) { continue; }
+            }
+            uris.add(u);
+        }
         if (uris.isEmpty()) {
             Toast.makeText(this, "Paylaşmak için dosya seç", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        Intent intent = new Intent(uris.size() == 1 ? Intent.ACTION_SEND : Intent.ACTION_SEND_MULTIPLE);
-        intent.setType("*/*");
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if (uris.size() == 1) intent.putExtra(Intent.EXTRA_STREAM, uris.get(0));
-        else intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-
+        Intent i = new Intent(uris.size() == 1 ? Intent.ACTION_SEND : Intent.ACTION_SEND_MULTIPLE);
+        i.setType("*/*");
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        if (uris.size() == 1) i.putExtra(Intent.EXTRA_STREAM, uris.get(0));
+        else i.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
         ClipData clip = ClipData.newUri(getContentResolver(), "ATMACA", uris.get(0));
-        for (int i = 1; i < uris.size(); i++) clip.addItem(new ClipData.Item(uris.get(i)));
-        intent.setClipData(clip);
-        startActivity(Intent.createChooser(intent, "Paylaş"));
+        for (int x = 1; x < uris.size(); x++) clip.addItem(new ClipData.Item(uris.get(x)));
+        i.setClipData(clip);
+        startActivity(Intent.createChooser(i, "Paylaş"));
     }
 
     private void deleteSelected() {
@@ -581,25 +614,23 @@ public class MainActivity extends Activity {
         }
         new AlertDialog.Builder(this)
                 .setTitle("Silinsin mi?")
-                .setMessage(chosen.size() + " öğe silinecek. Bu işlem sağlayıcıya göre geri alınamayabilir.")
+                .setMessage(chosen.size() + " öğe silinecek.")
                 .setNegativeButton("Vazgeç", null)
                 .setPositiveButton("Sil", (d, w) -> {
                     selected.clear();
                     adapter.notifyDataSetChanged();
-                    status.setText("Siliniyor…");
                     io.execute(() -> {
                         int ok = 0;
                         for (DocumentFile f : chosen) {
                             try { if (f.delete()) ok++; } catch (Exception ignored) { }
                         }
-                        final int count = ok;
+                        int count = ok;
                         runOnUiThread(() -> {
                             Toast.makeText(this, count + " öğe silindi", Toast.LENGTH_LONG).show();
                             loadCurrent();
                         });
                     });
-                })
-                .show();
+                }).show();
     }
 
     private void createFolderDialog() {
@@ -621,22 +652,38 @@ public class MainActivity extends Activity {
                         try { made = currentDir.createDirectory(name); } catch (Exception ignored) { }
                         DocumentFile finalMade = made;
                         runOnUiThread(() -> {
-                            Toast.makeText(this, finalMade != null ? "Klasör oluşturuldu" : "Klasör oluşturulamadı", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, finalMade != null ? "Klasör oluşturuldu" : "Oluşturulamadı", Toast.LENGTH_SHORT).show();
                             loadCurrent();
                         });
                     });
-                })
-                .show();
+                }).show();
     }
 
-    private void openFile(DocumentFile file) {
+    private void openFile(DocumentFile f) {
         try {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(file.getUri(), file.getType() == null ? "*/*" : file.getType());
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(intent);
+            Uri u = f.getUri();
+            if ("file".equalsIgnoreCase(u.getScheme())) {
+                u = FileProvider.getUriForFile(this, getPackageName() + ".files", new File(u.getPath()));
+            }
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setDataAndType(u, f.getType() == null ? "*/*" : f.getType());
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(i);
         } catch (Exception e) {
             Toast.makeText(this, "Bu dosyayı açacak uygulama bulunamadı", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!selected.isEmpty()) {
+            selected.clear();
+            if (adapter != null) adapter.notifyDataSetChanged();
+            if (status != null) status.setText(items.size() + " öğe");
+        } else if (currentDir != null) {
+            if (navStack.size() > 1) goUp(); else showHome();
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -646,22 +693,13 @@ public class MainActivity extends Activity {
         return out;
     }
 
-    private void runCatchingDelete(DocumentFile f) {
-        try { if (f != null) f.delete(); } catch (Exception ignored) { }
-    }
-
     private static String safeName(DocumentFile f) {
         String n = f == null ? null : f.getName();
-        return (n == null || n.isBlank()) ? "Adsız" : n;
+        return n == null || n.isBlank() ? "Adsız" : n;
     }
 
-    private Uri parseUri(String value) {
-        try { return value == null || value.isBlank() ? null : Uri.parse(value); }
-        catch (Exception e) { return null; }
-    }
-
-    private int dp(int value) {
-        return Math.round(value * getResources().getDisplayMetrics().density);
+    private int dp(int v) {
+        return Math.round(v * getResources().getDisplayMetrics().density);
     }
 
     @Override
@@ -692,30 +730,27 @@ public class MainActivity extends Activity {
                 row.setOrientation(LinearLayout.HORIZONTAL);
                 row.setGravity(Gravity.CENTER_VERTICAL);
                 row.setPadding(dp(10), dp(7), dp(10), dp(7));
-
                 icon = new TextView(MainActivity.this);
                 icon.setTextSize(24);
                 icon.setGravity(Gravity.CENTER);
-                row.addView(icon, new LinearLayout.LayoutParams(dp(46), dp(54)));
-
+                row.addView(icon, new LinearLayout.LayoutParams(dp(48), dp(58)));
                 LinearLayout texts = new LinearLayout(MainActivity.this);
                 texts.setOrientation(LinearLayout.VERTICAL);
                 name = new TextView(MainActivity.this);
                 name.setTextSize(16);
-                name.setTextColor(Color.WHITE);
+                name.setTextColor(NAVY);
                 name.setSingleLine(true);
                 detail = new TextView(MainActivity.this);
                 detail.setTextSize(11);
-                detail.setTextColor(Color.LTGRAY);
+                detail.setTextColor(Color.GRAY);
                 detail.setSingleLine(true);
                 texts.addView(name);
                 texts.addView(detail);
-                row.addView(texts, new LinearLayout.LayoutParams(0, dp(54), 1f));
+                row.addView(texts, new LinearLayout.LayoutParams(0, dp(58), 1f));
             }
-
             DocumentFile f = items.get(position);
             boolean sel = selected.contains(f.getUri().toString());
-            row.setBackgroundColor(sel ? Color.rgb(90, 76, 22) : (position % 2 == 0 ? Color.rgb(12, 26, 44) : NAVY_2));
+            row.setBackgroundColor(sel ? Color.rgb(255, 239, 179) : Color.WHITE);
             icon.setText(f.isDirectory() ? "📁" : iconFor(f));
             name.setText(safeName(f));
             detail.setText(f.isDirectory() ? "Klasör" : fileDetail(f));
@@ -731,6 +766,7 @@ public class MainActivity extends Activity {
         if (type.startsWith("audio/")) return "♫";
         if (type.contains("pdf")) return "PDF";
         if (type.contains("zip") || type.contains("rar") || type.contains("archive")) return "ZIP";
+        if (type.contains("android.package-archive")) return "APK";
         return "📄";
     }
 
@@ -738,8 +774,7 @@ public class MainActivity extends Activity {
         String size = formatSize(f.length());
         long changed = f.lastModified();
         if (changed <= 0) return size;
-        String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(changed));
-        return size + " • " + date;
+        return size + " • " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(changed));
     }
 
     private String formatSize(long bytes) {
