@@ -6,10 +6,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 final class HunterDb extends SQLiteOpenHelper {
+    private static final String FILTER_VERSION = "2";
+    private static final Set<String> GENERIC_WORDS = new HashSet<>(Arrays.asList(
+            "foto", "fotograf", "fotografi", "photo", "photos", "image", "images",
+            "galeri", "gallery", "video", "videos", "picture", "pictures", "fotos", "bilder"
+    ));
+
     static final class Row {
         long id;
         String url;
@@ -43,18 +56,16 @@ final class HunterDb extends SQLiteOpenHelper {
 
     synchronized boolean prepareQuery(String query) {
         SQLiteDatabase db = getWritableDatabase();
-        String old = null;
-        try (Cursor c = db.rawQuery("SELECT v FROM meta WHERE k='query'", null)) {
-            if (c.moveToFirst()) old = c.getString(0);
-        }
-        if (old == null || !old.equalsIgnoreCase(query.trim())) {
+        String wanted = query == null ? "" : query.trim();
+        String old = meta(db, "query");
+        String oldFilter = meta(db, "filter_version");
+
+        if (old == null || !old.equalsIgnoreCase(wanted) || !FILTER_VERSION.equals(oldFilter)) {
             db.beginTransaction();
             try {
                 db.delete("media", null, null);
-                ContentValues cv = new ContentValues();
-                cv.put("k", "query");
-                cv.put("v", query.trim());
-                db.insertWithOnConflict("meta", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+                putMeta(db, "query", wanted);
+                putMeta(db, "filter_version", FILTER_VERSION);
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
@@ -66,6 +77,12 @@ final class HunterDb extends SQLiteOpenHelper {
 
     synchronized boolean add(String url, String kind, String source) {
         if (url == null || url.trim().isEmpty()) return false;
+
+        // Sınırsız tarama yalnızca derinliği artırmalı; alakasız görselleri kabul etmemeli.
+        // Bu yüzden URL + kaynak sayfa adresinde aranan kişinin bütün anlamlı kelimeleri bulunmadan
+        // medya veritabanına girmiyor. Örn. "Pelin Akil" için hem "pelin" hem "akil" kanıtı aranır.
+        if (!isRelevant(url, source)) return false;
+
         ContentValues cv = new ContentValues();
         cv.put("url", url.trim());
         cv.put("kind", kind == null ? "image" : kind);
@@ -73,6 +90,57 @@ final class HunterDb extends SQLiteOpenHelper {
         long id = getWritableDatabase().insertWithOnConflict(
                 "media", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
         return id != -1;
+    }
+
+    private boolean isRelevant(String url, String source) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = meta(db, "query");
+        if (query == null || query.trim().isEmpty()) return true;
+
+        List<String> wanted = meaningfulTokens(query);
+        if (wanted.isEmpty()) return true;
+
+        String evidence = normalize((url == null ? "" : url) + " " + (source == null ? "" : source));
+        Set<String> evidenceTokens = new HashSet<>(Arrays.asList(evidence.split("\\s+")));
+        for (String token : wanted) {
+            if (!evidenceTokens.contains(token)) return false;
+        }
+        return true;
+    }
+
+    private List<String> meaningfulTokens(String text) {
+        String n = normalize(text);
+        ArrayList<String> out = new ArrayList<>();
+        for (String token : n.split("\\s+")) {
+            if (token.length() < 2 || GENERIC_WORDS.contains(token)) continue;
+            if (!out.contains(token)) out.add(token);
+        }
+        return out;
+    }
+
+    private String normalize(String text) {
+        if (text == null) return "";
+        String decoded = text;
+        try { decoded = URLDecoder.decode(text, StandardCharsets.UTF_8.name()); } catch (Throwable ignored) {}
+        String s = Normalizer.normalize(decoded, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "")
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^\\p{L}\\p{N}]+", " ")
+                .trim();
+        return s.replaceAll("\\s+", " ");
+    }
+
+    private String meta(SQLiteDatabase db, String key) {
+        try (Cursor c = db.rawQuery("SELECT v FROM meta WHERE k=?", new String[]{key})) {
+            return c.moveToFirst() ? c.getString(0) : null;
+        }
+    }
+
+    private void putMeta(SQLiteDatabase db, String key, String value) {
+        ContentValues cv = new ContentValues();
+        cv.put("k", key);
+        cv.put("v", value == null ? "" : value);
+        db.insertWithOnConflict("meta", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     synchronized void status(String url, String status, String filename, String hash) {
