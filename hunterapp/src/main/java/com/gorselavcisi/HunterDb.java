@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.Set;
 
 final class HunterDb extends SQLiteOpenHelper {
-    private static final String FILTER_VERSION = "2";
+    private static final String FILTER_VERSION = "3";
     private static final Set<String> GENERIC_WORDS = new HashSet<>(Arrays.asList(
             "foto", "fotograf", "fotografi", "photo", "photos", "image", "images",
             "galeri", "gallery", "video", "videos", "picture", "pictures", "fotos", "bilder"
@@ -78,9 +78,8 @@ final class HunterDb extends SQLiteOpenHelper {
     synchronized boolean add(String url, String kind, String source) {
         if (url == null || url.trim().isEmpty()) return false;
 
-        // Sınırsız tarama yalnızca derinliği artırmalı; alakasız görselleri kabul etmemeli.
-        // Bu yüzden URL + kaynak sayfa adresinde aranan kişinin bütün anlamlı kelimeleri bulunmadan
-        // medya veritabanına girmiyor. Örn. "Pelin Akil" için hem "pelin" hem "akil" kanıtı aranır.
+        // Tarama derinliği artabilir ama alaka filtresi gevşemez.
+        // En azından URL + kaynak adresi hedef arama teriminin bütün anlamlı kelimelerini taşımalı.
         if (!isRelevant(url, source)) return false;
 
         ContentValues cv = new ContentValues();
