@@ -2,6 +2,8 @@ name: Build Android APKs
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
@@ -38,7 +40,7 @@ jobs:
           gradle-version: '8.11.1'
 
       - name: APKleri derle
-        run: gradle :app:assembleDebug :videoapp:assembleDebug :downloaderapp:assembleDebug :filemanagerapp:assembleDebug :hunterapp:assembleDebug --stacktrace
+        run: gradle :app:assembleDebug :videoapp:assembleDebug :downloaderapp:assembleDebug :filemanagerapp:assembleDebug :hunterapp:assembleDebug :suiteapp:assembleDebug --stacktrace
 
       - name: Kisi Kirpma APK yukle
         uses: actions/upload-artifact@v4
@@ -69,4 +71,11 @@ jobs:
         with:
           name: Gorsel-Avcisi-APK
           path: hunterapp/build/outputs/apk/debug/hunterapp-debug.apk
+          if-no-files-found: error
+
+      - name: 5li Araclar deneme APK yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: Besli-Araclar-Deneme-APK
+          path: suiteapp/build/outputs/apk/debug/suiteapp-debug.apk
           if-no-files-found: error
