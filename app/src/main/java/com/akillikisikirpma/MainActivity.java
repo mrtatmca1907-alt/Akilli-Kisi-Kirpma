@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -185,7 +183,7 @@ public class MainActivity extends Activity {
             }
 
             int totalSaved = 0;
-            int totalBlocked = 0;
+            int totalSkipped = 0;
             int totalDetected = 0;
             int totalFailed = 0;
 
@@ -200,18 +198,18 @@ public class MainActivity extends Activity {
 
                     PersonCropEngine.ProcessResult r = engine.process(all.get(i));
                     totalSaved += r.saved;
-                    totalBlocked += r.blocked;
+                    totalSkipped += r.skipped;
                     totalDetected += r.detected;
                     totalFailed += r.failed;
 
                     final int fSaved = totalSaved;
-                    final int fBlocked = totalBlocked;
+                    final int fSkipped = totalSkipped;
                     final int fDetected = totalDetected;
                     final int fFailed = totalFailed;
                     runOnUiThread(() -> txtLog.setText(
                             "Algılanan kişi: " + fDetected
                                     + "\nKaydedilen: " + fSaved
-                                    + "\nÇocuk/belirsiz diye atlanan: " + fBlocked
+                                    + "\nÇok küçük alan atlandı: " + fSkipped
                                     + "\nHata: " + fFailed
                     ));
                 }
