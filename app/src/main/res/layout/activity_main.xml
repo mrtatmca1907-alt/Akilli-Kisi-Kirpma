@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Fotoğraf veya klasör seç. Her yetişkin kişi ayrı görsel olarak kaydedilir. Çocuk veya yaşı belirsiz görünen kişiler kaydedilmez."
+            android:text="Fotoğraf veya klasör seç. Algılanan her kişi ayrı görsel olarak kırpılıp kaydedilir."
             android:textColor="#D9E2F2"
             android:textSize="15sp" />
 
