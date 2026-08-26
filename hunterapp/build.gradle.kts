@@ -10,8 +10,8 @@ android {
         applicationId = "com.gorselavcisi"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2.0"
+        versionCode = 4
+        versionName = "1.3.0"
     }
 
     buildTypes {
@@ -31,10 +31,11 @@ dependencies {
     implementation("org.jsoup:jsoup:1.18.3")
 }
 
-// Derleme öncesi iki güvenlik/dogruluk yaması uygulanır:
+// Derleme öncesi doğruluk yamaları uygulanır:
 // 1) Android org.json için keySet() -> keys()
-// 2) Derin taramada bir sayfadaki her resmi körlemesine almak yerine yalnızca
-//    hedef kişiyi sayfa + görsel bağlamında doğrulayan medya toplanır.
+// 2) Derin taramada yalnızca hedef kişiyle bağlamı doğrulanan medya toplanır.
+// 3) SHA-256 farklı olsa bile aynı fotoğrafın yeniden boyutlandırılmış/sıkıştırılmış
+//    kopyaları 64-bit pHash ile tekilleştirilir.
 val patchHunterJson by tasks.registering {
     doLast {
         val source = file("src/main/java/com/gorselavcisi/HunterService.java")
@@ -67,17 +68,13 @@ val patchHunterJson by tasks.registering {
                     doc.select("meta[name=description],meta[property=og:description]").attr("content") + " " +
                     doc.select("h1").text();
 
-            // Aranan isim sayfanın kendisinde güçlü biçimde geçmiyorsa o sayfanın
-            // öneri/reklam/yan içerik görsellerini hiç toplamıyoruz.
             if (!mentionsTarget(pageEvidence)) return;
 
-            // Sayfanın ana/kapak görseli: sayfa hedefle ilgiliyse kabul edilir.
             for (Element m : doc.select("meta[property=og:image],meta[name=twitter:image],link[rel=image_src]")) {
                 String v = m.hasAttr("content") ? m.attr("content") : m.attr("href");
                 addCandidate(abs(pageUrl, v), "image", pageUrl);
             }
 
-            // Ana video metaları yalnızca doğrulanmış hedef sayfadan gelir.
             for (Element m : doc.select("meta[property=og:video],meta[property=og:video:url],meta[property=og:video:secure_url]")) {
                 String v = m.attr("content");
                 String u = abs(pageUrl, v);
@@ -85,9 +82,6 @@ val patchHunterJson by tasks.registering {
                 else if (u != null) addCandidate(u, "video_link", pageUrl);
             }
 
-            // Sayfadaki normal görseller artık yalnızca kendi alt/title/caption/link
-            // bağlamında hedef isim geçiyorsa kabul edilir. Böylece haber kenarındaki
-            // başka ünlüler, reklamlar ve öneri kutuları içeri girmez.
             for (Element img : doc.select("img")) {
                 String v = firstNonEmpty(img.attr("data-src"), img.attr("data-original"), img.attr("src"));
                 String u = abs(pageUrl, v);
@@ -110,14 +104,12 @@ val patchHunterJson by tasks.registering {
                 }
             }
 
-            // Sayfanın içindeki video etiketi, sayfa zaten hedefle doğrulandıysa tutulur.
             for (Element s : doc.select("video[src],video source[src],source[type^=video][src]")) {
                 String u = abs(pageUrl, s.attr("src"));
                 if (looksVideoFile(u)) addCandidate(u, "video", pageUrl);
                 else if (u != null) addCandidate(u, "video_link", pageUrl);
             }
 
-            // Doğrudan medya linklerinde de linkin kendi metni/adresi hedefle ilgili olmalı.
             for (Element a : doc.select("a[href]")) {
                 String u = abs(pageUrl, a.attr("href"));
                 String local = a.text() + " " + a.attr("title") + " " + a.attr("aria-label") + " " + u;
@@ -162,6 +154,36 @@ val patchHunterJson by tasks.registering {
 
 """.trimIndent() + "\n"
             text = text.substring(0, crawlStart) + strictCrawler + text.substring(crawlEnd)
+        }
+
+        // OutputManager içine algısal tekilleştirme ekle.
+        if (!text.contains("PerceptualDeduper perceptual")) {
+            text = text.replace(
+                "        private final String mode;\n        private ZipOutputStream zip;",
+                "        private final String mode;\n        private final PerceptualDeduper perceptual;\n        private ZipOutputStream zip;"
+            )
+            text = text.replace(
+                "            this.mode = mode;\n        }",
+                "            this.mode = mode;\n            this.perceptual = new PerceptualDeduper(service, slug);\n        }"
+            )
+            val exactBlock = """
+            if (service.db.hashExists(hash, row.url)) {
+                result.duplicate = true;
+                temp.delete();
+                return result;
+            }
+""".trimIndent()
+            val visualBlock = exactBlock + """
+
+            // SHA farklı olsa bile aynı fotoğrafın yeniden boyutlandırılmış, tekrar sıkıştırılmış
+            // veya hafif düzenlenmiş kopyalarını algısal hash ile ele.
+            if ("image".equals(row.kind) && perceptual.isDuplicateOrRemember(temp)) {
+                result.duplicate = true;
+                temp.delete();
+                return result;
+            }
+"""
+            text = text.replace(exactBlock, visualBlock)
         }
 
         source.writeText(text)
