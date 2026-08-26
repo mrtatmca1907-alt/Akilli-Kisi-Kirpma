@@ -34,11 +34,6 @@ jobs:
             -o app/src/main/assets/efficientdet-lite0.tflite
           test -s app/src/main/assets/efficientdet-lite0.tflite
 
-      - name: Downloader v2 kaynagini uygula
-        run: |
-          base64 -d downloaderapp/MainActivity.java.gz.b64 | gunzip > downloaderapp/src/main/java/com/cokluvideoindirici/MainActivity.java
-          test -s downloaderapp/src/main/java/com/cokluvideoindirici/MainActivity.java
-
       - name: Gradle 8.11.1 kur
         uses: gradle/actions/setup-gradle@v4
         with:
