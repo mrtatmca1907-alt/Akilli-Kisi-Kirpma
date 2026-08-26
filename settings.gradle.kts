@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "AkilliKisiKirpma"
-include(":app", ":videoapp")
+include(":app", ":videoapp", ":downloaderapp")
