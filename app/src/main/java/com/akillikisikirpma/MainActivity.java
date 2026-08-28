@@ -7,30 +7,25 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.documentfile.provider.DocumentFile;
-
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends Activity {
     private static final int REQ_PHOTOS = 1001;
     private static final int REQ_FOLDER = 1002;
     private static final int REQ_WRITE = 1003;
+    private static final int REQ_NOTIFICATIONS = 1004;
 
     private final List<Uri> selectedImages = new ArrayList<>();
     private final List<Uri> selectedFolders = new ArrayList<>();
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final AtomicBoolean stopRequested = new AtomicBoolean(false);
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     private Button btnPhotos;
     private Button btnFolder;
@@ -61,12 +56,11 @@ public class MainActivity extends Activity {
         btnFolder.setOnClickListener(v -> chooseFolder());
         btnClear.setOnClickListener(v -> clearSelections());
         btnStart.setOnClickListener(v -> requestStart());
-        btnStop.setOnClickListener(v -> {
-            stopRequested.set(true);
-            txtStatus.setText("Durdurma isteniyor…");
-        });
+        btnStop.setOnClickListener(v -> requestStop());
 
         updateSelectionText();
+        requestNotificationPermissionIfNeeded();
+        handler.post(statusPoller);
     }
 
     private void choosePhotos() {
@@ -81,7 +75,6 @@ public class MainActivity extends Activity {
     private void chooseFolder() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
                 | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
         startActivityForResult(intent, REQ_FOLDER);
@@ -118,19 +111,19 @@ public class MainActivity extends Activity {
 
     private void persistRead(Uri uri, int flags) {
         try {
-            int takeFlags = flags & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            int takeFlags = flags & Intent.FLAG_GRANT_READ_URI_PERMISSION;
             getContentResolver().takePersistableUriPermission(uri, takeFlags);
         } catch (Throwable ignored) {
         }
     }
 
     private void clearSelections() {
-        if (btnStop.isEnabled()) return;
+        if (StatusStore.read(this).running) return;
         selectedImages.clear();
         selectedFolders.clear();
         progress.setProgress(0);
         txtStatus.setText("Hazır");
-        txtLog.setText("");
+        txtLog.setText("İşlenen 0 • Algılanan 0 • Kaydedilen 0 • Hata 0");
         updateSelectionText();
     }
 
@@ -150,108 +143,63 @@ public class MainActivity extends Activity {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQ_WRITE);
             return;
         }
-        startProcessing();
+        startProcessingService();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQ_WRITE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startProcessing();
+            startProcessingService();
         }
     }
 
-    private void startProcessing() {
-        stopRequested.set(false);
-        setRunning(true);
-        progress.setProgress(0);
-        txtStatus.setText("Dosyalar hazırlanıyor…");
-        txtLog.setText("");
+    private void startProcessingService() {
+        ArrayList<String> images = new ArrayList<>();
+        for (Uri uri : selectedImages) images.add(uri.toString());
+        ArrayList<String> folders = new ArrayList<>();
+        for (Uri uri : selectedFolders) folders.add(uri.toString());
 
-        executor.submit(() -> {
-            Map<String, Uri> unique = new LinkedHashMap<>();
-            for (Uri uri : selectedImages) unique.put(uri.toString(), uri);
-            for (Uri tree : selectedFolders) collectImages(DocumentFile.fromTreeUri(this, tree), unique);
+        Intent service = new Intent(this, CropForegroundService.class)
+                .setAction(CropForegroundService.ACTION_START)
+                .putStringArrayListExtra(CropForegroundService.EXTRA_IMAGES, images)
+                .putStringArrayListExtra(CropForegroundService.EXTRA_FOLDERS, folders);
 
-            List<Uri> all = new ArrayList<>(unique.values());
-            if (all.isEmpty()) {
-                runOnUiThread(() -> {
-                    txtStatus.setText("Seçilen yerde fotoğraf bulunamadı");
-                    setRunning(false);
-                });
-                return;
-            }
-
-            int totalSaved = 0;
-            int totalSkipped = 0;
-            int totalDetected = 0;
-            int totalFailed = 0;
-
-            try (PersonCropEngine engine = new PersonCropEngine(this)) {
-                for (int i = 0; i < all.size(); i++) {
-                    if (stopRequested.get()) break;
-                    final int current = i + 1;
-                    runOnUiThread(() -> {
-                        progress.setProgress((int) ((current - 1) * 100f / all.size()));
-                        txtStatus.setText(current + "/" + all.size() + " işleniyor…");
-                    });
-
-                    PersonCropEngine.ProcessResult r = engine.process(all.get(i));
-                    totalSaved += r.saved;
-                    totalSkipped += r.skipped;
-                    totalDetected += r.detected;
-                    totalFailed += r.failed;
-
-                    final int fSaved = totalSaved;
-                    final int fSkipped = totalSkipped;
-                    final int fDetected = totalDetected;
-                    final int fFailed = totalFailed;
-                    runOnUiThread(() -> txtLog.setText(
-                            "Algılanan kişi: " + fDetected
-                                    + "\nKaydedilen: " + fSaved
-                                    + "\nÇok küçük alan atlandı: " + fSkipped
-                                    + "\nHata: " + fFailed
-                    ));
-                }
-            } catch (Throwable t) {
-                final String msg = t.getMessage() == null ? t.getClass().getSimpleName() : t.getMessage();
-                runOnUiThread(() -> txtLog.setText(txtLog.getText() + "\nMotor hatası: " + msg));
-            }
-
-            final boolean stopped = stopRequested.get();
-            final int fSaved = totalSaved;
-            runOnUiThread(() -> {
-                progress.setProgress(stopped ? progress.getProgress() : 100);
-                txtStatus.setText(stopped ? "Durduruldu • " + fSaved + " çıktı" : "Tamamlandı • " + fSaved + " çıktı");
-                setRunning(false);
-            });
-        });
+        StatusStore.write(this, true, 0, 0, 0, 0, 0, "Başlatılıyor…");
+        startForegroundService(service);
     }
 
-    private void collectImages(DocumentFile file, Map<String, Uri> out) {
-        if (file == null || stopRequested.get()) return;
-        try {
-            if (file.isFile()) {
-                String type = file.getType();
-                String name = file.getName();
-                boolean image = type != null && type.startsWith("image/");
-                if (!image && name != null) {
-                    String lower = name.toLowerCase();
-                    image = lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png")
-                            || lower.endsWith(".webp") || lower.endsWith(".heic") || lower.endsWith(".heif");
-                }
-                if (image) out.put(file.getUri().toString(), file.getUri());
-                return;
-            }
-            if (file.isDirectory()) {
-                for (DocumentFile child : file.listFiles()) {
-                    if (stopRequested.get()) return;
-                    collectImages(child, out);
-                }
-            }
-        } catch (Throwable ignored) {
+    private void requestStop() {
+        Intent stop = new Intent(this, CropForegroundService.class).setAction(CropForegroundService.ACTION_STOP);
+        startService(stop);
+        txtStatus.setText("Durdurma isteniyor…");
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_NOTIFICATIONS);
         }
     }
+
+    private final Runnable statusPoller = new Runnable() {
+        @Override
+        public void run() {
+            StatusStore.Snapshot s = StatusStore.read(MainActivity.this);
+            txtStatus.setText(s.status);
+            txtLog.setText(
+                    "İşlenen " + s.processed
+                            + " • Algılanan " + s.detected
+                            + " • Kaydedilen " + s.saved
+                            + " • Atlanan " + s.skipped
+                            + " • Hata " + s.failed
+            );
+            progress.setIndeterminate(s.running);
+            if (!s.running) progress.setProgress(s.status.startsWith("Tamamlandı") ? 100 : 0);
+            setRunning(s.running);
+            handler.postDelayed(this, 650);
+        }
+    };
 
     private void setRunning(boolean running) {
         btnPhotos.setEnabled(!running);
@@ -263,8 +211,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        stopRequested.set(true);
-        executor.shutdownNow();
+        handler.removeCallbacks(statusPoller);
         super.onDestroy();
     }
 }
