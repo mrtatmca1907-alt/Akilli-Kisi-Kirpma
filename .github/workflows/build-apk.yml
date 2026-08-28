@@ -3,7 +3,7 @@ name: Build Android APKs
 on:
   workflow_dispatch:
   push:
-    branches: [ main, screenshot-pro ]
+    branches: [ main, screenshot-pro, crop-paired-folders ]
 
 jobs:
   build:
@@ -39,13 +39,13 @@ jobs:
         with:
           gradle-version: '8.11.1'
 
-      - name: Screenshot APK derle
-        if: github.ref == 'refs/heads/screenshot-pro'
-        run: gradle :app:assembleDebug --stacktrace
+      - name: Screenshot test ve APK derle
+        if: github.ref == 'refs/heads/screenshot-pro' || github.ref == 'refs/heads/crop-paired-folders'
+        run: gradle :app:testDebugUnitTest :app:assembleDebug --stacktrace
 
       - name: Tum APKleri derle
         if: github.ref == 'refs/heads/main'
-        run: gradle :app:assembleDebug :videoapp:assembleDebug :downloaderapp:assembleDebug :filemanagerapp:assembleDebug :hunterapp:assembleDebug :suiteapp:assembleDebug --stacktrace
+        run: gradle :app:testDebugUnitTest :app:assembleDebug :videoapp:assembleDebug :downloaderapp:assembleDebug :filemanagerapp:assembleDebug :hunterapp:assembleDebug :suiteapp:assembleDebug --stacktrace
 
       - name: Screenshot APK yukle
         uses: actions/upload-artifact@v4
