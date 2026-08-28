@@ -35,6 +35,12 @@ final class PersonCropEngine implements AutoCloseable {
         int failed;
     }
 
+    private static final float PERSON_THRESHOLD = 0.58f;
+    private static final float MIN_AREA_RATIO = 0.012f;
+    private static final float MIN_SHARPNESS = 42f;
+    private static final float MIN_ASPECT = 0.22f;
+    private static final float MAX_ASPECT = 1.25f;
+
     private final Context context;
     private final ObjectDetector personDetector;
 
@@ -44,7 +50,7 @@ final class PersonCropEngine implements AutoCloseable {
         ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
                 .setBaseOptions(base)
                 .setMaxResults(30)
-                .setScoreThreshold(0.35f)
+                .setScoreThreshold(PERSON_THRESHOLD)
                 .build();
         personDetector = ObjectDetector.createFromFileAndOptions(
                 this.context,
@@ -66,8 +72,11 @@ final class PersonCropEngine implements AutoCloseable {
             List<Detection> detections = personDetector.detect(TensorImage.fromBitmap(bitmap));
             List<Detection> people = new ArrayList<>();
             for (Detection detection : detections) {
-                if (isPerson(detection)) people.add(detection);
+                if (isPerson(detection) && isSensiblePersonBox(detection.getBoundingBox(), bitmap.getWidth(), bitmap.getHeight())) {
+                    people.add(detection);
+                }
             }
+
             people.sort(Comparator
                     .comparingDouble((Detection d) -> d.getBoundingBox().top)
                     .thenComparingDouble(d -> d.getBoundingBox().left));
@@ -76,16 +85,19 @@ final class PersonCropEngine implements AutoCloseable {
             int personNo = 0;
             for (Detection detection : people) {
                 result.detected++;
-                personNo++;
-
                 Rect cropRect = expandedRect(detection.getBoundingBox(), bitmap.getWidth(), bitmap.getHeight());
-                if (cropRect.width() < 24 || cropRect.height() < 36) {
+                if (!isSensibleCrop(cropRect, bitmap.getWidth(), bitmap.getHeight())) {
                     result.skipped++;
                     continue;
                 }
 
                 Bitmap person = Bitmap.createBitmap(bitmap, cropRect.left, cropRect.top, cropRect.width(), cropRect.height());
                 try {
+                    if (sharpness(person) < MIN_SHARPNESS) {
+                        result.skipped++;
+                        continue;
+                    }
+                    personNo++;
                     if (saveBitmap(person, sourceBase, personNo)) result.saved++;
                     else result.failed++;
                 } finally {
@@ -103,18 +115,78 @@ final class PersonCropEngine implements AutoCloseable {
     private boolean isPerson(Detection detection) {
         for (Category c : detection.getCategories()) {
             String label = c.getLabel();
-            if (label != null && label.equalsIgnoreCase("person") && c.getScore() >= 0.35f) return true;
+            if (label != null && label.equalsIgnoreCase("person") && c.getScore() >= PERSON_THRESHOLD) return true;
         }
         return false;
+    }
+
+    private boolean isSensiblePersonBox(RectF box, int width, int height) {
+        float bw = Math.max(1f, box.width());
+        float bh = Math.max(1f, box.height());
+        float aspect = bw / bh;
+        float areaRatio = (bw * bh) / Math.max(1f, (float) width * height);
+        if (areaRatio < MIN_AREA_RATIO) return false;
+        if (aspect < MIN_ASPECT || aspect > MAX_ASPECT) return false;
+        if (bw < 48f || bh < 96f) return false;
+        return true;
+    }
+
+    private boolean isSensibleCrop(Rect crop, int imageWidth, int imageHeight) {
+        if (crop.width() < 64 || crop.height() < 120) return false;
+        float ratio = crop.width() / (float) crop.height();
+        if (ratio < 0.20f || ratio > 1.35f) return false;
+        float areaRatio = (crop.width() * crop.height()) / Math.max(1f, (float) imageWidth * imageHeight);
+        return areaRatio >= 0.015f;
+    }
+
+    private float sharpness(Bitmap bitmap) {
+        int targetW = Math.min(256, bitmap.getWidth());
+        int targetH = Math.min(256, bitmap.getHeight());
+        if (targetW < 3 || targetH < 3) return 0f;
+
+        Bitmap sample = bitmap;
+        boolean scaled = bitmap.getWidth() != targetW || bitmap.getHeight() != targetH;
+        if (scaled) sample = Bitmap.createScaledBitmap(bitmap, targetW, targetH, true);
+
+        try {
+            int[] pixels = new int[targetW * targetH];
+            sample.getPixels(pixels, 0, targetW, 0, 0, targetW, targetH);
+            double sum = 0;
+            double sumSq = 0;
+            int count = 0;
+            for (int y = 1; y < targetH - 1; y++) {
+                int row = y * targetW;
+                for (int x = 1; x < targetW - 1; x++) {
+                    int i = row + x;
+                    int c = gray(pixels[i]);
+                    int lap = (gray(pixels[i - 1]) + gray(pixels[i + 1]) + gray(pixels[i - targetW]) + gray(pixels[i + targetW])) - (4 * c);
+                    sum += lap;
+                    sumSq += (double) lap * lap;
+                    count++;
+                }
+            }
+            if (count == 0) return 0f;
+            double mean = sum / count;
+            return (float) Math.max(0, (sumSq / count) - (mean * mean));
+        } finally {
+            if (scaled && sample != bitmap && !sample.isRecycled()) sample.recycle();
+        }
+    }
+
+    private int gray(int color) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+        return (r * 299 + g * 587 + b * 114) / 1000;
     }
 
     private Rect expandedRect(RectF box, int width, int height) {
         float bw = Math.max(1f, box.width());
         float bh = Math.max(1f, box.height());
-        int left = Math.max(0, Math.round(box.left - bw * 0.20f));
-        int right = Math.min(width, Math.round(box.right + bw * 0.20f));
-        int top = Math.max(0, Math.round(box.top - bh * 0.16f));
-        int bottom = Math.min(height, Math.round(box.bottom + bh * 0.20f));
+        int left = Math.max(0, Math.round(box.left - bw * 0.12f));
+        int right = Math.min(width, Math.round(box.right + bw * 0.12f));
+        int top = Math.max(0, Math.round(box.top - bh * 0.10f));
+        int bottom = Math.min(height, Math.round(box.bottom + bh * 0.14f));
         if (right <= left) right = Math.min(width, left + 1);
         if (bottom <= top) bottom = Math.min(height, top + 1);
         return new Rect(left, top, right, bottom);
