@@ -16,12 +16,15 @@ import android.util.Size;
 
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.label.Category;
+import org.tensorflow.lite.task.core.BaseOptions;
 import org.tensorflow.lite.task.vision.detector.Detection;
 import org.tensorflow.lite.task.vision.detector.ObjectDetector;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 final class PersonCropEngine implements AutoCloseable {
@@ -37,8 +40,10 @@ final class PersonCropEngine implements AutoCloseable {
 
     PersonCropEngine(Context context) throws Exception {
         this.context = context.getApplicationContext();
+        BaseOptions base = BaseOptions.builder().setNumThreads(4).build();
         ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
-                .setMaxResults(20)
+                .setBaseOptions(base)
+                .setMaxResults(30)
                 .setScoreThreshold(0.35f)
                 .build();
         personDetector = ObjectDetector.createFromFileAndOptions(
@@ -59,9 +64,17 @@ final class PersonCropEngine implements AutoCloseable {
             }
 
             List<Detection> detections = personDetector.detect(TensorImage.fromBitmap(bitmap));
-            int personNo = 0;
+            List<Detection> people = new ArrayList<>();
             for (Detection detection : detections) {
-                if (!isPerson(detection)) continue;
+                if (isPerson(detection)) people.add(detection);
+            }
+            people.sort(Comparator
+                    .comparingDouble((Detection d) -> d.getBoundingBox().top)
+                    .thenComparingDouble(d -> d.getBoundingBox().left));
+
+            String sourceBase = sourceBaseName(uri);
+            int personNo = 0;
+            for (Detection detection : people) {
                 result.detected++;
                 personNo++;
 
@@ -72,10 +85,12 @@ final class PersonCropEngine implements AutoCloseable {
                 }
 
                 Bitmap person = Bitmap.createBitmap(bitmap, cropRect.left, cropRect.top, cropRect.width(), cropRect.height());
-                String sourceBase = sourceBaseName(uri);
-                if (saveBitmap(person, sourceBase, personNo)) result.saved++;
-                else result.failed++;
-                person.recycle();
+                try {
+                    if (saveBitmap(person, sourceBase, personNo)) result.saved++;
+                    else result.failed++;
+                } finally {
+                    person.recycle();
+                }
             }
         } catch (Throwable t) {
             result.failed++;
@@ -94,12 +109,14 @@ final class PersonCropEngine implements AutoCloseable {
     }
 
     private Rect expandedRect(RectF box, int width, int height) {
-        float bw = box.width();
-        float bh = box.height();
-        int left = Math.max(0, Math.round(box.left - bw * 0.18f));
-        int right = Math.min(width, Math.round(box.right + bw * 0.18f));
-        int top = Math.max(0, Math.round(box.top - bh * 0.12f));
-        int bottom = Math.min(height, Math.round(box.bottom + bh * 0.16f));
+        float bw = Math.max(1f, box.width());
+        float bh = Math.max(1f, box.height());
+        int left = Math.max(0, Math.round(box.left - bw * 0.20f));
+        int right = Math.min(width, Math.round(box.right + bw * 0.20f));
+        int top = Math.max(0, Math.round(box.top - bh * 0.16f));
+        int bottom = Math.min(height, Math.round(box.bottom + bh * 0.20f));
+        if (right <= left) right = Math.min(width, left + 1);
+        if (bottom <= top) bottom = Math.min(height, top + 1);
         return new Rect(left, top, right, bottom);
     }
 
@@ -124,13 +141,20 @@ final class PersonCropEngine implements AutoCloseable {
 
     private String sourceBaseName(Uri uri) {
         String name = null;
-        try (android.database.Cursor c = context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+        try (android.database.Cursor c = context.getContentResolver().query(
+                uri,
+                new String[]{OpenableColumns.DISPLAY_NAME},
+                null,
+                null,
+                null
+        )) {
             if (c != null && c.moveToFirst()) name = c.getString(0);
         } catch (Exception ignored) {}
         if (name == null || name.trim().isEmpty()) name = "fotograf";
         int dot = name.lastIndexOf('.');
         if (dot > 0) name = name.substring(0, dot);
-        return name.replaceAll("[\\/:*?\"<>|]", "_").trim();
+        name = name.replaceAll("[\\/:*?\"<>|]", "_").trim();
+        return name.isEmpty() ? "fotograf" : name;
     }
 
     private boolean saveBitmap(Bitmap bitmap, String sourceBase, int personNo) {
@@ -140,13 +164,20 @@ final class PersonCropEngine implements AutoCloseable {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
                 values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                values.put(MediaStore.Images.Media.RELATIVE_PATH,
-                        Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + sourceBase);
+                values.put(
+                        MediaStore.Images.Media.RELATIVE_PATH,
+                        Environment.DIRECTORY_PICTURES + "/Screenshot/" + sourceBase
+                );
                 values.put(MediaStore.Images.Media.IS_PENDING, 1);
                 Uri out = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 if (out == null) return false;
-                try (OutputStream os = context.getContentResolver().openOutputStream(out)) {
-                    if (os == null || !bitmap.compress(Bitmap.CompressFormat.JPEG, 94, os)) return false;
+                boolean success = false;
+                try (OutputStream os = context.getContentResolver().openOutputStream(out, "w")) {
+                    success = os != null && bitmap.compress(Bitmap.CompressFormat.JPEG, 96, os);
+                }
+                if (!success) {
+                    context.getContentResolver().delete(out, null, null);
+                    return false;
                 }
                 values.clear();
                 values.put(MediaStore.Images.Media.IS_PENDING, 0);
@@ -154,21 +185,31 @@ final class PersonCropEngine implements AutoCloseable {
                 return true;
             }
 
-            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                    "AkilliKisiKirpma/" + sourceBase);
+            File dir = new File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                    "Screenshot/" + sourceBase
+            );
             if (!dir.exists() && !dir.mkdirs()) return false;
             File out = new File(dir, fileName);
             try (FileOutputStream fos = new FileOutputStream(out)) {
-                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 94, fos)) return false;
+                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 96, fos)) return false;
             }
-            android.media.MediaScannerConnection.scanFile(context, new String[]{out.getAbsolutePath()}, new String[]{"image/jpeg"}, null);
+            android.media.MediaScannerConnection.scanFile(
+                    context,
+                    new String[]{out.getAbsolutePath()},
+                    new String[]{"image/jpeg"},
+                    null
+            );
             return true;
         } catch (Throwable t) {
             return false;
         }
     }
 
-    @Override public void close() {
-        try { personDetector.close(); } catch (Throwable ignored) {}
+    @Override
+    public void close() {
+        try {
+            personDetector.close();
+        } catch (Throwable ignored) {}
     }
 }
