@@ -4,13 +4,7 @@
     android:layout_height="match_parent"
     android:background="#05070B"
     android:fillViewport="true">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
-
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Screenshot" android:textColor="#FFD200" android:textSize="28sp" android:textStyle="bold" />
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Fotoğraf veya klasör seç. Gerçek kişi olarak güvenle algılanan bölgeler ayrı görsel olarak kaydedilir." android:textColor="#FFFFFF" android:textSize="15sp" />
         <Button android:id="@+id/btnPhotos" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:backgroundTint="#FFD200" android:text="Fotoğrafları seç" android:textColor="#05070B" android:textStyle="bold" />
