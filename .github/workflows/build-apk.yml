@@ -3,7 +3,7 @@ name: Build Android APKs
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, screenshot-pro ]
 
 jobs:
   build:
@@ -39,34 +39,44 @@ jobs:
         with:
           gradle-version: '8.11.1'
 
-      - name: APKleri derle
+      - name: Screenshot APK derle
+        if: github.ref == 'refs/heads/screenshot-pro'
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Tum APKleri derle
+        if: github.ref == 'refs/heads/main'
         run: gradle :app:assembleDebug :videoapp:assembleDebug :downloaderapp:assembleDebug :filemanagerapp:assembleDebug :hunterapp:assembleDebug :suiteapp:assembleDebug --stacktrace
 
-      - name: Kisi Kirpma APK yukle
+      - name: Screenshot APK yukle
         uses: actions/upload-artifact@v4
         with:
-          name: Akilli-Kisi-Kirpma-APK
+          name: Screenshot-APK
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
 
       - name: Video Kareleri APK yukle
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: VideoKareleri-APK
           path: videoapp/build/outputs/apk/debug/videoapp-debug.apk
 
       - name: Coklu Video Indirici APK yukle
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: Coklu-Video-Indirici-APK
           path: downloaderapp/build/outputs/apk/debug/downloaderapp-debug.apk
 
       - name: ATMACA Dosyalar APK yukle
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: ATMACA-Dosyalar-APK
           path: filemanagerapp/build/outputs/apk/debug/filemanagerapp-debug.apk
 
       - name: Gorsel Avcisi APK yukle
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: Gorsel-Avcisi-APK
@@ -74,6 +84,7 @@ jobs:
           if-no-files-found: error
 
       - name: 5li Araclar deneme APK yukle
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: Besli-Araclar-Deneme-APK
