@@ -10,8 +10,8 @@ android {
         applicationId = "com.akillikisikirpma"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "2.0.0-screenshot"
+        versionCode = 5
+        versionName = "2.1.0-paired-folders"
     }
 
     buildTypes {
@@ -34,4 +34,5 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("org.tensorflow:tensorflow-lite-task-vision:0.4.4")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
+    testImplementation("junit:junit:4.13.2")
 }
