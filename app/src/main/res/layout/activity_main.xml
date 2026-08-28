@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#071A52"
+    android:background="#05070B"
     android:fillViewport="true">
 
     <LinearLayout
@@ -14,27 +14,16 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SCREENSHOT"
-            android:textColor="#FFD21F"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.08" />
+            android:text="Screenshot"
+            android:textColor="#FFD200"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Akıllı kişi kırpma • Yaş filtresiz"
-            android:textColor="#C9D4F4"
-            android:textSize="15sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:background="#122D6B"
-            android:padding="16dp"
-            android:text="Fotoğraf seç veya klasör ekle. Uygulama klasörlerin altını da tarar; algılanan her kişiyi ayrı yüksek kaliteli JPG olarak kaydeder. Orijinallere dokunmaz."
+            android:layout_marginTop="8dp"
+            android:text="Fotoğraf veya klasör seç. Gerçek kişi olarak güvenle algılanan bölgeler ayrı görsel olarak kaydedilir."
             android:textColor="#FFFFFF"
             android:textSize="15sp" />
 
@@ -42,11 +31,10 @@
             android:id="@+id/btnPhotos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:backgroundTint="#173A7D"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#FFD200"
             android:text="Fotoğrafları seç"
-            android:textAllCaps="false"
-            android:textColor="#FFD21F"
+            android:textColor="#05070B"
             android:textStyle="bold" />
 
         <Button
@@ -54,10 +42,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:backgroundTint="#173A7D"
+            android:backgroundTint="#0A1B3D"
             android:text="Klasör ekle"
-            android:textAllCaps="false"
-            android:textColor="#FFD21F"
+            android:textColor="#FFD200"
             android:textStyle="bold" />
 
         <Button
@@ -65,9 +52,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:backgroundTint="#173A7D"
+            android:backgroundTint="#0A1B3D"
             android:text="Seçimleri temizle"
-            android:textAllCaps="false"
             android:textColor="#FFFFFF" />
 
         <TextView
@@ -75,8 +61,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:background="#122D6B"
-            android:padding="16dp"
             android:text="Henüz seçim yok"
             android:textColor="#FFFFFF"
             android:textSize="15sp" />
@@ -85,12 +69,10 @@
             android:id="@+id/btnStart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:backgroundTint="#FFD21F"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#FFD200"
             android:text="Kırpmayı başlat"
-            android:textAllCaps="false"
-            android:textColor="#071A52"
-            android:textSize="18sp"
+            android:textColor="#05070B"
             android:textStyle="bold" />
 
         <Button
@@ -98,23 +80,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:backgroundTint="#8B1D30"
+            android:backgroundTint="#0A1B3D"
             android:enabled="false"
             android:text="Durdur"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
+            android:textColor="#FFD200"
             android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/progress"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="12dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:indeterminateTint="#FFD200"
             android:max="100"
             android:progress="0"
-            android:progressTint="#FFD21F"
-            android:progressBackgroundTint="#31539A" />
+            android:progressTint="#FFD200"
+            android:progressBackgroundTint="#0A1B3D" />
 
         <TextView
             android:id="@+id/txtStatus"
@@ -122,27 +104,24 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="Hazır"
-            android:textColor="#FFD21F"
-            android:textSize="19sp"
+            android:textColor="#FFD200"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtLog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="#122D6B"
-            android:padding="16dp"
-            android:text="İşlenen 0 • Algılanan 0 • Kaydedilen 0 • Hata 0"
-            android:textColor="#D9E2F2"
-            android:textSize="14sp" />
+            android:layout_marginTop="12dp"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="Çıktı: Pictures/Screenshot/orijinal-dosya-adi/\nİşlem arka planda devam eder; bildirimden durum ve durdurma kullanılabilir."
-            android:textColor="#9FB4E4"
+            android:layout_marginTop="20dp"
+            android:text="Çıktı: Pictures/Screenshot/orijinal-dosya-adi/"
+            android:textColor="#FFD200"
             android:textSize="12sp" />
 
     </LinearLayout>
