@@ -36,10 +36,10 @@ final class PersonCropEngine implements AutoCloseable {
         int failed;
     }
 
-    private static final float PERSON_THRESHOLD = 0.32f;
-    private static final float MIN_AREA_RATIO = 0.002f;
-    private static final float MIN_ASPECT = 0.12f;
-    private static final float MAX_ASPECT = 2.20f;
+    private static final float PERSON_THRESHOLD = 0.28f;
+    private static final float MIN_AREA_RATIO = 0.0012f;
+    private static final float MIN_ASPECT = 0.10f;
+    private static final float MAX_ASPECT = 2.40f;
     private static final int DETECTION_MAX_DIMENSION = 3072;
 
     private final Context context;
@@ -50,7 +50,7 @@ final class PersonCropEngine implements AutoCloseable {
         BaseOptions base = BaseOptions.builder().setNumThreads(4).build();
         ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
                 .setBaseOptions(base)
-                .setMaxResults(50)
+                .setMaxResults(80)
                 .setScoreThreshold(PERSON_THRESHOLD)
                 .build();
         personDetector = ObjectDetector.createFromFileAndOptions(
@@ -72,16 +72,25 @@ final class PersonCropEngine implements AutoCloseable {
 
             Bitmap detectionBitmap = decoded.bitmap;
             List<Detection> detections = personDetector.detect(TensorImage.fromBitmap(detectionBitmap));
-            List<Detection> people = new ArrayList<>();
+            List<Detection> candidates = new ArrayList<>();
             for (Detection detection : detections) {
                 if (isPerson(detection) && isSensiblePersonBox(
                         detection.getBoundingBox(),
                         detectionBitmap.getWidth(),
                         detectionBitmap.getHeight())) {
-                    people.add(detection);
+                    candidates.add(detection);
                 }
             }
 
+            // Aynı kişiye ait üst üste tespitlerde yüksek güven skorunu tut.
+            candidates.sort(Comparator.comparingDouble(this::scoreOf).reversed());
+            List<Detection> people = new ArrayList<>();
+            for (Detection candidate : candidates) {
+                if (!duplicatesAny(candidate, people)) people.add(candidate);
+                else result.skipped++;
+            }
+
+            // Klasör numaraları görüntü konumuna göre kararlı olsun.
             people.sort(Comparator
                     .comparingDouble((Detection d) -> d.getBoundingBox().top)
                     .thenComparingDouble(d -> d.getBoundingBox().left));
@@ -102,7 +111,6 @@ final class PersonCropEngine implements AutoCloseable {
                     continue;
                 }
 
-                personNo++;
                 Rect sourceCrop = mapToSource(
                         detectionCrop,
                         detectionBitmap.getWidth(),
@@ -118,10 +126,15 @@ final class PersonCropEngine implements AutoCloseable {
                         continue;
                     }
 
-                    boolean cropSaved = saveCrop(person, sourceBase, personNo);
-                    boolean sourceSaved = copySource(uri, sourceBase, sourceFileName, sourceMime, personNo);
-                    if (cropSaved && sourceSaved) result.saved++;
-                    else result.failed++;
+                    int nextPersonNo = personNo + 1;
+                    boolean cropSaved = saveCrop(person, sourceBase, nextPersonNo);
+                    boolean sourceSaved = copySource(uri, sourceBase, sourceFileName, sourceMime, nextPersonNo);
+                    if (cropSaved && sourceSaved) {
+                        personNo = nextPersonNo;
+                        result.saved++;
+                    } else {
+                        result.failed++;
+                    }
                 } finally {
                     if (person != null && person != detectionBitmap && !person.isRecycled()) person.recycle();
                 }
@@ -129,19 +142,33 @@ final class PersonCropEngine implements AutoCloseable {
         } catch (Throwable t) {
             result.failed++;
         } finally {
-            if (decoded != null && decoded.bitmap != null && !decoded.bitmap.isRecycled()) {
-                decoded.bitmap.recycle();
-            }
+            if (decoded != null && decoded.bitmap != null && !decoded.bitmap.isRecycled()) decoded.bitmap.recycle();
         }
         return result;
     }
 
-    private boolean isPerson(Detection detection) {
-        for (Category c : detection.getCategories()) {
-            String label = c.getLabel();
-            if (label != null && label.equalsIgnoreCase("person") && c.getScore() >= PERSON_THRESHOLD) return true;
+    private boolean duplicatesAny(Detection candidate, List<Detection> accepted) {
+        RectF c = candidate.getBoundingBox();
+        DetectionPolicy.Box cb = new DetectionPolicy.Box(c.left, c.top, c.right, c.bottom);
+        for (Detection existing : accepted) {
+            RectF e = existing.getBoundingBox();
+            DetectionPolicy.Box eb = new DetectionPolicy.Box(e.left, e.top, e.right, e.bottom);
+            if (DetectionPolicy.isDuplicate(cb, eb)) return true;
         }
         return false;
+    }
+
+    private float scoreOf(Detection detection) {
+        float best = 0f;
+        for (Category c : detection.getCategories()) {
+            String label = c.getLabel();
+            if (label != null && label.equalsIgnoreCase("person")) best = Math.max(best, c.getScore());
+        }
+        return best;
+    }
+
+    private boolean isPerson(Detection detection) {
+        return scoreOf(detection) >= PERSON_THRESHOLD;
     }
 
     private boolean isSensiblePersonBox(RectF box, int width, int height) {
@@ -149,26 +176,24 @@ final class PersonCropEngine implements AutoCloseable {
         float bh = Math.max(1f, box.height());
         float aspect = bw / bh;
         float areaRatio = (bw * bh) / Math.max(1f, (float) width * height);
-        if (areaRatio < MIN_AREA_RATIO) return false;
-        if (aspect < MIN_ASPECT || aspect > MAX_ASPECT) return false;
-        return bw >= 20f && bh >= 40f;
+        return areaRatio >= MIN_AREA_RATIO && aspect >= MIN_ASPECT && aspect <= MAX_ASPECT && bw >= 14f && bh >= 28f;
     }
 
     private boolean isSensibleCrop(Rect crop, int imageWidth, int imageHeight) {
-        if (crop.width() < 24 || crop.height() < 48) return false;
+        if (crop.width() < 18 || crop.height() < 36) return false;
         float ratio = crop.width() / (float) crop.height();
-        if (ratio < 0.10f || ratio > 2.40f) return false;
+        if (ratio < 0.08f || ratio > 2.60f) return false;
         float areaRatio = (crop.width() * crop.height()) / Math.max(1f, (float) imageWidth * imageHeight);
-        return areaRatio >= 0.0015f;
+        return areaRatio >= 0.0009f;
     }
 
     private Rect expandedRect(RectF box, int width, int height) {
         float bw = Math.max(1f, box.width());
         float bh = Math.max(1f, box.height());
-        int left = Math.max(0, Math.round(box.left - bw * 0.16f));
-        int right = Math.min(width, Math.round(box.right + bw * 0.16f));
-        int top = Math.max(0, Math.round(box.top - bh * 0.14f));
-        int bottom = Math.min(height, Math.round(box.bottom + bh * 0.18f));
+        int left = Math.max(0, Math.round(box.left - bw * 0.14f));
+        int right = Math.min(width, Math.round(box.right + bw * 0.14f));
+        int top = Math.max(0, Math.round(box.top - bh * 0.12f));
+        int bottom = Math.min(height, Math.round(box.bottom + bh * 0.16f));
         if (right <= left) right = Math.min(width, left + 1);
         if (bottom <= top) bottom = Math.min(height, top + 1);
         return new Rect(left, top, right, bottom);
@@ -222,16 +247,12 @@ final class PersonCropEngine implements AutoCloseable {
                 decoder.setCrop(sourceCrop);
             });
         }
-
-        float sx = detectionBitmap.getWidth() / (float) Math.max(1, sourceCrop.right);
-        float sy = detectionBitmap.getHeight() / (float) Math.max(1, sourceCrop.bottom);
-        Rect fallback = new Rect(
-                clamp(Math.round(sourceCrop.left * sx), 0, detectionBitmap.getWidth() - 1),
-                clamp(Math.round(sourceCrop.top * sy), 0, detectionBitmap.getHeight() - 1),
-                clamp(Math.round(sourceCrop.right * sx), 1, detectionBitmap.getWidth()),
-                clamp(Math.round(sourceCrop.bottom * sy), 1, detectionBitmap.getHeight())
-        );
-        return Bitmap.createBitmap(detectionBitmap, fallback.left, fallback.top, fallback.width(), fallback.height());
+        return Bitmap.createBitmap(
+                detectionBitmap,
+                sourceCrop.left,
+                sourceCrop.top,
+                sourceCrop.width(),
+                sourceCrop.height());
     }
 
     private String sourceBaseName(Uri uri) {
@@ -258,8 +279,7 @@ final class PersonCropEngine implements AutoCloseable {
                 new String[]{OpenableColumns.DISPLAY_NAME},
                 null,
                 null,
-                null
-        )) {
+                null)) {
             if (c != null && c.moveToFirst()) name = c.getString(0);
         } catch (Exception ignored) {}
         if (name == null || name.trim().isEmpty()) name = "fotograf.jpg";
