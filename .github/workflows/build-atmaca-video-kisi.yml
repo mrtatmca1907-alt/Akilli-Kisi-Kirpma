@@ -1,0 +1,53 @@
+name: Build ATMACA Video Kisi APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ atmaca-video-kisi-apk-20260902 ]
+    paths:
+      - 'videokisiapp/**'
+      - 'settings.gradle.kts'
+      - '.github/workflows/build-atmaca-video-kisi.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Kodu al
+        uses: actions/checkout@v5
+
+      - name: Java 17 kur
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK kur
+        uses: android-actions/setup-android@v3
+
+      - name: API 35 kur
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: AI kisi modelini indir
+        run: |
+          mkdir -p videokisiapp/src/main/assets
+          curl -L --fail --retry 3 \
+            "https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_efficientdet_lite0_detection_metadata_1.tflite" \
+            -o videokisiapp/src/main/assets/efficientdet-lite0.tflite
+          test -s videokisiapp/src/main/assets/efficientdet-lite0.tflite
+
+      - name: Gradle kur
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: APK derle
+        run: gradle :videokisiapp:assembleDebug --stacktrace
+
+      - name: APK yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ATMACA-Video-Kare-Kisi-Android-APK
+          path: videokisiapp/build/outputs/apk/debug/videokisiapp-debug.apk
+          if-no-files-found: error
