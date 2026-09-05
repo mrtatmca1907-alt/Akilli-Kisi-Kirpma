@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Seçtiğin klasör ve alt klasörlerindeki fotoğrafları sırayla işler. Her fotoğraf kendi klasörüne orijinaliyle birlikte kaydedilir; bulunan her insan tam vücudu kapsayacak güvenli payla ayrı görüntü olarak çıkarılır."
+            android:text="1) Seçilen klasör ve alt klasörlerdeki tüm görseller önce ATMACA_TEK_KLASOR içine taşınır ve gerçek kopyalar teke düşürülür. 2) Toplama tamamen bittikten sonra fotoğraflar tek tek kişi algılamadan geçirilir; orijinal ve bulunan kişiler aynı fotoğraf klasörüne kaydedilir."
             android:textColor="#D9E2F2"
             android:textSize="15sp" />
 
@@ -81,7 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text="Çıktı: Pictures/AkilliKisiKirpma/"
+            android:text="Ara klasör: seçilen klasör/ATMACA_TEK_KLASOR   •   Son çıktı: Pictures/AkilliKisiKirpma/"
             android:textColor="#8FA2BA"
             android:textSize="12sp" />
 
