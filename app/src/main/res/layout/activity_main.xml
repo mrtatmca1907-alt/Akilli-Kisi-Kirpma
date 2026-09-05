@@ -23,15 +23,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Telefondaki erişilebilir fotoğrafları sırayla işler. Her fotoğraf kendi klasörüne orijinaliyle birlikte kaydedilir; bulunan her insan tam vücudu kapsayacak güvenli payla ayrı görüntü olarak çıkarılır."
+            android:text="Seçtiğin klasör ve alt klasörlerindeki fotoğrafları sırayla işler. Her fotoğraf kendi klasörüne orijinaliyle birlikte kaydedilir; bulunan her insan tam vücudu kapsayacak güvenli payla ayrı görüntü olarak çıkarılır."
             android:textColor="#D9E2F2"
             android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnSelectFolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Klasör Seç" />
+
+        <TextView
+            android:id="@+id/txtFolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Kaynak klasör: Seçilmedi"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/btnStart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
+            android:enabled="false"
             android:text="Başlat" />
 
         <Button
