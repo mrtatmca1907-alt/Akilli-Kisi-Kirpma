@@ -1,18 +1,34 @@
 package com.akillikisikirpma;
 
-import android.graphics.Rect;
-import android.graphics.RectF;
-
 final class CropMath {
     private CropMath() {}
 
-    static Rect toOriginalExpanded(RectF detected, int detectW, int detectH, int originalW, int originalH) {
+    static final class Box {
+        final int left;
+        final int top;
+        final int right;
+        final int bottom;
+
+        Box(int left, int top, int right, int bottom) {
+            this.left = left;
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
+        }
+
+        int width() { return right - left; }
+        int height() { return bottom - top; }
+    }
+
+    static Box toOriginalExpanded(
+            float detectedLeft, float detectedTop, float detectedRight, float detectedBottom,
+            int detectW, int detectH, int originalW, int originalH) {
         float sx = originalW / (float) Math.max(1, detectW);
         float sy = originalH / (float) Math.max(1, detectH);
-        float leftF = detected.left * sx;
-        float topF = detected.top * sy;
-        float rightF = detected.right * sx;
-        float bottomF = detected.bottom * sy;
+        float leftF = detectedLeft * sx;
+        float topF = detectedTop * sy;
+        float rightF = detectedRight * sx;
+        float bottomF = detectedBottom * sy;
         float bw = Math.max(1f, rightF - leftF);
         float bh = Math.max(1f, bottomF - topF);
 
@@ -22,6 +38,6 @@ final class CropMath {
         int bottom = Math.min(originalH, Math.round(bottomF + bh * 0.28f));
         if (right <= left) right = Math.min(originalW, left + 1);
         if (bottom <= top) bottom = Math.min(originalH, top + 1);
-        return new Rect(left, top, right, bottom);
+        return new Box(left, top, right, bottom);
     }
 }
