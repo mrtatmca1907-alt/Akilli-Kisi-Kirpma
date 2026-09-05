@@ -48,6 +48,6 @@ jobs:
       - name: APK yukle
         uses: actions/upload-artifact@v4
         with:
-          name: Akilli-Kisi-Kirpma-v1.5.0
+          name: Akilli-Kisi-Kirpma-v1.6.0-TURBO
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
