@@ -3,6 +3,7 @@ package com.akillikisikirpma;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.graphics.Rect;
@@ -143,15 +144,33 @@ final class PersonCropEngine implements AutoCloseable {
         return MediaStore.Images.Media.getBitmap(resolver, uri);
     }
 
+    private boolean mediaStoreFileExists(String relativePath, String name) {
+        if (Build.VERSION.SDK_INT < 29) return false;
+        String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.SIZE};
+        String selection = MediaStore.Images.Media.RELATIVE_PATH + "=? AND " + MediaStore.Images.Media.DISPLAY_NAME + "=?";
+        String[] args = {relativePath, name};
+        try (Cursor c = context.getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, args, null)) {
+            if (c == null || !c.moveToFirst()) return false;
+            int sizeCol = c.getColumnIndex(MediaStore.Images.Media.SIZE);
+            return sizeCol < 0 || c.getLong(sizeCol) > 0;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     private boolean copyOriginal(Uri source, String folder, String displayName, String mimeType) {
         String name = (displayName == null || displayName.trim().isEmpty()) ? "orijinal.jpg" : displayName;
         String mime = (mimeType == null || mimeType.trim().isEmpty()) ? "image/jpeg" : mimeType;
         try {
             if (Build.VERSION.SDK_INT >= 29) {
+                String relativePath = Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + folder + "/";
+                if (mediaStoreFileExists(relativePath, name)) return true;
+
                 ContentValues v = new ContentValues();
                 v.put(MediaStore.Images.Media.DISPLAY_NAME, name);
                 v.put(MediaStore.Images.Media.MIME_TYPE, mime);
-                v.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + folder);
+                v.put(MediaStore.Images.Media.RELATIVE_PATH, relativePath);
                 v.put(MediaStore.Images.Media.IS_PENDING, 1);
                 Uri out = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
                 if (out == null) return false;
@@ -175,6 +194,7 @@ final class PersonCropEngine implements AutoCloseable {
             File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "AkilliKisiKirpma/" + folder);
             if (!dir.exists() && !dir.mkdirs()) return false;
             File out = new File(dir, name);
+            if (out.isFile() && out.length() > 0) return true;
             try (InputStream in = context.getContentResolver().openInputStream(source); FileOutputStream os = new FileOutputStream(out)) {
                 if (in == null) return false;
                 byte[] buf = new byte[1024 * 1024];
@@ -192,10 +212,13 @@ final class PersonCropEngine implements AutoCloseable {
         String fileName = sourceBase + "_kisi_" + personNo + ".jpg";
         try {
             if (Build.VERSION.SDK_INT >= 29) {
+                String relativePath = Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + folder + "/";
+                if (mediaStoreFileExists(relativePath, fileName)) return true;
+
                 ContentValues v = new ContentValues();
                 v.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
                 v.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                v.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + folder);
+                v.put(MediaStore.Images.Media.RELATIVE_PATH, relativePath);
                 v.put(MediaStore.Images.Media.IS_PENDING, 1);
                 Uri out = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
                 if (out == null) return false;
@@ -214,6 +237,7 @@ final class PersonCropEngine implements AutoCloseable {
             File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "AkilliKisiKirpma/" + folder);
             if (!dir.exists() && !dir.mkdirs()) return false;
             File out = new File(dir, fileName);
+            if (out.isFile() && out.length() > 0) return true;
             try (FileOutputStream fos = new FileOutputStream(out)) {
                 if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)) return false;
             }
