@@ -6,13 +6,16 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.DocumentsContract;
+import android.provider.Settings;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.documentfile.provider.DocumentFile;
+import java.io.File;
 
 public class MainActivity extends Activity {
     private static final int REQ_TREE = 1907;
@@ -39,15 +42,17 @@ public class MainActivity extends Activity {
             int errors = p.getInt("errors", 0);
             String phase = p.getString("phase", "Hazır");
             String current = p.getString("current", "");
-            String tree = p.getString(CropForegroundService.KEY_TREE_URI, "");
+            String directPath = p.getString(CropForegroundService.KEY_DIRECT_PATH, "");
+            boolean allFiles = hasAllFilesAccess();
 
-            btnSelectFolder.setEnabled(!running);
-            btnStart.setEnabled(!running && tree != null && !tree.isEmpty());
+            btnSelectFolder.setEnabled(!running && allFiles);
+            btnStart.setEnabled(!running && allFiles && directPath != null && !directPath.isEmpty());
             btnStop.setEnabled(running);
-            txtStatus.setText(running ? phase : (finished ? "Tamamlandı" : phase));
-            txtFolder.setText(folderLabel(tree));
+            txtStatus.setText(allFiles ? (running ? phase : (finished ? "Tamamlandı" : phase)) : "Tüm dosyalara erişim gerekli");
+            txtFolder.setText(directPath == null || directPath.isEmpty() ? "Kaynak klasör: Seçilmedi" : "Kaynak klasör: " + directPath);
             txtLog.setText(
-                    "Tek klasöre taşınan: " + gathered +
+                    "GERÇEK TURBO: doğrudan dosya sistemi" +
+                    "\nTek klasöre taşınan: " + gathered +
                     "\nTeke düşürülen kopya: " + duplicates +
                     "\nKırpma için işlenen: " + processed +
                     "\nÇıktıya taşınan orijinal: " + moved +
@@ -70,87 +75,79 @@ public class MainActivity extends Activity {
         txtStatus = findViewById(R.id.txtStatus);
         txtLog = findViewById(R.id.txtLog);
 
-        btnSelectFolder.setOnClickListener(v -> openFolderPicker());
+        btnSelectFolder.setOnClickListener(v -> {
+            if (!hasAllFilesAccess()) requestAllFilesAccess();
+            else openFolderPicker();
+        });
         btnStart.setOnClickListener(v -> startCropService());
         btnStop.setOnClickListener(v -> {
             Intent i = new Intent(this, CropForegroundService.class);
             i.setAction(CropForegroundService.ACTION_STOP);
             startService(i);
         });
+
+        if (!hasAllFilesAccess()) requestAllFilesAccess();
+    }
+
+    private boolean hasAllFilesAccess() {
+        return Build.VERSION.SDK_INT < 30 || Environment.isExternalStorageManager();
+    }
+
+    private void requestAllFilesAccess() {
+        if (Build.VERSION.SDK_INT < 30) return;
+        try {
+            Intent i = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName()));
+            startActivity(i);
+        } catch (Throwable t) {
+            startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+        }
+        Toast.makeText(this, "Akıllı Kişi Kırpma için 'Tüm dosyalara erişim'e izin ver", Toast.LENGTH_LONG).show();
     }
 
     private void openFolderPicker() {
         Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
-                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION |
-                Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
         startActivityForResult(i, REQ_TREE);
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode != REQ_TREE || resultCode != RESULT_OK || data == null || data.getData() == null) return;
-
         Uri treeUri = data.getData();
-        int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         try {
-            getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
-        } catch (SecurityException e) {
-            Toast.makeText(this, "Klasör izni kalıcı alınamadı", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        getSharedPreferences(CropForegroundService.PREFS, MODE_PRIVATE).edit()
-                .putString(CropForegroundService.KEY_TREE_URI, treeUri.toString())
-                .remove("resume_index")
-                .putInt("gathered", 0)
-                .putInt("duplicates", 0)
-                .putInt("processed", 0)
-                .putInt("people", 0)
-                .putInt("crops", 0)
-                .putInt("moved", 0)
-                .putInt("errors", 0)
-                .putBoolean("finished", false)
-                .putString("phase", "Hazır")
-                .putString("current", "")
-                .apply();
-        Toast.makeText(this, "Klasör seçildi", Toast.LENGTH_SHORT).show();
-    }
-
-    private String folderLabel(String tree) {
-        if (tree == null || tree.isEmpty()) return "Kaynak klasör: Seçilmedi";
-        try {
-            DocumentFile f = DocumentFile.fromTreeUri(this, Uri.parse(tree));
-            String name = f == null ? null : f.getName();
-            return "Kaynak klasör: " + (name == null || name.isEmpty() ? tree : name);
+            String docId = DocumentsContract.getTreeDocumentId(treeUri);
+            File direct = StoragePathResolver.fromDocumentId(docId, Environment.getExternalStorageDirectory());
+            if (direct == null || !direct.isDirectory()) {
+                Toast.makeText(this, "Bu sürümde telefonun ana depolamasından bir klasör seç", Toast.LENGTH_LONG).show();
+                return;
+            }
+            getSharedPreferences(CropForegroundService.PREFS, MODE_PRIVATE).edit()
+                    .putString(CropForegroundService.KEY_TREE_URI, treeUri.toString())
+                    .putString(CropForegroundService.KEY_DIRECT_PATH, direct.getAbsolutePath())
+                    .putInt("gathered", 0).putInt("duplicates", 0).putInt("processed", 0)
+                    .putInt("people", 0).putInt("crops", 0).putInt("moved", 0).putInt("errors", 0)
+                    .putBoolean("finished", false).putString("phase", "Hazır").putString("current", "").apply();
+            Toast.makeText(this, "Klasör seçildi • Gerçek turbo hazır", Toast.LENGTH_SHORT).show();
         } catch (Throwable t) {
-            return "Kaynak klasör: Seçili";
+            Toast.makeText(this, "Klasör yolu çözülemedi", Toast.LENGTH_LONG).show();
         }
     }
 
     private void startCropService() {
+        if (!hasAllFilesAccess()) { requestAllFilesAccess(); return; }
         SharedPreferences p = getSharedPreferences(CropForegroundService.PREFS, MODE_PRIVATE);
-        String tree = p.getString(CropForegroundService.KEY_TREE_URI, "");
-        if (tree == null || tree.isEmpty()) {
+        String path = p.getString(CropForegroundService.KEY_DIRECT_PATH, "");
+        if (path == null || path.isEmpty()) {
             Toast.makeText(this, "Önce klasör seç", Toast.LENGTH_LONG).show();
             return;
         }
         Intent i = new Intent(this, CropForegroundService.class);
         i.setAction(CropForegroundService.ACTION_START);
-        if (Build.VERSION.SDK_INT >= 26) startForegroundService(i);
-        else startService(i);
-        Toast.makeText(this, "Önce toplama, sonra kişi kırpma başladı", Toast.LENGTH_SHORT).show();
+        if (Build.VERSION.SDK_INT >= 26) startForegroundService(i); else startService(i);
+        Toast.makeText(this, "Gerçek turbo başladı", Toast.LENGTH_SHORT).show();
     }
 
-    @Override protected void onResume() {
-        super.onResume();
-        handler.removeCallbacks(refresh);
-        handler.post(refresh);
-    }
-
-    @Override protected void onPause() {
-        handler.removeCallbacks(refresh);
-        super.onPause();
-    }
+    @Override protected void onResume() { super.onResume(); handler.removeCallbacks(refresh); handler.post(refresh); }
+    @Override protected void onPause() { handler.removeCallbacks(refresh); super.onPause(); }
 }
