@@ -27,6 +27,7 @@ import java.util.List;
 
 final class PersonCropEngine implements AutoCloseable {
     private static final float PERSON_SCORE = 0.20f;
+    private static final int TURBO_DETECT_MAX = 1440;
 
     static final class ProcessResult {
         int detected;
@@ -52,26 +53,26 @@ final class PersonCropEngine implements AutoCloseable {
         String sourceBase = safeBase(displayName);
         String folder = sourceBase + "_" + mediaId;
 
-        result.originalSaved = copyOriginal(uri, folder, displayName, mimeType);
-        if (!result.originalSaved) {
-            result.failed++;
-            return result;
-        }
-
         Bitmap detectBitmap = null;
         Bitmap original = null;
+        List<Detection> people = new ArrayList<>();
         try {
             detectBitmap = decodeForDetection(uri);
             if (detectBitmap == null) {
                 result.failed++;
                 return result;
             }
-
-            List<Detection> people = new ArrayList<>();
             for (Detection d : detector.detect(TensorImage.fromBitmap(detectBitmap))) {
                 if (isPerson(d)) people.add(d);
             }
             result.detected = people.size();
+
+            // Orijinal her durumda korunur; kişi yoksa tam çözünür bitmap hiç açılmaz.
+            result.originalSaved = copyOriginal(uri, folder, displayName, mimeType);
+            if (!result.originalSaved) {
+                result.failed++;
+                return result;
+            }
             if (people.isEmpty()) return result;
 
             original = decodeOriginal(uri);
@@ -128,8 +129,8 @@ final class PersonCropEngine implements AutoCloseable {
                 decoder.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE);
                 Size s = info.getSize();
                 int max = Math.max(s.getWidth(), s.getHeight());
-                if (max > 1920) {
-                    float scale = 1920f / max;
+                if (max > TURBO_DETECT_MAX) {
+                    float scale = (float) TURBO_DETECT_MAX / max;
                     decoder.setTargetSize(Math.max(1, Math.round(s.getWidth() * scale)), Math.max(1, Math.round(s.getHeight() * scale)));
                 }
             });
@@ -151,8 +152,7 @@ final class PersonCropEngine implements AutoCloseable {
         String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.SIZE};
         String selection = MediaStore.Images.Media.RELATIVE_PATH + "=? AND " + MediaStore.Images.Media.DISPLAY_NAME + "=?";
         String[] args = {relativePath, name};
-        try (Cursor c = context.getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, args, null)) {
+        try (Cursor c = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, args, null)) {
             if (c == null || !c.moveToFirst()) return false;
             int sizeCol = c.getColumnIndex(MediaStore.Images.Media.SIZE);
             return sizeCol < 0 || c.getLong(sizeCol) > 0;
@@ -168,7 +168,6 @@ final class PersonCropEngine implements AutoCloseable {
             if (Build.VERSION.SDK_INT >= 29) {
                 String relativePath = Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + folder + "/";
                 if (mediaStoreFileExists(relativePath, name)) return true;
-
                 ContentValues v = new ContentValues();
                 v.put(MediaStore.Images.Media.DISPLAY_NAME, name);
                 v.put(MediaStore.Images.Media.MIME_TYPE, mime);
@@ -180,7 +179,7 @@ final class PersonCropEngine implements AutoCloseable {
                 try (InputStream in = context.getContentResolver().openInputStream(source);
                      OutputStream os = context.getContentResolver().openOutputStream(out)) {
                     if (in == null || os == null) throw new IllegalStateException("stream yok");
-                    byte[] buf = new byte[1024 * 1024];
+                    byte[] buf = new byte[4 * 1024 * 1024];
                     int n;
                     while ((n = in.read(buf)) >= 0) os.write(buf, 0, n);
                     ok = true;
@@ -199,7 +198,7 @@ final class PersonCropEngine implements AutoCloseable {
             if (out.isFile() && out.length() > 0) return true;
             try (InputStream in = context.getContentResolver().openInputStream(source); FileOutputStream os = new FileOutputStream(out)) {
                 if (in == null) return false;
-                byte[] buf = new byte[1024 * 1024];
+                byte[] buf = new byte[4 * 1024 * 1024];
                 int n;
                 while ((n = in.read(buf)) >= 0) os.write(buf, 0, n);
             }
@@ -216,7 +215,6 @@ final class PersonCropEngine implements AutoCloseable {
             if (Build.VERSION.SDK_INT >= 29) {
                 String relativePath = Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + folder + "/";
                 if (mediaStoreFileExists(relativePath, fileName)) return true;
-
                 ContentValues v = new ContentValues();
                 v.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
                 v.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
