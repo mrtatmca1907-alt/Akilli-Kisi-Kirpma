@@ -1,5 +1,8 @@
 package com.akillikisikirpma;
 
+import android.graphics.Rect;
+import android.graphics.RectF;
+
 final class CropMath {
     private CropMath() {}
 
@@ -39,5 +42,13 @@ final class CropMath {
         if (right <= left) right = Math.min(originalW, left + 1);
         if (bottom <= top) bottom = Math.min(originalH, top + 1);
         return new Box(left, top, right, bottom);
+    }
+
+    static Rect toOriginalExpanded(RectF detected, int detectW, int detectH, int originalW, int originalH) {
+        Box b = toOriginalExpanded(
+                detected.left, detected.top, detected.right, detected.bottom,
+                detectW, detectH, originalW, originalH
+        );
+        return new Rect(b.left, b.top, b.right, b.bottom);
     }
 }
