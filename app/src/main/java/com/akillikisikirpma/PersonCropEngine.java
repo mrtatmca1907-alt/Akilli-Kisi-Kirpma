@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class PersonCropEngine implements AutoCloseable {
+    private static final float PERSON_SCORE = 0.20f;
+
     static final class ProcessResult {
         int detected;
         int saved;
@@ -39,8 +41,8 @@ final class PersonCropEngine implements AutoCloseable {
     PersonCropEngine(Context context) throws Exception {
         this.context = context.getApplicationContext();
         ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
-                .setMaxResults(50)
-                .setScoreThreshold(0.30f)
+                .setMaxResults(100)
+                .setScoreThreshold(PERSON_SCORE)
                 .build();
         detector = ObjectDetector.createFromFileAndOptions(this.context, "efficientdet-lite0.tflite", options);
     }
@@ -113,7 +115,7 @@ final class PersonCropEngine implements AutoCloseable {
     private boolean isPerson(Detection detection) {
         for (Category c : detection.getCategories()) {
             String label = c.getLabel();
-            if (label != null && "person".equalsIgnoreCase(label) && c.getScore() >= 0.30f) return true;
+            if (label != null && "person".equalsIgnoreCase(label) && c.getScore() >= PERSON_SCORE) return true;
         }
         return false;
     }
@@ -126,8 +128,8 @@ final class PersonCropEngine implements AutoCloseable {
                 decoder.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE);
                 Size s = info.getSize();
                 int max = Math.max(s.getWidth(), s.getHeight());
-                if (max > 1600) {
-                    float scale = 1600f / max;
+                if (max > 1920) {
+                    float scale = 1920f / max;
                     decoder.setTargetSize(Math.max(1, Math.round(s.getWidth() * scale)), Math.max(1, Math.round(s.getHeight() * scale)));
                 }
             });
