@@ -19,8 +19,8 @@ public class CropMathTest {
         assertTrue(r.top >= 0);
         assertTrue(r.right <= 4000);
         assertTrue(r.bottom <= 3000);
-        assertTrue(r.width() > 1000);
-        assertTrue(r.height() > 2500);
+        assertTrue((r.right - r.left) > 1000);
+        assertTrue((r.bottom - r.top) > 2500);
     }
 
     @Test
