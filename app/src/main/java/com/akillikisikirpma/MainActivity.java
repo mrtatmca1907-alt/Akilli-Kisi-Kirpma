@@ -1,24 +1,28 @@
 package com.akillikisikirpma;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.documentfile.provider.DocumentFile;
+
 public class MainActivity extends Activity {
-    private static final int REQ_PERMS = 1907;
+    private static final int REQ_TREE = 1907;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
+    private Button btnSelectFolder;
     private Button btnStart;
     private Button btnStop;
+    private TextView txtFolder;
     private TextView txtStatus;
     private TextView txtLog;
 
@@ -32,10 +36,13 @@ public class MainActivity extends Activity {
             int crops = p.getInt("crops", 0);
             int errors = p.getInt("errors", 0);
             String current = p.getString("current", "");
+            String tree = p.getString(CropForegroundService.KEY_TREE_URI, "");
 
-            btnStart.setEnabled(!running);
+            btnSelectFolder.setEnabled(!running);
+            btnStart.setEnabled(!running && tree != null && !tree.isEmpty());
             btnStop.setEnabled(running);
             txtStatus.setText(running ? "Arka planda çalışıyor" : (finished ? "Tamamlandı" : "Hazır"));
+            txtFolder.setText(folderLabel(tree));
             txtLog.setText(
                     "İşlenen fotoğraf: " + processed +
                     "\nBulunan kişi: " + people +
@@ -50,12 +57,15 @@ public class MainActivity extends Activity {
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        btnSelectFolder = findViewById(R.id.btnSelectFolder);
         btnStart = findViewById(R.id.btnStart);
         btnStop = findViewById(R.id.btnStop);
+        txtFolder = findViewById(R.id.txtFolder);
         txtStatus = findViewById(R.id.txtStatus);
         txtLog = findViewById(R.id.txtLog);
 
-        btnStart.setOnClickListener(v -> requestStart());
+        btnSelectFolder.setOnClickListener(v -> openFolderPicker());
+        btnStart.setOnClickListener(v -> startCropService());
         btnStop.setOnClickListener(v -> {
             Intent i = new Intent(this, CropForegroundService.class);
             i.setAction(CropForegroundService.ACTION_STOP);
@@ -63,37 +73,64 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void requestStart() {
-        if (!hasImagePermission()) {
-            if (Build.VERSION.SDK_INT >= 33) {
-                requestPermissions(new String[]{Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.POST_NOTIFICATIONS}, REQ_PERMS);
-            } else {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQ_PERMS);
-            }
-            return;
-        }
-        startCropService();
+    private void openFolderPicker() {
+        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION |
+                Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        startActivityForResult(i, REQ_TREE);
     }
 
-    private boolean hasImagePermission() {
-        if (Build.VERSION.SDK_INT >= 33) {
-            return checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQ_TREE || resultCode != RESULT_OK || data == null || data.getData() == null) return;
+
+        Uri treeUri = data.getData();
+        int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        try {
+            getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+        } catch (SecurityException e) {
+            Toast.makeText(this, "Klasör izni kalıcı alınamadı", Toast.LENGTH_LONG).show();
+            return;
         }
-        return checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+
+        getSharedPreferences(CropForegroundService.PREFS, MODE_PRIVATE).edit()
+                .putString(CropForegroundService.KEY_TREE_URI, treeUri.toString())
+                .putLong("last_doc_hash", Long.MIN_VALUE)
+                .putInt("processed", 0)
+                .putInt("people", 0)
+                .putInt("crops", 0)
+                .putInt("errors", 0)
+                .putBoolean("finished", false)
+                .putString("current", "")
+                .apply();
+        Toast.makeText(this, "Klasör seçildi", Toast.LENGTH_SHORT).show();
+    }
+
+    private String folderLabel(String tree) {
+        if (tree == null || tree.isEmpty()) return "Kaynak klasör: Seçilmedi";
+        try {
+            DocumentFile f = DocumentFile.fromTreeUri(this, Uri.parse(tree));
+            String name = f == null ? null : f.getName();
+            return "Kaynak klasör: " + (name == null || name.isEmpty() ? tree : name);
+        } catch (Throwable t) {
+            return "Kaynak klasör: Seçili";
+        }
     }
 
     private void startCropService() {
+        SharedPreferences p = getSharedPreferences(CropForegroundService.PREFS, MODE_PRIVATE);
+        String tree = p.getString(CropForegroundService.KEY_TREE_URI, "");
+        if (tree == null || tree.isEmpty()) {
+            Toast.makeText(this, "Önce klasör seç", Toast.LENGTH_LONG).show();
+            return;
+        }
         Intent i = new Intent(this, CropForegroundService.class);
         i.setAction(CropForegroundService.ACTION_START);
         if (Build.VERSION.SDK_INT >= 26) startForegroundService(i);
         else startService(i);
         Toast.makeText(this, "Kırpma arka planda başladı", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQ_PERMS && hasImagePermission()) startCropService();
-        else if (requestCode == REQ_PERMS) Toast.makeText(this, "Fotoğraf izni gerekli", Toast.LENGTH_LONG).show();
     }
 
     @Override protected void onResume() {
