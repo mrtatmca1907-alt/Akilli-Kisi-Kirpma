@@ -22,47 +22,17 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Fotoğraf veya klasör seç. Algılanan her kişi ayrı görsel olarak kırpılıp kaydedilir."
+            android:layout_marginTop="10dp"
+            android:text="Telefondaki erişilebilir fotoğrafları sırayla işler. Her fotoğraf kendi klasörüne orijinaliyle birlikte kaydedilir; bulunan her insan tam vücudu kapsayacak güvenli payla ayrı görüntü olarak çıkarılır."
             android:textColor="#D9E2F2"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btnPhotos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Fotoğrafları seç" />
-
-        <Button
-            android:id="@+id/btnFolder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Klasör ekle" />
-
-        <Button
-            android:id="@+id/btnClear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Seçimleri temizle" />
-
-        <TextView
-            android:id="@+id/txtSelection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="Henüz seçim yok"
-            android:textColor="#FFFFFF"
             android:textSize="15sp" />
 
         <Button
             android:id="@+id/btnStart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Kırpmayı başlat" />
+            android:layout_marginTop="24dp"
+            android:text="Başlat" />
 
         <Button
             android:id="@+id/btnStop"
@@ -72,23 +42,14 @@
             android:enabled="false"
             android:text="Durdur" />
 
-        <ProgressBar
-            android:id="@+id/progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:max="100"
-            android:progress="0" />
-
         <TextView
             android:id="@+id/txtStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="20dp"
             android:text="Hazır"
             android:textColor="#F4C430"
-            android:textSize="15sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
@@ -96,14 +57,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textColor="#C8D1DF"
-            android:textSize="13sp" />
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Çıktı: Pictures/AkilliKisiKirpma/orijinal-dosya-adi/"
+            android:layout_marginTop="22dp"
+            android:text="Çıktı: Pictures/AkilliKisiKirpma/"
             android:textColor="#8FA2BA"
             android:textSize="12sp" />
 
