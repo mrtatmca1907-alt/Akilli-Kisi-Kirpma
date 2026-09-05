@@ -32,11 +32,10 @@ public class CropForegroundService extends Service {
     private final AtomicBoolean stopRequested = new AtomicBoolean(false);
 
     private static final class QueueState {
-        long seenImages;
-        long resumeIndex;
         int processed;
         int people;
         int crops;
+        int moved;
         int errors;
     }
 
@@ -63,10 +62,10 @@ public class CropForegroundService extends Service {
     private void runQueue() {
         SharedPreferences p = getSharedPreferences(PREFS, MODE_PRIVATE);
         QueueState s = new QueueState();
-        s.resumeIndex = p.getLong("resume_index", 0L);
         s.processed = p.getInt("processed", 0);
         s.people = p.getInt("people", 0);
         s.crops = p.getInt("crops", 0);
+        s.moved = p.getInt("moved", 0);
         s.errors = p.getInt("errors", 0);
         p.edit().putBoolean("running", true).putBoolean("finished", false).apply();
 
@@ -123,9 +122,6 @@ public class CropForegroundService extends Service {
             }
             if (!child.isFile() || !isImage(child)) continue;
 
-            long thisIndex = s.seenImages++;
-            if (thisIndex < s.resumeIndex) continue;
-
             Uri uri = child.getUri();
             String name = child.getName();
             String mime = child.getType();
@@ -137,13 +133,27 @@ public class CropForegroundService extends Service {
             s.people += r.detected;
             s.crops += r.saved;
             s.errors += r.failed;
-            s.resumeIndex = thisIndex + 1;
+
+            if (r.originalSaved) {
+                boolean deleted = false;
+                try {
+                    deleted = child.delete();
+                } catch (Throwable ignored) {
+                    deleted = false;
+                }
+                if (deleted) {
+                    s.moved++;
+                } else {
+                    s.errors++;
+                    p.edit().putString("last_error", "Kaynak silinemedi: " + (name == null ? uri : name)).apply();
+                }
+            }
 
             p.edit()
-                    .putLong("resume_index", s.resumeIndex)
                     .putInt("processed", s.processed)
                     .putInt("people", s.people)
                     .putInt("crops", s.crops)
+                    .putInt("moved", s.moved)
                     .putInt("errors", s.errors)
                     .putString("current", name == null ? "" : name)
                     .apply();
