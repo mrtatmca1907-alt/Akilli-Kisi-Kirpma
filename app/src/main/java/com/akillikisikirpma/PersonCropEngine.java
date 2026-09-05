@@ -6,7 +6,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
+import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -55,19 +57,18 @@ final class PersonCropEngine implements AutoCloseable {
 
         Bitmap detectBitmap = null;
         Bitmap original = null;
-        List<Detection> people = new ArrayList<>();
         try {
             detectBitmap = decodeForDetection(uri);
             if (detectBitmap == null) {
                 result.failed++;
                 return result;
             }
-            for (Detection d : detector.detect(TensorImage.fromBitmap(detectBitmap))) {
-                if (isPerson(d)) people.add(d);
-            }
+
+            List<RectF> people = detectPeopleBoxes(detectBitmap);
+            if (people.isEmpty()) people = detectPeopleRotatedFallback(detectBitmap, 90);
+            if (people.isEmpty()) people = detectPeopleRotatedFallback(detectBitmap, 270);
             result.detected = people.size();
 
-            // Orijinal her durumda korunur; kişi yoksa tam çözünür bitmap hiç açılmaz.
             result.originalSaved = copyOriginal(uri, folder, displayName, mimeType);
             if (!result.originalSaved) {
                 result.failed++;
@@ -82,10 +83,10 @@ final class PersonCropEngine implements AutoCloseable {
             }
 
             int personNo = 0;
-            for (Detection d : people) {
+            for (RectF detected : people) {
                 personNo++;
                 Rect r = CropMath.toOriginalExpanded(
-                        d.getBoundingBox(),
+                        detected,
                         detectBitmap.getWidth(), detectBitmap.getHeight(),
                         original.getWidth(), original.getHeight()
                 );
@@ -112,6 +113,43 @@ final class PersonCropEngine implements AutoCloseable {
         }
         return result;
     }
+
+    private List<RectF> detectPeopleBoxes(Bitmap bitmap) {
+        List<RectF> out = new ArrayList<>();
+        for (Detection d : detector.detect(TensorImage.fromBitmap(bitmap))) {
+            if (isPerson(d)) out.add(new RectF(d.getBoundingBox()));
+        }
+        return out;
+    }
+
+    private List<RectF> detectPeopleRotatedFallback(Bitmap source, int degrees) {
+        List<RectF> out = new ArrayList<>();
+        Bitmap rotated = null;
+        try {
+            Matrix m = new Matrix();
+            m.postRotate(degrees);
+            rotated = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), m, false);
+            for (Detection d : detector.detect(TensorImage.fromBitmap(rotated))) {
+                if (!isPerson(d)) continue;
+                RectF b = d.getBoundingBox();
+                float[] mapped = degrees == 90
+                        ? RotationBoxMath.fromRotated90(b.left, b.top, b.right, b.bottom, source.getWidth(), source.getHeight())
+                        : RotationBoxMath.fromRotated270(b.left, b.top, b.right, b.bottom, source.getWidth(), source.getHeight());
+                out.add(new RectF(
+                        clamp(mapped[0], 0, source.getWidth()),
+                        clamp(mapped[1], 0, source.getHeight()),
+                        clamp(mapped[2], 0, source.getWidth()),
+                        clamp(mapped[3], 0, source.getHeight())
+                ));
+            }
+        } catch (Throwable ignored) {
+        } finally {
+            if (rotated != null && rotated != source && !rotated.isRecycled()) rotated.recycle();
+        }
+        return out;
+    }
+
+    private float clamp(float v, float min, float max) { return Math.max(min, Math.min(max, v)); }
 
     private boolean isPerson(Detection detection) {
         for (Category c : detection.getCategories()) {
