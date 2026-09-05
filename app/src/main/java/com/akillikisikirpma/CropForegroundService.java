@@ -5,14 +5,18 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.DocumentsContract;
 
 import androidx.documentfile.provider.DocumentFile;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,6 +28,7 @@ public class CropForegroundService extends Service {
     public static final String PREFS = "crop_status";
     public static final String KEY_TREE_URI = "source_tree_uri";
 
+    private static final String STAGING_NAME = "ATMACA_TEK_KLASOR";
     private static final String CHANNEL = "crop_work";
     private static final int NOTIFICATION_ID = 1907;
 
@@ -32,6 +37,8 @@ public class CropForegroundService extends Service {
     private final AtomicBoolean stopRequested = new AtomicBoolean(false);
 
     private static final class QueueState {
+        int gathered;
+        int duplicates;
         int processed;
         int people;
         int crops;
@@ -62,6 +69,8 @@ public class CropForegroundService extends Service {
     private void runQueue() {
         SharedPreferences p = getSharedPreferences(PREFS, MODE_PRIVATE);
         QueueState s = new QueueState();
+        s.gathered = p.getInt("gathered", 0);
+        s.duplicates = p.getInt("duplicates", 0);
         s.processed = p.getInt("processed", 0);
         s.people = p.getInt("people", 0);
         s.crops = p.getInt("crops", 0);
@@ -83,15 +92,33 @@ public class CropForegroundService extends Service {
                 return;
             }
 
+            DocumentFile staging = root.findFile(STAGING_NAME);
+            if (staging == null) staging = root.createDirectory(STAGING_NAME);
+            if (staging == null || !staging.isDirectory()) {
+                finishWithError(p, s, "Tek klasör oluşturulamadı");
+                return;
+            }
+
+            p.edit().putString("phase", "Toplanıyor").apply();
+            updateNotification("Tüm görseller tek klasöre taşınıyor");
+            consolidateDirectory(root, staging, p, s);
+            if (stopRequested.get()) return;
+
+            p.edit().putString("phase", "Kırpılıyor").apply();
+            updateNotification("Toplama tamamlandı, kişiler kırpılıyor");
             try (PersonCropEngine engine = new PersonCropEngine(this)) {
-                processDirectory(root, engine, p, s);
+                processStaging(staging, engine, p, s);
             }
         } catch (Throwable t) {
             s.errors++;
             p.edit().putInt("errors", s.errors).putString("last_error", String.valueOf(t.getMessage())).apply();
         } finally {
             boolean stopped = stopRequested.get();
-            p.edit().putBoolean("running", false).putBoolean("finished", !stopped).apply();
+            p.edit()
+                    .putBoolean("running", false)
+                    .putBoolean("finished", !stopped)
+                    .putString("phase", stopped ? "Durduruldu" : "Tamamlandı")
+                    .apply();
             updateNotification(stopped ? "Durduruldu" : "Tamamlandı");
             running.set(false);
             stopForeground(false);
@@ -99,8 +126,9 @@ public class CropForegroundService extends Service {
         }
     }
 
-    private void processDirectory(DocumentFile dir, PersonCropEngine engine, SharedPreferences p, QueueState s) {
+    private void consolidateDirectory(DocumentFile dir, DocumentFile staging, SharedPreferences p, QueueState s) {
         if (stopRequested.get()) return;
+        if (sameUri(dir, staging)) return;
         String dirName = dir.getName();
         if (dirName != null && "AkilliKisiKirpma".equalsIgnoreCase(dirName)) return;
 
@@ -108,8 +136,7 @@ public class CropForegroundService extends Service {
         try {
             children = dir.listFiles();
         } catch (Throwable t) {
-            s.errors++;
-            p.edit().putInt("errors", s.errors).apply();
+            recordError(p, s, "Klasör okunamadı: " + safeName(dir));
             return;
         }
 
@@ -117,17 +144,110 @@ public class CropForegroundService extends Service {
             if (stopRequested.get()) return;
             if (child == null) continue;
             if (child.isDirectory()) {
-                processDirectory(child, engine, p, s);
+                if (!sameUri(child, staging)) consolidateDirectory(child, staging, p, s);
                 continue;
             }
             if (!child.isFile() || !isImage(child)) continue;
+            moveIntoStaging(child, dir, staging, p, s);
+        }
+    }
+
+    private void moveIntoStaging(DocumentFile source, DocumentFile sourceParent, DocumentFile staging,
+                                 SharedPreferences p, QueueState s) {
+        String originalName = source.getName();
+        String name = (originalName == null || originalName.trim().isEmpty())
+                ? "fotograf_" + stableId(source.getUri().toString()) + ".jpg" : originalName;
+        String mime = source.getType();
+        if (mime == null || mime.trim().isEmpty()) mime = "image/jpeg";
+
+        updateNotification("Toplanıyor: " + name);
+        p.edit().putString("current", name).apply();
+
+        DocumentFile existing = staging.findFile(name);
+        if (existing != null && ConsolidationPolicy.isDuplicate(name, source.length(), existing.getName(), existing.length())) {
+            try {
+                if (source.delete()) {
+                    s.duplicates++;
+                    saveCounters(p, s);
+                    return;
+                }
+            } catch (Throwable ignored) {}
+            recordError(p, s, "Kopya kaynak silinemedi: " + name);
+            return;
+        }
+
+        if (existing != null) name = uniqueName(staging, name);
+
+        // Aynı DocumentsProvider içindeyse gerçek taşıma çok daha hızlıdır.
+        try {
+            String currentName = source.getName();
+            if (currentName == null || !currentName.equals(name)) {
+                if (!source.renameTo(name)) throw new IllegalStateException("yeniden adlandırma desteklenmiyor");
+            }
+            Uri moved = DocumentsContract.moveDocument(
+                    getContentResolver(), source.getUri(), sourceParent.getUri(), staging.getUri());
+            if (moved != null) {
+                s.gathered++;
+                saveCounters(p, s);
+                return;
+            }
+        } catch (Throwable ignored) {
+            // Sağlayıcı moveDocument desteklemiyorsa aşağıdaki güvenli yedek kullanılır.
+        }
+
+        String fallbackName = source.getName();
+        if (fallbackName == null || fallbackName.trim().isEmpty()) fallbackName = name;
+        if (staging.findFile(fallbackName) != null) fallbackName = uniqueName(staging, fallbackName);
+        DocumentFile target = null;
+        try {
+            target = staging.createFile(mime, fallbackName);
+            if (target == null) throw new IllegalStateException("hedef dosya oluşturulamadı");
+            long sourceSize = source.length();
+            long copied = 0L;
+            ContentResolver resolver = getContentResolver();
+            try (InputStream in = resolver.openInputStream(source.getUri());
+                 OutputStream out = resolver.openOutputStream(target.getUri(), "w")) {
+                if (in == null || out == null) throw new IllegalStateException("dosya akışı açılamadı");
+                byte[] buffer = new byte[1024 * 1024];
+                int n;
+                while ((n = in.read(buffer)) != -1) {
+                    if (stopRequested.get()) throw new InterruptedException("durduruldu");
+                    out.write(buffer, 0, n);
+                    copied += n;
+                }
+                out.flush();
+            }
+            if (sourceSize > 0L && copied != sourceSize) {
+                throw new IllegalStateException("taşıma doğrulaması başarısız");
+            }
+            if (!source.delete()) throw new IllegalStateException("kaynak silinemedi");
+            s.gathered++;
+            saveCounters(p, s);
+        } catch (Throwable t) {
+            try { if (target != null) target.delete(); } catch (Throwable ignored) {}
+            if (!(t instanceof InterruptedException)) recordError(p, s, "Toplama hatası: " + fallbackName);
+        }
+    }
+
+    private void processStaging(DocumentFile staging, PersonCropEngine engine, SharedPreferences p, QueueState s) {
+        DocumentFile[] files;
+        try {
+            files = staging.listFiles();
+        } catch (Throwable t) {
+            recordError(p, s, "Tek klasör okunamadı");
+            return;
+        }
+
+        for (DocumentFile child : files) {
+            if (stopRequested.get()) return;
+            if (child == null || !child.isFile() || !isImage(child)) continue;
 
             Uri uri = child.getUri();
             String name = child.getName();
             String mime = child.getType();
             long stableId = stableId(uri.toString());
 
-            updateNotification("İşleniyor: " + (name == null ? "fotoğraf" : name));
+            updateNotification("Kırpılıyor: " + (name == null ? "fotoğraf" : name));
             PersonCropEngine.ProcessResult r = engine.process(uri, stableId, name, mime);
             s.processed++;
             s.people += r.detected;
@@ -136,28 +256,55 @@ public class CropForegroundService extends Service {
 
             if (r.originalSaved) {
                 boolean deleted = false;
-                try {
-                    deleted = child.delete();
-                } catch (Throwable ignored) {
-                    deleted = false;
-                }
-                if (deleted) {
-                    s.moved++;
-                } else {
-                    s.errors++;
-                    p.edit().putString("last_error", "Kaynak silinemedi: " + (name == null ? uri : name)).apply();
-                }
+                try { deleted = child.delete(); } catch (Throwable ignored) {}
+                if (deleted) s.moved++;
+                else recordError(p, s, "İşlenen kaynak silinemedi: " + (name == null ? uri : name));
             }
 
-            p.edit()
-                    .putInt("processed", s.processed)
-                    .putInt("people", s.people)
-                    .putInt("crops", s.crops)
-                    .putInt("moved", s.moved)
-                    .putInt("errors", s.errors)
-                    .putString("current", name == null ? "" : name)
-                    .apply();
+            p.edit().putString("current", name == null ? "" : name).apply();
+            saveCounters(p, s);
         }
+    }
+
+    private String uniqueName(DocumentFile dir, String name) {
+        String base = name;
+        String ext = "";
+        int dot = name.lastIndexOf('.');
+        if (dot > 0) {
+            base = name.substring(0, dot);
+            ext = name.substring(dot);
+        }
+        for (int i = 1; i < 1000000; i++) {
+            String candidate = base + " (" + i + ")" + ext;
+            if (dir.findFile(candidate) == null) return candidate;
+        }
+        return base + "_" + System.currentTimeMillis() + ext;
+    }
+
+    private void saveCounters(SharedPreferences p, QueueState s) {
+        p.edit()
+                .putInt("gathered", s.gathered)
+                .putInt("duplicates", s.duplicates)
+                .putInt("processed", s.processed)
+                .putInt("people", s.people)
+                .putInt("crops", s.crops)
+                .putInt("moved", s.moved)
+                .putInt("errors", s.errors)
+                .apply();
+    }
+
+    private void recordError(SharedPreferences p, QueueState s, String message) {
+        s.errors++;
+        p.edit().putInt("errors", s.errors).putString("last_error", message).apply();
+    }
+
+    private boolean sameUri(DocumentFile a, DocumentFile b) {
+        return a != null && b != null && a.getUri().equals(b.getUri());
+    }
+
+    private String safeName(DocumentFile file) {
+        String n = file == null ? null : file.getName();
+        return n == null ? "klasör" : n;
     }
 
     private boolean isImage(DocumentFile file) {
@@ -181,12 +328,11 @@ public class CropForegroundService extends Service {
     }
 
     private void finishWithError(SharedPreferences p, QueueState s, String message) {
-        s.errors++;
+        recordError(p, s, message);
         p.edit()
-                .putInt("errors", s.errors)
-                .putString("last_error", message)
                 .putBoolean("running", false)
                 .putBoolean("finished", false)
+                .putString("phase", "Hata")
                 .apply();
         updateNotification(message);
         running.set(false);
@@ -197,7 +343,7 @@ public class CropForegroundService extends Service {
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel ch = new NotificationChannel(CHANNEL, "Kişi kırpma işlemi", NotificationManager.IMPORTANCE_LOW);
-            ch.setDescription("Fotoğraflar arka planda işlenirken gösterilir");
+            ch.setDescription("Görseller toplanırken ve kişiler kırpılırken gösterilir");
             getSystemService(NotificationManager.class).createNotificationChannel(ch);
         }
     }
