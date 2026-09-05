@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,7 +96,7 @@ public class MainActivity extends Activity {
 
         getSharedPreferences(CropForegroundService.PREFS, MODE_PRIVATE).edit()
                 .putString(CropForegroundService.KEY_TREE_URI, treeUri.toString())
-                .putLong("last_doc_hash", Long.MIN_VALUE)
+                .putLong("resume_index", 0L)
                 .putInt("processed", 0)
                 .putInt("people", 0)
                 .putInt("crops", 0)
