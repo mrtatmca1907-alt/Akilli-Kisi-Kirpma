@@ -1,4 +1,4 @@
-name: Build Android APKs
+name: Build Akilli Kisi Kirpma APK
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 45
 
     steps:
       - name: Kodu al
@@ -39,43 +39,15 @@ jobs:
         with:
           gradle-version: '8.11.1'
 
-      - name: APKleri derle
-        run: gradle :app:assembleDebug :videoapp:assembleDebug :downloaderapp:assembleDebug :filemanagerapp:assembleDebug :hunterapp:assembleDebug :suiteapp:assembleDebug --stacktrace
+      - name: Testleri calistir
+        run: gradle :app:testDebugUnitTest --stacktrace
 
-      - name: Kisi Kirpma APK yukle
+      - name: APK derle
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: APK yukle
         uses: actions/upload-artifact@v4
         with:
-          name: Akilli-Kisi-Kirpma-APK
+          name: Akilli-Kisi-Kirpma-v1.2.0
           path: app/build/outputs/apk/debug/app-debug.apk
-
-      - name: Video Kareleri APK yukle
-        uses: actions/upload-artifact@v4
-        with:
-          name: VideoKareleri-APK
-          path: videoapp/build/outputs/apk/debug/videoapp-debug.apk
-
-      - name: Coklu Video Indirici APK yukle
-        uses: actions/upload-artifact@v4
-        with:
-          name: Coklu-Video-Indirici-APK
-          path: downloaderapp/build/outputs/apk/debug/downloaderapp-debug.apk
-
-      - name: ATMACA Dosyalar APK yukle
-        uses: actions/upload-artifact@v4
-        with:
-          name: ATMACA-Dosyalar-APK
-          path: filemanagerapp/build/outputs/apk/debug/filemanagerapp-debug.apk
-
-      - name: Gorsel Avcisi APK yukle
-        uses: actions/upload-artifact@v4
-        with:
-          name: Gorsel-Avcisi-APK
-          path: hunterapp/build/outputs/apk/debug/hunterapp-debug.apk
-          if-no-files-found: error
-
-      - name: 5li Araclar deneme APK yukle
-        uses: actions/upload-artifact@v4
-        with:
-          name: Besli-Araclar-Deneme-APK
-          path: suiteapp/build/outputs/apk/debug/suiteapp-debug.apk
           if-no-files-found: error
