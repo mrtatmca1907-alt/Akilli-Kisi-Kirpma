@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
             int processed = p.getInt("processed", 0);
             int people = p.getInt("people", 0);
             int crops = p.getInt("crops", 0);
+            int moved = p.getInt("moved", 0);
             int errors = p.getInt("errors", 0);
             String current = p.getString("current", "");
             String tree = p.getString(CropForegroundService.KEY_TREE_URI, "");
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
             txtFolder.setText(folderLabel(tree));
             txtLog.setText(
                     "İşlenen fotoğraf: " + processed +
+                    "\nTaşınan orijinal: " + moved +
                     "\nBulunan kişi: " + people +
                     "\nKaydedilen kişi kırpımı: " + crops +
                     "\nHata: " + errors +
@@ -96,10 +98,11 @@ public class MainActivity extends Activity {
 
         getSharedPreferences(CropForegroundService.PREFS, MODE_PRIVATE).edit()
                 .putString(CropForegroundService.KEY_TREE_URI, treeUri.toString())
-                .putLong("resume_index", 0L)
+                .remove("resume_index")
                 .putInt("processed", 0)
                 .putInt("people", 0)
                 .putInt("crops", 0)
+                .putInt("moved", 0)
                 .putInt("errors", 0)
                 .putBoolean("finished", false)
                 .putString("current", "")
@@ -129,7 +132,7 @@ public class MainActivity extends Activity {
         i.setAction(CropForegroundService.ACTION_START);
         if (Build.VERSION.SDK_INT >= 26) startForegroundService(i);
         else startService(i);
-        Toast.makeText(this, "Kırpma arka planda başladı", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Taşıma ve kırpma arka planda başladı", Toast.LENGTH_SHORT).show();
     }
 
     @Override protected void onResume() {
