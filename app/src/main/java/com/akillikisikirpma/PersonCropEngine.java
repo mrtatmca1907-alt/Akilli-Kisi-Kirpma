@@ -1,9 +1,7 @@
 package com.akillikisikirpma;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.graphics.Matrix;
@@ -22,8 +20,6 @@ import org.tensorflow.lite.task.vision.detector.ObjectDetector;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +50,11 @@ final class PersonCropEngine implements AutoCloseable {
         ProcessResult result = new ProcessResult();
         String sourceBase = safeBase(displayName);
         String folder = sourceBase + "_" + mediaId;
+        File outputDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "AkilliKisiKirpma/" + folder);
+        if (!outputDir.exists() && !outputDir.mkdirs()) {
+            result.failed++;
+            return result;
+        }
 
         Bitmap detectBitmap = null;
         Bitmap original = null;
@@ -69,42 +70,40 @@ final class PersonCropEngine implements AutoCloseable {
             if (people.isEmpty()) people = detectPeopleRotatedFallback(detectBitmap, 270);
             result.detected = people.size();
 
-            result.originalSaved = copyOriginal(uri, folder, displayName, mimeType);
-            if (!result.originalSaved) {
-                result.failed++;
-                return result;
-            }
-            if (people.isEmpty()) return result;
-
-            original = decodeOriginal(uri);
-            if (original == null) {
-                result.failed++;
-                return result;
-            }
-
-            int personNo = 0;
-            for (RectF detected : people) {
-                personNo++;
-                Rect r = CropMath.toOriginalExpanded(
-                        detected,
-                        detectBitmap.getWidth(), detectBitmap.getHeight(),
-                        original.getWidth(), original.getHeight()
-                );
-                if (r.width() < 2 || r.height() < 2) {
+            if (!people.isEmpty()) {
+                original = decodeOriginal(uri);
+                if (original == null) {
                     result.failed++;
-                    continue;
-                }
-                Bitmap crop = null;
-                try {
-                    crop = Bitmap.createBitmap(original, r.left, r.top, r.width(), r.height());
-                    if (saveCrop(crop, folder, sourceBase, personNo)) result.saved++;
-                    else result.failed++;
-                } catch (Throwable t) {
-                    result.failed++;
-                } finally {
-                    if (crop != null && crop != original && !crop.isRecycled()) crop.recycle();
+                } else {
+                    int personNo = 0;
+                    for (RectF detected : people) {
+                        personNo++;
+                        Rect r = CropMath.toOriginalExpanded(
+                                detected,
+                                detectBitmap.getWidth(), detectBitmap.getHeight(),
+                                original.getWidth(), original.getHeight()
+                        );
+                        if (r.width() < 2 || r.height() < 2) {
+                            result.failed++;
+                            continue;
+                        }
+                        Bitmap crop = null;
+                        try {
+                            crop = Bitmap.createBitmap(original, r.left, r.top, r.width(), r.height());
+                            if (saveCropDirect(crop, outputDir, sourceBase, personNo)) result.saved++;
+                            else result.failed++;
+                        } catch (Throwable t) {
+                            result.failed++;
+                        } finally {
+                            if (crop != null && crop != original && !crop.isRecycled()) crop.recycle();
+                        }
+                    }
                 }
             }
+
+            // Bütün okuma/kırpma bittikten sonra büyük orijinali KOPYALAMADAN hedefe taşı.
+            result.originalSaved = moveOriginalDirect(uri, outputDir, displayName);
+            if (!result.originalSaved) result.failed++;
         } catch (Throwable t) {
             result.failed++;
         } finally {
@@ -112,6 +111,43 @@ final class PersonCropEngine implements AutoCloseable {
             if (original != null && !original.isRecycled()) original.recycle();
         }
         return result;
+    }
+
+    private boolean moveOriginalDirect(Uri uri, File outputDir, String displayName) {
+        if (!"file".equalsIgnoreCase(uri.getScheme()) || uri.getPath() == null) return false;
+        File source = new File(uri.getPath());
+        if (!source.isFile()) return false;
+        String name = (displayName == null || displayName.trim().isEmpty()) ? source.getName() : displayName;
+        File out = new File(outputDir, name);
+
+        if (out.isFile()) {
+            if (out.length() == source.length() && source.length() > 0) return source.delete();
+            out = uniqueFile(outputDir, name);
+        }
+        return source.renameTo(out);
+    }
+
+    private File uniqueFile(File dir, String name) {
+        String base = name;
+        String ext = "";
+        int dot = name.lastIndexOf('.');
+        if (dot > 0) { base = name.substring(0, dot); ext = name.substring(dot); }
+        for (int i = 1; i < 1000000; i++) {
+            File f = new File(dir, base + " (" + i + ")" + ext);
+            if (!f.exists()) return f;
+        }
+        return new File(dir, base + "_" + System.currentTimeMillis() + ext);
+    }
+
+    private boolean saveCropDirect(Bitmap bitmap, File dir, String sourceBase, int personNo) {
+        File out = new File(dir, sourceBase + "_kisi_" + personNo + ".jpg");
+        if (out.isFile() && out.length() > 0) return true;
+        try (FileOutputStream fos = new FileOutputStream(out)) {
+            return bitmap.compress(Bitmap.CompressFormat.JPEG, 96, fos);
+        } catch (Throwable t) {
+            try { out.delete(); } catch (Throwable ignored) {}
+            return false;
+        }
     }
 
     private List<RectF> detectPeopleBoxes(Bitmap bitmap) {
@@ -183,107 +219,6 @@ final class PersonCropEngine implements AutoCloseable {
             return ImageDecoder.decodeBitmap(source, (decoder, info, src) -> decoder.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE));
         }
         return MediaStore.Images.Media.getBitmap(resolver, uri);
-    }
-
-    private boolean mediaStoreFileExists(String relativePath, String name) {
-        if (Build.VERSION.SDK_INT < 29) return false;
-        String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.SIZE};
-        String selection = MediaStore.Images.Media.RELATIVE_PATH + "=? AND " + MediaStore.Images.Media.DISPLAY_NAME + "=?";
-        String[] args = {relativePath, name};
-        try (Cursor c = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, args, null)) {
-            if (c == null || !c.moveToFirst()) return false;
-            int sizeCol = c.getColumnIndex(MediaStore.Images.Media.SIZE);
-            return sizeCol < 0 || c.getLong(sizeCol) > 0;
-        } catch (Throwable t) {
-            return false;
-        }
-    }
-
-    private boolean copyOriginal(Uri source, String folder, String displayName, String mimeType) {
-        String name = (displayName == null || displayName.trim().isEmpty()) ? "orijinal.jpg" : displayName;
-        String mime = (mimeType == null || mimeType.trim().isEmpty()) ? "image/jpeg" : mimeType;
-        try {
-            if (Build.VERSION.SDK_INT >= 29) {
-                String relativePath = Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + folder + "/";
-                if (mediaStoreFileExists(relativePath, name)) return true;
-                ContentValues v = new ContentValues();
-                v.put(MediaStore.Images.Media.DISPLAY_NAME, name);
-                v.put(MediaStore.Images.Media.MIME_TYPE, mime);
-                v.put(MediaStore.Images.Media.RELATIVE_PATH, relativePath);
-                v.put(MediaStore.Images.Media.IS_PENDING, 1);
-                Uri out = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
-                if (out == null) return false;
-                boolean ok = false;
-                try (InputStream in = context.getContentResolver().openInputStream(source);
-                     OutputStream os = context.getContentResolver().openOutputStream(out)) {
-                    if (in == null || os == null) throw new IllegalStateException("stream yok");
-                    byte[] buf = new byte[4 * 1024 * 1024];
-                    int n;
-                    while ((n = in.read(buf)) >= 0) os.write(buf, 0, n);
-                    ok = true;
-                } finally {
-                    if (!ok) context.getContentResolver().delete(out, null, null);
-                }
-                v.clear();
-                v.put(MediaStore.Images.Media.IS_PENDING, 0);
-                context.getContentResolver().update(out, v, null, null);
-                return true;
-            }
-
-            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "AkilliKisiKirpma/" + folder);
-            if (!dir.exists() && !dir.mkdirs()) return false;
-            File out = new File(dir, name);
-            if (out.isFile() && out.length() > 0) return true;
-            try (InputStream in = context.getContentResolver().openInputStream(source); FileOutputStream os = new FileOutputStream(out)) {
-                if (in == null) return false;
-                byte[] buf = new byte[4 * 1024 * 1024];
-                int n;
-                while ((n = in.read(buf)) >= 0) os.write(buf, 0, n);
-            }
-            android.media.MediaScannerConnection.scanFile(context, new String[]{out.getAbsolutePath()}, new String[]{mime}, null);
-            return true;
-        } catch (Throwable t) {
-            return false;
-        }
-    }
-
-    private boolean saveCrop(Bitmap bitmap, String folder, String sourceBase, int personNo) {
-        String fileName = sourceBase + "_kisi_" + personNo + ".jpg";
-        try {
-            if (Build.VERSION.SDK_INT >= 29) {
-                String relativePath = Environment.DIRECTORY_PICTURES + "/AkilliKisiKirpma/" + folder + "/";
-                if (mediaStoreFileExists(relativePath, fileName)) return true;
-                ContentValues v = new ContentValues();
-                v.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-                v.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                v.put(MediaStore.Images.Media.RELATIVE_PATH, relativePath);
-                v.put(MediaStore.Images.Media.IS_PENDING, 1);
-                Uri out = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
-                if (out == null) return false;
-                try (OutputStream os = context.getContentResolver().openOutputStream(out)) {
-                    if (os == null || !bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)) {
-                        context.getContentResolver().delete(out, null, null);
-                        return false;
-                    }
-                }
-                v.clear();
-                v.put(MediaStore.Images.Media.IS_PENDING, 0);
-                context.getContentResolver().update(out, v, null, null);
-                return true;
-            }
-
-            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "AkilliKisiKirpma/" + folder);
-            if (!dir.exists() && !dir.mkdirs()) return false;
-            File out = new File(dir, fileName);
-            if (out.isFile() && out.length() > 0) return true;
-            try (FileOutputStream fos = new FileOutputStream(out)) {
-                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)) return false;
-            }
-            android.media.MediaScannerConnection.scanFile(context, new String[]{out.getAbsolutePath()}, new String[]{"image/jpeg"}, null);
-            return true;
-        } catch (Throwable t) {
-            return false;
-        }
     }
 
     private String safeBase(String name) {
