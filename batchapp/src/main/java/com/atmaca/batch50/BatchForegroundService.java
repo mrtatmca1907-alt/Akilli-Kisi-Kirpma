@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.os.IBinder;
-import android.annotation.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,18 +56,17 @@ public class BatchForegroundService extends Service {
                 for (String path : paths) {
                     File src = new File(path);
                     if (!src.isFile()) { db.mark(path, BatchQueueDb.MISSING); continue; }
-                    File[] before = crops.listFiles(); int beforeCount = before == null ? 0 : before.length;
                     engine.cropPeople(src, crops);
                     File out = BatchCropEngine.unique(originals, src.getName());
                     copyFast(src, out);
                     galleryFiles.add(out.getAbsolutePath());
-                    File[] after = crops.listFiles();
-                    if (after != null && after.length > beforeCount) for (int x=beforeCount; x<after.length; x++) galleryFiles.add(after[x].getAbsolutePath());
                     db.mark(path, BatchQueueDb.DONE);
                     done++;
                     send(done, paths.size(), done + "/" + paths.size() + " hazırlandı");
                 }
             }
+            File[] cropFiles = crops.listFiles();
+            if (cropFiles != null) for (File f : cropFiles) if (f.isFile()) galleryFiles.add(f.getAbsolutePath());
             if (!galleryFiles.isEmpty()) MediaScannerConnection.scanFile(this, galleryFiles.toArray(new String[0]), null, null);
             send(done, paths.size(), "Hazır. Galeride ATMACA_50 klasörünü açabilirsin.");
         } catch (Throwable t) {
@@ -102,6 +100,6 @@ public class BatchForegroundService extends Service {
         i.putExtra(EXTRA_DONE, done); i.putExtra(EXTRA_TOTAL, total); i.putExtra(EXTRA_MESSAGE, msg); sendBroadcast(i);
     }
 
-    @Nullable @Override public IBinder onBind(Intent intent) { return null; }
+    @Override public IBinder onBind(Intent intent) { return null; }
     @Override public void onDestroy() { executor.shutdownNow(); super.onDestroy(); }
 }
