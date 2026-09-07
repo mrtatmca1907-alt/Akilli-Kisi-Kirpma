@@ -8,77 +8,68 @@ on:
       - 'tools/filemanager/**'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install tools
+      - name: Install apktool
         run: |
           sudo apt-get update
-          sudo apt-get install -y apktool unzip
-          curl -L --fail --retry 3 -o /tmp/jadx.zip https://github.com/skylot/jadx/releases/download/v1.5.6/jadx-1.5.6.zip
-          unzip -q /tmp/jadx.zip -d /tmp/jadx
-          echo "/tmp/jadx/bin" >> "$GITHUB_PATH"
+          sudo apt-get install -y apktool
 
       - name: Download exact upstream APK
         run: |
           curl -L --fail --retry 3 -A 'Mozilla/5.0' -o /tmp/filemanager.apk 'https://d.apkpure.net/b/APK/com.alphainventor.filemanager?version=latest'
           echo '2528b7ac9e2ada91c17f5a853dd4d0ec8556354dd578e647a1caba0c69a547cb  /tmp/filemanager.apk' | sha256sum -c -
-          ls -lh /tmp/filemanager.apk
 
-      - name: Decompile resources and smali
+      - name: Decompile APK
         run: |
-          apktool d -f /tmp/filemanager.apk -o /tmp/apktool-out >/tmp/apktool.log 2>&1
-          tail -n 80 /tmp/apktool.log
+          apktool d -f /tmp/filemanager.apk -o /tmp/apktool-out
 
-      - name: Decompile Java view
+      - name: Build focused report
         run: |
-          jadx -d /tmp/jadx-out /tmp/filemanager.apk >/tmp/jadx.log 2>&1 || true
-          tail -n 80 /tmp/jadx.log
-
-      - name: Locate file operation code
-        run: |
-          mkdir -p out
-          {
-            echo '=== JAVA MATCHES ==='
-            grep -RniE 'Recycle Bin|RecycleBin|DeleteOperator|DELETE TO RECYCLE|CREATE RECYCLE BIN|\.nomedia|MediaScanner|renameTo\(|Files\.move|mkdirs?\(' /tmp/jadx-out/sources 2>/dev/null | head -n 1000 || true
-            echo
-            echo '=== SMALI MATCHES ==='
-            grep -RniE 'Recycle Bin|RecycleBin|DeleteOperator|DELETE TO RECYCLE|CREATE RECYCLE BIN|\.nomedia|MediaScanner|renameTo|Files;->move|mkdirs?' /tmp/apktool-out/smali* 2>/dev/null | head -n 1500 || true
-          } | tee out/file-ops-matches.txt
-
-      - name: Collect matching source files
-        run: |
+          mkdir -p tools/filemanager
           python3 - <<'PY'
-          import os,re,shutil
-          roots=['/tmp/jadx-out/sources','/tmp/apktool-out']
-          pat=re.compile(r'Recycle Bin|RecycleBin|DeleteOperator|DELETE TO RECYCLE|CREATE RECYCLE BIN|\.nomedia|MediaScanner|renameTo\(|Files\.move|mkdirs?\(',re.I)
-          out='out/matches'
-          os.makedirs(out,exist_ok=True)
-          count=0
+          import os,re
+          roots=[p for p in os.listdir('/tmp/apktool-out') if p.startswith('smali')]
+          pats=[
+            r'Recycle Bin',r'RecycleBin',r'DeleteOperator',r'DELETE TO RECYCLE',r'CREATE RECYCLE BIN',
+            r'\.nomedia',r'MediaScanner',r'renameTo',r'Files;->move',r'mkdirs?',r'calculate',r'folder size'
+          ]
+          rx=re.compile('|'.join(pats),re.I)
+          out=[]
           for root in roots:
-            for dp,_,fs in os.walk(root):
-              for f in fs:
-                if not f.endswith(('.java','.smali','.xml')): continue
-                p=os.path.join(dp,f)
-                try:
-                  s=open(p,'r',errors='ignore').read()
+            base='/tmp/apktool-out/'+root
+            for dp,_,fs in os.walk(base):
+              for fn in fs:
+                if not fn.endswith('.smali'): continue
+                p=os.path.join(dp,fn)
+                try: lines=open(p,'r',errors='ignore').read().splitlines()
                 except: continue
-                if pat.search(s):
-                  rel=p.replace('/tmp/','').replace('/','__')
-                  shutil.copy2(p,os.path.join(out,rel))
-                  count+=1
-                  if count>=300: break
-              if count>=300: break
-            if count>=300: break
-          print('collected',count)
+                hits=[i for i,l in enumerate(lines) if rx.search(l)]
+                if not hits: continue
+                out.append('\n===== '+p+' =====')
+                seen=set()
+                for i in hits[:30]:
+                  a=max(0,i-12); b=min(len(lines),i+18)
+                  key=(a,b)
+                  if key in seen: continue
+                  seen.add(key)
+                  out.extend(f'{n+1:06d}: {lines[n]}' for n in range(a,b))
+          open('tools/filemanager/inspection-report.txt','w').write('\n'.join(out[:30000]))
+          print('report lines',min(len(out),30000))
           PY
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: filemanager-inspection
-          path: out
-          retention-days: 3
+      - name: Commit report
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add tools/filemanager/inspection-report.txt
+          git diff --cached --quiet || git commit -m 'Add File Manager smali inspection report'
+          git push
