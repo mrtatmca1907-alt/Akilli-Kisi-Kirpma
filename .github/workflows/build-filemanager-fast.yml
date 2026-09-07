@@ -1,0 +1,100 @@
+name: Build File Manager FAST
+
+on:
+  push:
+    branches: [ filemanager-patch ]
+    paths:
+      - '.github/workflows/build-filemanager-fast.yml'
+      - 'tools/filemanager/patch/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install apktool
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apktool
+
+      - name: Download and verify exact APK
+        run: |
+          curl -L --fail --retry 3 -A 'Mozilla/5.0' -o /tmp/original.apk 'https://d.apkpure.net/b/APK/com.alphainventor.filemanager?version=latest'
+          echo '2528b7ac9e2ada91c17f5a853dd4d0ec8556354dd578e647a1caba0c69a547cb  /tmp/original.apk' | sha256sum -c -
+          apktool d -f /tmp/original.apk -o /tmp/app
+
+      - name: RED - prove original has recycle and confirmation paths
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/app/smali/ax/Z2/o.smali')
+          s=p.read_text()
+          assert 'iput-boolean p1, p0, Lax/Z2/o;->i:Z' in s, 'expected configurable recycle flag missing'
+          assert 'if-eqz p5, :cond_4' in s, 'expected confirmation branch missing'
+          print('RED confirmed: stock APK still allows recycle-bin path and confirmation dialog')
+          PY
+
+      - name: Patch permanent direct delete + no confirmation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('/tmp/app/smali/ax/Z2/o.smali')
+          s=p.read_text()
+
+          # Force all delete operations through permanent DeleteOperator (p), never RecycleOperator (q).
+          old='''.method public y(Z)V\n    .locals 0\n\n    .line 1\n    iput-boolean p1, p0, Lax/Z2/o;->i:Z'''
+          new='''.method public y(Z)V\n    .locals 1\n\n    .line 1\n    const/4 v0, 0x0\n\n    iput-boolean v0, p0, Lax/Z2/o;->i:Z'''
+          if old not in s:
+              raise SystemExit('y(Z) recycle selector pattern not found')
+          s=s.replace(old,new,1)
+
+          # Normal delete entry: force direct execution instead of opening delete confirmation fragment.
+          sig='.method public static l(Lax/g3/s;Lcom/alphainventor/filemanager/file/o;Ljava/util/List;IZZIILax/Z2/h$a;Landroid/content/DialogInterface$OnCancelListener;)V'
+          start=s.index(sig)
+          loc=s.index('    .locals 7',start)
+          ins='    .locals 7\n\n    # FAST PATCH: skip confirmation\n    const/4 p5, 0x1'
+          s=s[:loc]+s[loc:].replace('    .locals 7',ins,1)
+
+          p.write_text(s)
+          PY
+
+      - name: GREEN - verify patch is surgical
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('/tmp/app/smali/ax/Z2/o.smali').read_text()
+          y=s[s.index('.method public y(Z)V'):s.index('.end method',s.index('.method public y(Z)V'))]
+          assert 'const/4 v0, 0x0' in y
+          assert 'iput-boolean v0, p0, Lax/Z2/o;->i:Z' in y
+          assert 'iput-boolean p1, p0, Lax/Z2/o;->i:Z' not in y
+          l=s[s.index('.method public static l('):s.index('.end method',s.index('.method public static l('))]
+          assert 'const/4 p5, 0x1' in l
+          # Permanent operator still present and untouched.
+          assert 'new-instance v2, Lax/Z2/p;' in s
+          assert 'Lax/Z2/p;-><init>' in s
+          print('GREEN: delete is permanent and confirmation is bypassed; permanent operator remains intact')
+          PY
+
+      - name: Rebuild APK
+        run: apktool b /tmp/app -o /tmp/unsigned.apk
+
+      - name: Sign APK
+        run: |
+          BT=$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+          APKSIGNER="$ANDROID_HOME/build-tools/$BT/apksigner"
+          ZIPALIGN="$ANDROID_HOME/build-tools/$BT/zipalign"
+          keytool -genkeypair -v -keystore /tmp/fast.keystore -storepass android -keypass android -alias fast -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=ATMACA FAST,O=Local,C=TR'
+          "$ZIPALIGN" -p -f 4 /tmp/unsigned.apk /tmp/aligned.apk
+          "$APKSIGNER" sign --ks /tmp/fast.keystore --ks-key-alias fast --ks-pass pass:android --key-pass pass:android --out /tmp/ATMACA-FileManager-FAST.apk /tmp/aligned.apk
+          "$APKSIGNER" verify --verbose /tmp/ATMACA-FileManager-FAST.apk
+          sha256sum /tmp/ATMACA-FileManager-FAST.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ATMACA-FileManager-FAST
+          path: /tmp/ATMACA-FileManager-FAST.apk
+          retention-days: 3
