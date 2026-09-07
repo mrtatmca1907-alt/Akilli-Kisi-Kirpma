@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,14 +51,18 @@ public class MainActivity extends Activity {
         setContentView(buildUi());
         if (Build.VERSION.SDK_INT >= 33) requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 81);
         if (!hasStorageAccess()) statusText.setText("İlk kez: DOSYA İZNİ VER düğmesine bas.");
-        else if (db.countAll() == 0) startScan();
-        else refreshCounts();
+        else {
+            AppPaths.removeNoMedia(AppPaths.sourceRoot());
+            if (db.countAll() == 0) startScan();
+            else refreshCounts();
+        }
     }
 
     @Override protected void onResume() {
         super.onResume();
         IntentFilter f = new IntentFilter(BatchForegroundService.ACTION_PROGRESS);
         if (Build.VERSION.SDK_INT >= 33) registerReceiver(receiver, f, Context.RECEIVER_NOT_EXPORTED); else registerReceiver(receiver, f);
+        if (hasStorageAccess()) AppPaths.removeNoMedia(AppPaths.sourceRoot());
         refreshCounts();
     }
 
@@ -85,11 +88,11 @@ public class MainActivity extends Activity {
         box.addView(cards, lp(-1,dp(92)));
 
         Button permission = button("DOSYA İZNİ VER"); permission.setOnClickListener(v -> requestStorageAccess()); box.addView(permission, lp(-1,dp(58)));
-        scanButton = button("HIZLI TARA + GALERİDEN GİZLE"); scanButton.setOnClickListener(v -> startScan()); box.addView(scanButton, marginLp());
+        scanButton = button("HIZLI TARA"); scanButton.setOnClickListener(v -> startScan()); box.addView(scanButton, marginLp());
         giveButton = button("VER — SIRADAKİ 50"); giveButton.setTextSize(20); giveButton.setOnClickListener(v -> give50()); box.addView(giveButton, marginLp());
         progress = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal); progress.setIndeterminate(false); box.addView(progress, marginLp());
         statusText = text("Hazır.", 16, false); statusText.setPadding(0,dp(16),0,0); box.addView(statusText);
-        TextView note = text("Kaynak fotoğraflar taşınmaz/silinmez. Yalnız DCIM/1907 yönetilir. Pictures/Screenshots'a dokunulmaz. ATMACA_50 klasörünü sen sildikten sonra yeniden VER'e bas.", 14, false);
+        TextView note = text("Kaynak fotoğraflar taşınmaz/silinmez. DCIM/1907 içindeki .nomedia otomatik kaldırılır. Pictures/Screenshots'a dokunulmaz. ATMACA_50 klasörünü sen sildikten sonra yeniden VER'e bas.", 14, false);
         note.setTextColor(Color.DKGRAY); note.setPadding(0,dp(18),0,0); box.addView(note);
         ScrollView sv = new ScrollView(this); sv.addView(box); return sv;
     }
@@ -112,20 +115,14 @@ public class MainActivity extends Activity {
                 File root = AppPaths.sourceRoot();
                 if (!root.isDirectory()) result = "DCIM/1907 bulunamadı.";
                 else {
-                    hideFromGallery(root);
+                    AppPaths.removeNoMedia(root);
                     int added = db.scan(root);
-                    result = "Tarama bitti. Yeni bulunan: " + added + ". Kaynak galeriden gizlendi.";
+                    result = "Tarama bitti. Yeni bulunan: " + added + ".";
                 }
             } catch (Throwable t) { result = "Tarama hatası: " + t.getMessage(); }
             String finalResult = result;
             runOnUiThread(() -> { scanButton.setEnabled(true); giveButton.setEnabled(true); progress.setIndeterminate(false); statusText.setText(finalResult); refreshCounts(); });
         });
-    }
-
-    private void hideFromGallery(File root) throws Exception {
-        File marker = new File(root, ".nomedia");
-        if (!marker.exists()) try (FileOutputStream ignored = new FileOutputStream(marker)) {}
-        android.media.MediaScannerConnection.scanFile(this, new String[]{marker.getAbsolutePath()}, null, null);
     }
 
     private void give50() {
