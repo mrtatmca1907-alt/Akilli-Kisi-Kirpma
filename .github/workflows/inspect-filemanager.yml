@@ -21,42 +21,38 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y apktool
-      - name: Download exact upstream APK
+      - name: Download exact APK
         run: |
           curl -L --fail --retry 3 -A 'Mozilla/5.0' -o /tmp/filemanager.apk 'https://d.apkpure.net/b/APK/com.alphainventor.filemanager?version=latest'
           echo '2528b7ac9e2ada91c17f5a853dd4d0ec8556354dd578e647a1caba0c69a547cb  /tmp/filemanager.apk' | sha256sum -c -
-      - name: Decompile APK
+      - name: Decompile
         run: apktool d -f /tmp/filemanager.apk -o /tmp/apktool-out
-      - name: Map entry points
+      - name: Collect delete flow
         run: |
-          mkdir -p tools/filemanager
+          mkdir -p tools/filemanager/delete-flow
+          cp /tmp/apktool-out/smali/ax/Z2/q.smali tools/filemanager/delete-flow/q.smali
+          cp '/tmp/apktool-out/smali/ax/Z2/q$b.smali' 'tools/filemanager/delete-flow/q$b.smali'
           python3 - <<'PY'
-          import os,re
-          needles=['FileManager.DeleteOperator','DELETE TO RECYCLE BIN','DELETE TO RECYCLEBIN FAILED','FAILED MOVE TO RECYCLE BIN','BATCH DELETE 1','BATCH DELETE 2','BATCH DELETE TRAN','CREATE RECYCLE BIN FOLDER','.nomedia']
+          import os,re,shutil
           out=[]
           for root,_,files in os.walk('/tmp/apktool-out'):
             for fn in files:
               if not fn.endswith('.smali'): continue
               p=os.path.join(root,fn)
-              try: lines=open(p,'r',errors='ignore').read().splitlines()
-              except: continue
-              for i,line in enumerate(lines):
-                if not any(n.lower() in line.lower() for n in needles): continue
-                # find enclosing method header
-                mh=''
-                for j in range(i,-1,-1):
-                  if lines[j].startswith('.method '): mh=lines[j]; break
-                out.append(f'FILE: {os.path.relpath(p,"/tmp/apktool-out")}\nMETHOD: {mh}\nLINE: {i+1}\n')
-                a=max(0,i-35); b=min(len(lines),i+60)
-                out.extend(f'{k+1:06d}: {lines[k]}' for k in range(a,b))
-                out.append('\n---\n')
-          open('tools/filemanager/entrypoints.txt','w').write('\n'.join(out))
-          print('sections',sum(1 for x in out if x.startswith('FILE: ')))
+              try:s=open(p,errors='ignore').read()
+              except:continue
+              if 'FileManager.DeleteOperator' in s or 'Lax/Z2/q;-><init>' in s or 'new-instance' in s and 'Lax/Z2/q;' in s:
+                rel=os.path.relpath(p,'/tmp/apktool-out')
+                out.append(rel)
+                if len(out)<=40:
+                  shutil.copy2(p,'tools/filemanager/delete-flow/'+rel.replace('/','__'))
+          open('tools/filemanager/delete-callers.txt','w').write('\n'.join(out))
+          print('\n'.join(out[:40]))
           PY
-      - name: Commit map
+      - name: Commit
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add tools/filemanager/entrypoints.txt
-          git diff --cached --quiet || git commit -m 'Map File Manager delete/recycle entry points'
+          git add tools/filemanager/delete-flow tools/filemanager/delete-callers.txt
+          git diff --cached --quiet || git commit -m 'Collect delete operator flow'
           git push
