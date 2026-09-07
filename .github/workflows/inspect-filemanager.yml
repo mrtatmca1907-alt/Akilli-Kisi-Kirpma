@@ -17,55 +17,46 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-
       - name: Install apktool
         run: |
           sudo apt-get update
           sudo apt-get install -y apktool
-
       - name: Download exact upstream APK
         run: |
           curl -L --fail --retry 3 -A 'Mozilla/5.0' -o /tmp/filemanager.apk 'https://d.apkpure.net/b/APK/com.alphainventor.filemanager?version=latest'
           echo '2528b7ac9e2ada91c17f5a853dd4d0ec8556354dd578e647a1caba0c69a547cb  /tmp/filemanager.apk' | sha256sum -c -
-
       - name: Decompile APK
+        run: apktool d -f /tmp/filemanager.apk -o /tmp/apktool-out
+      - name: Map entry points
         run: |
-          apktool d -f /tmp/filemanager.apk -o /tmp/apktool-out
-
-      - name: Collect focused smali
-        run: |
-          rm -rf tools/filemanager/selected
-          mkdir -p tools/filemanager/selected
+          mkdir -p tools/filemanager
           python3 - <<'PY'
-          import os,re,shutil
-          bases=[os.path.join('/tmp/apktool-out',x) for x in os.listdir('/tmp/apktool-out') if x.startswith('smali')]
-          rx=re.compile(r'Recycle Bin|RecycleBin|DeleteOperator|DELETE TO RECYCLE|CREATE RECYCLE BIN|FAILED MOVE TO RECYCLE|\.nomedia|MediaScanner|renameTo|Files;->move|BATCH DELETE|permanentDelete|deleteFileRecursively',re.I)
-          chosen=[]
-          for base in bases:
-            for dp,_,fs in os.walk(base):
-              for fn in fs:
-                if not fn.endswith('.smali'): continue
-                p=os.path.join(dp,fn)
-                try: s=open(p,'r',errors='ignore').read()
-                except: continue
-                if rx.search(s):
-                  rel=os.path.relpath(p,'/tmp/apktool-out')
-                  chosen.append((rel,p))
-          # prioritize app package and direct recycle/delete strings
-          chosen.sort(key=lambda x:(0 if 'com/alphainventor/filemanager' in x[0] else 1, x[0]))
-          lines=[]
-          for rel,p in chosen[:120]:
-            safe=rel.replace('/','__')
-            shutil.copy2(p,os.path.join('tools/filemanager/selected',safe))
-            lines.append(rel)
-          open('tools/filemanager/selected-files.txt','w').write('\n'.join(lines))
-          print('selected',len(lines))
+          import os,re
+          needles=['FileManager.DeleteOperator','DELETE TO RECYCLE BIN','DELETE TO RECYCLEBIN FAILED','FAILED MOVE TO RECYCLE BIN','BATCH DELETE 1','BATCH DELETE 2','BATCH DELETE TRAN','CREATE RECYCLE BIN FOLDER','.nomedia']
+          out=[]
+          for root,_,files in os.walk('/tmp/apktool-out'):
+            for fn in files:
+              if not fn.endswith('.smali'): continue
+              p=os.path.join(root,fn)
+              try: lines=open(p,'r',errors='ignore').read().splitlines()
+              except: continue
+              for i,line in enumerate(lines):
+                if not any(n.lower() in line.lower() for n in needles): continue
+                # find enclosing method header
+                mh=''
+                for j in range(i,-1,-1):
+                  if lines[j].startswith('.method '): mh=lines[j]; break
+                out.append(f'FILE: {os.path.relpath(p,"/tmp/apktool-out")}\nMETHOD: {mh}\nLINE: {i+1}\n')
+                a=max(0,i-35); b=min(len(lines),i+60)
+                out.extend(f'{k+1:06d}: {lines[k]}' for k in range(a,b))
+                out.append('\n---\n')
+          open('tools/filemanager/entrypoints.txt','w').write('\n'.join(out))
+          print('sections',sum(1 for x in out if x.startswith('FILE: ')))
           PY
-
-      - name: Commit focused sources
+      - name: Commit map
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add tools/filemanager/selected tools/filemanager/selected-files.txt
-          git diff --cached --quiet || git commit -m 'Collect File Manager file-operation smali'
+          git add tools/filemanager/entrypoints.txt
+          git diff --cached --quiet || git commit -m 'Map File Manager delete/recycle entry points'
           git push
