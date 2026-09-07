@@ -1,0 +1,5364 @@
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/z.smali =====
+008658: 
+008659:     .line 2
+008660:     :try_start_0
+008661:     new-instance v1, Ljava/lang/StringBuilder;
+008662: 
+008663:     .line 3
+008664:     .line 4
+008665:     invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+008666: 
+008667:     .line 5
+008668:     .line 6
+008669:     .line 7
+008670:     const-string v2, "mkdir "
+008671: 
+008672:     .line 8
+008673:     .line 9
+008674:     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+008675: 
+008676:     .line 10
+008677:     .line 11
+008678:     .line 12
+008679:     invoke-static {p1}, Lcom/alphainventor/filemanager/file/z;->k(Ljava/lang/String;)Ljava/lang/String;
+008680: 
+008681:     .line 13
+008682:     .line 14
+008683:     .line 15
+008684:     move-result-object v2
+008685: 
+008686:     .line 16
+008687:     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/u.smali =====
+001121:     invoke-virtual {p0}, Ljava/io/File;->exists()Z
+001122: 
+001123:     .line 90
+001124:     .line 91
+001125:     .line 92
+001126:     move-result v0
+001127: 
+001128:     .line 93
+001129:     if-nez v0, :cond_5
+001130: 
+001131:     .line 94
+001132:     .line 95
+001133:     invoke-virtual {p0}, Ljava/io/File;->mkdirs()Z
+001134: 
+001135:     .line 96
+001136:     .line 97
+001137:     .line 98
+001138:     :cond_5
+001139:     invoke-virtual {p0}, Ljava/io/File;->getAbsolutePath()Ljava/lang/String;
+001140: 
+001141:     .line 99
+001142:     .line 100
+001143:     .line 101
+001144:     move-result-object p0
+001145: 
+001146:     .line 102
+001147:     return-object p0
+001148:     .line 103
+001149:     .line 104
+001150:     .line 105
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/b$b.smali =====
+000972:     iget-object p1, p0, Lcom/alphainventor/filemanager/file/b$b;->j:Lcom/alphainventor/filemanager/file/b;
+000973: 
+000974:     .line 201
+000975:     .line 202
+000976:     invoke-static {p1}, Lcom/alphainventor/filemanager/file/b;->V(Lcom/alphainventor/filemanager/file/b;)Ljava/io/File;
+000977: 
+000978:     .line 203
+000979:     .line 204
+000980:     .line 205
+000981:     move-result-object p1
+000982: 
+000983:     .line 206
+000984:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+000985: 
+000986:     .line 207
+000987:     .line 208
+000988:     .line 209
+000989:     :cond_3
+000990:     iget-object p1, p0, Lcom/alphainventor/filemanager/file/b$b;->j:Lcom/alphainventor/filemanager/file/b;
+000991: 
+000992:     .line 210
+000993:     .line 211
+000994:     invoke-static {p1, v0}, Lcom/alphainventor/filemanager/file/b;->Y(Lcom/alphainventor/filemanager/file/b;Z)Z
+000995: 
+000996:     .line 212
+000997:     .line 213
+000998:     .line 214
+000999:     sget-object p1, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
+001000: 
+001001:     .line 215
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/w.smali =====
+006562:     :try_end_4
+006563:     .catchall {:try_start_4 .. :try_end_4} :catchall_1
+006564: 
+006565:     .line 207
+006566:     .line 208
+006567:     .line 209
+006568:     :try_start_5
+006569:     invoke-static {v0}, Lcom/alphainventor/filemanager/file/w;->A(Ljava/io/File;)V
+006570: 
+006571:     .line 210
+006572:     .line 211
+006573:     .line 212
+006574:     invoke-virtual {v2, v0}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+006575:     :try_end_5
+006576:     .catchall {:try_start_5 .. :try_end_5} :catchall_3
+006577: 
+006578:     .line 213
+006579:     .line 214
+006580:     .line 215
+006581:     if-eqz v3, :cond_6
+006582: 
+006583:     .line 216
+006584:     .line 217
+006585:     :try_start_6
+006586:     invoke-virtual {v3}, Ljava/io/BufferedReader;->close()V
+006587:     :try_end_6
+006588:     .catch Ljava/io/IOException; {:try_start_6 .. :try_end_6} :catch_0
+006589: 
+006590:     .line 218
+006591:     .line 219
+014032:     invoke-interface {p3}, Ljava/util/Iterator;->hasNext()Z
+014033: 
+014034:     .line 13
+014035:     .line 14
+014036:     .line 15
+014037:     move-result v3
+014038: 
+014039:     .line 16
+014040:     const-string v4, ".hidden"
+014041: 
+014042:     .line 17
+014043:     .line 18
+014044:     const-string v5, ".nomedia"
+014045: 
+014046:     .line 19
+014047:     .line 20
+014048:     const/4 v6, 0x1
+014049: 
+014050:     .line 21
+014051:     if-eqz v3, :cond_5
+014052: 
+014053:     .line 22
+014054:     .line 23
+014055:     invoke-interface {p3}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+014056: 
+014057:     .line 24
+014058:     .line 25
+014059:     .line 26
+014060:     move-result-object v3
+014061: 
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/J.smali =====
+000445:     .line 62
+000446:     move-result v7
+000447: 
+000448:     .line 63
+000449:     if-eqz v7, :cond_2
+000450: 
+000451:     .line 64
+000452:     .line 65
+000453:     goto :goto_1
+000454: 
+000455:     .line 66
+000456:     :cond_2
+000457:     const-string v7, ".nomedia"
+000458: 
+000459:     .line 67
+000460:     .line 68
+000461:     invoke-virtual {v7, v6}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+000462: 
+000463:     .line 69
+000464:     .line 70
+000465:     .line 71
+000466:     move-result v6
+000467: 
+000468:     .line 72
+000469:     if-nez v6, :cond_1
+000470: 
+000471:     .line 73
+000472:     .line 74
+000473:     invoke-virtual {v0, v5}, Lcom/alphainventor/filemanager/file/o;->m(Lcom/alphainventor/filemanager/file/n;)V
+000474: 
+001096:     .line 33
+001097:     move-result-object p1
+001098: 
+001099:     .line 34
+001100:     invoke-virtual {p1}, Lax/sb/b;->g()Lax/sb/b;
+001101: 
+001102:     .line 35
+001103:     .line 36
+001104:     .line 37
+001105:     move-result-object p1
+001106: 
+001107:     .line 38
+001108:     const-string v3, "CREATE RECYCLE BIN FOLDER"
+001109: 
+001110:     .line 39
+001111:     .line 40
+001112:     invoke-virtual {p1, v3}, Lax/sb/b;->c(Ljava/lang/String;)Lax/sb/b;
+001113: 
+001114:     .line 41
+001115:     .line 42
+001116:     .line 43
+001117:     move-result-object p1
+001118: 
+001119:     .line 44
+001120:     new-instance v3, Ljava/lang/StringBuilder;
+001121: 
+001122:     .line 45
+001123:     .line 46
+001124:     invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
+001125: 
+001285: 
+001286:     .line 133
+001287:     .line 134
+001288:     .line 135
+001289:     goto :goto_0
+001290: 
+001291:     .line 136
+001292:     :cond_0
+001293:     new-instance p0, Lax/e3/j;
+001294: 
+001295:     .line 137
+001296:     .line 138
+001297:     const-string p1, "Could not create Recycle Bin folder!"
+001298: 
+001299:     .line 139
+001300:     .line 140
+001301:     invoke-direct {p0, p1}, Lax/e3/j;-><init>(Ljava/lang/String;)V
+001302: 
+001303:     .line 141
+001304:     .line 142
+001305:     .line 143
+001306:     throw p0
+001307: 
+001308:     .line 144
+001309:     :cond_1
+001310:     if-eqz p1, :cond_2
+001311: 
+001312:     .line 145
+001313:     .line 146
+001314:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+001318:     .line 149
+001319:     move-result-object p0
+001320: 
+001321:     .line 150
+001322:     invoke-virtual {p0}, Lax/sb/b;->g()Lax/sb/b;
+001323: 
+001324:     .line 151
+001325:     .line 152
+001326:     .line 153
+001327:     move-result-object p0
+001328: 
+001329:     .line 154
+001330:     const-string p1, "CREATE RECYCLE BIN REPORT DIR EXIST"
+001331: 
+001332:     .line 155
+001333:     .line 156
+001334:     invoke-virtual {p0, p1}, Lax/sb/b;->c(Ljava/lang/String;)Lax/sb/b;
+001335: 
+001336:     .line 157
+001337:     .line 158
+001338:     .line 159
+001339:     move-result-object p0
+001340: 
+001341:     .line 160
+001342:     invoke-virtual {p0, v0}, Lax/sb/b;->h(Ljava/lang/Object;)Lax/sb/b;
+001343: 
+001344:     .line 161
+001345:     .line 162
+001346:     .line 163
+001347:     move-result-object p0
+001345:     .line 162
+001346:     .line 163
+001347:     move-result-object p0
+001348: 
+001349:     .line 164
+001350:     invoke-virtual {p0}, Lax/sb/b;->i()V
+001351: 
+001352:     .line 165
+001353:     .line 166
+001354:     .line 167
+001355:     :cond_2
+001356:     :goto_0
+001357:     const-string p0, ".nomedia"
+001358: 
+001359:     .line 168
+001360:     .line 169
+001361:     invoke-static {v0, p0}, Lax/f3/d0;->Q(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+001362: 
+001363:     .line 170
+001364:     .line 171
+001365:     .line 172
+001366:     move-result-object p0
+001367: 
+001368:     .line 173
+001369:     invoke-virtual {v1, p0}, Lcom/alphainventor/filemanager/file/o;->a1(Ljava/lang/String;)Lcom/alphainventor/filemanager/file/n;
+001370: 
+001371:     .line 174
+001372:     .line 175
+001373:     .line 176
+001374:     move-result-object p0
+001814:     .line 27
+001815:     move-result-object v1
+001816: 
+001817:     .line 28
+001818:     invoke-virtual {v1}, Lax/sb/b;->g()Lax/sb/b;
+001819: 
+001820:     .line 29
+001821:     .line 30
+001822:     .line 31
+001823:     move-result-object v1
+001824: 
+001825:     .line 32
+001826:     const-string v2, "Invalid Recycle Bin Base location"
+001827: 
+001828:     .line 33
+001829:     .line 34
+001830:     invoke-virtual {v1, v2}, Lax/sb/b;->b(Ljava/lang/String;)Lax/sb/b;
+001831: 
+001832:     .line 35
+001833:     .line 36
+001834:     .line 37
+001835:     move-result-object v1
+001836: 
+001837:     .line 38
+001838:     invoke-virtual {v1}, Lax/sb/b;->k()Lax/sb/b;
+001839: 
+001840:     .line 39
+001841:     .line 40
+001842:     .line 41
+001843:     move-result-object v1
+002394:     move-result-object v0
+002395: 
+002396:     .line 19
+002397:     new-instance v1, Ljava/lang/StringBuilder;
+002398: 
+002399:     .line 20
+002400:     .line 21
+002401:     invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+002402: 
+002403:     .line 22
+002404:     .line 23
+002405:     .line 24
+002406:     const-string v2, "Not normalized root path in recycle bin :"
+002407: 
+002408:     .line 25
+002409:     .line 26
+002410:     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+002411: 
+002412:     .line 27
+002413:     .line 28
+002414:     .line 29
+002415:     invoke-virtual {p0}, Lax/f3/K;->e()Ljava/lang/String;
+002416: 
+002417:     .line 30
+002418:     .line 31
+002419:     .line 32
+002420:     move-result-object v2
+002421: 
+002422:     .line 33
+002423:     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+004112:     if-eqz v8, :cond_a
+004113: 
+004114:     .line 457
+004115:     .line 458
+004116:     invoke-virtual {v7}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+004117: 
+004118:     .line 459
+004119:     .line 460
+004120:     .line 461
+004121:     move-result-object v7
+004122: 
+004123:     .line 462
+004124:     const-string v8, "Invalid RecycleBin Index"
+004125: 
+004126:     .line 463
+004127:     .line 464
+004128:     invoke-virtual {v7, v8}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
+004129: 
+004130:     .line 465
+004131:     .line 466
+004132:     .line 467
+004133:     move-result v7
+004134: 
+004135:     .line 468
+004136:     if-eqz v7, :cond_a
+004137: 
+004138:     .line 469
+004139:     .line 470
+004140:     invoke-interface {v3}, Lax/f3/b;->q()J
+004141: 
+007043:     if-eqz v11, :cond_2
+007044: 
+007045:     .line 78
+007046:     .line 79
+007047:     goto :goto_2
+007048: 
+007049:     .line 80
+007050:     :cond_2
+007051:     new-instance v0, Lax/e3/j;
+007052: 
+007053:     .line 81
+007054:     .line 82
+007055:     const-string v1, "Could not create recycle bin taret parent!"
+007056: 
+007057:     .line 83
+007058:     .line 84
+007059:     invoke-direct {v0, v1}, Lax/e3/j;-><init>(Ljava/lang/String;)V
+007060: 
+007061:     .line 85
+007062:     .line 86
+007063:     .line 87
+007064:     throw v0
+007065: 
+007066:     .line 88
+007067:     :cond_3
+007068:     invoke-virtual {v2}, Lcom/alphainventor/filemanager/file/n;->U()Ljava/lang/String;
+007069: 
+007070:     .line 89
+007071:     .line 90
+007072:     .line 91
+007638:     .line 341
+007639:     move-result v1
+007640: 
+007641:     .line 342
+007642:     if-eqz v1, :cond_8
+007643: 
+007644:     .line 343
+007645:     .line 344
+007646:     new-instance v1, Lax/e3/e;
+007647: 
+007648:     .line 345
+007649:     .line 346
+007650:     const-string v2, "Failed to move to recyclebin"
+007651: 
+007652:     .line 347
+007653:     .line 348
+007654:     invoke-direct {v1, v2, v0}, Lax/e3/e;-><init>(Ljava/lang/String;Ljava/lang/Throwable;)V
+007655: 
+007656:     .line 349
+007657:     .line 350
+007658:     .line 351
+007659:     throw v1
+007660: 
+007661:     .line 352
+007662:     :cond_8
+007663:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+007664: 
+007665:     .line 353
+007666:     .line 354
+007667:     .line 355
+007667:     .line 355
+007668:     move-result-object v1
+007669: 
+007670:     .line 356
+007671:     invoke-virtual {v1}, Lax/sb/b;->g()Lax/sb/b;
+007672: 
+007673:     .line 357
+007674:     .line 358
+007675:     .line 359
+007676:     move-result-object v1
+007677: 
+007678:     .line 360
+007679:     const-string v9, "FAILED MOVE TO RECYCLE BIN AFTER WRITING INDEX FILE"
+007680: 
+007681:     .line 361
+007682:     .line 362
+007683:     invoke-virtual {v1, v9}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+007684: 
+007685:     .line 363
+007686:     .line 364
+007687:     .line 365
+007688:     move-result-object v1
+007689: 
+007690:     .line 366
+007691:     invoke-virtual {v1, v0}, Lax/sb/b;->m(Ljava/lang/Throwable;)Lax/sb/b;
+007692: 
+007693:     .line 367
+007694:     .line 368
+007695:     .line 369
+007696:     move-result-object v1
+007976:     move-result-object v1
+007977: 
+007978:     .line 522
+007979:     invoke-virtual {v1}, Lax/sb/b;->i()V
+007980: 
+007981:     .line 523
+007982:     .line 524
+007983:     .line 525
+007984:     new-instance v1, Lax/e3/j;
+007985: 
+007986:     .line 526
+007987:     .line 527
+007988:     const-string v2, "Failed to move to recyclebin"
+007989: 
+007990:     .line 528
+007991:     .line 529
+007992:     invoke-direct {v1, v2, v0}, Lax/e3/j;-><init>(Ljava/lang/String;Ljava/lang/Throwable;)V
+007993: 
+007994:     .line 530
+007995:     .line 531
+007996:     .line 532
+007997:     throw v1
+007998: 
+007999:     .line 533
+008000:     :catch_6
+008001:     move-exception v0
+008002: 
+008003:     .line 534
+008004:     invoke-virtual {v1, v6}, Lcom/alphainventor/filemanager/file/o;->a1(Ljava/lang/String;)Lcom/alphainventor/filemanager/file/n;
+008005: 
+008016:     .line 541
+008017:     move-result-object v2
+008018: 
+008019:     .line 542
+008020:     invoke-virtual {v2}, Lax/sb/b;->g()Lax/sb/b;
+008021: 
+008022:     .line 543
+008023:     .line 544
+008024:     .line 545
+008025:     move-result-object v2
+008026: 
+008027:     .line 546
+008028:     const-string v3, "FAILED TO WRITE RECYCLEBIN INDEX"
+008029: 
+008030:     .line 547
+008031:     .line 548
+008032:     invoke-virtual {v2, v3}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+008033: 
+008034:     .line 549
+008035:     .line 550
+008036:     .line 551
+008037:     move-result-object v2
+008038: 
+008039:     .line 552
+008040:     invoke-virtual {v2, v0}, Lax/sb/b;->m(Ljava/lang/Throwable;)Lax/sb/b;
+008041: 
+008042:     .line 553
+008043:     .line 554
+008044:     .line 555
+008045:     move-result-object v2
+009279:     :catch_1
+009280:     move-exception p0
+009281: 
+009282:     .line 145
+009283:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+009284: 
+009285:     .line 146
+009286:     .line 147
+009287:     .line 148
+009288:     move-result-object p1
+009289: 
+009290:     .line 149
+009291:     const-string p2, "CANT GET RECYCLE BIN INDEX DIR"
+009292: 
+009293:     .line 150
+009294:     .line 151
+009295:     invoke-virtual {p1, p2}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+009296: 
+009297:     .line 152
+009298:     .line 153
+009299:     .line 154
+009300:     move-result-object p1
+009301: 
+009302:     .line 155
+009303:     invoke-virtual {p0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+009304: 
+009305:     .line 156
+009306:     .line 157
+009307:     .line 158
+009308:     move-result-object p2
+013108:     .catch Ljava/lang/IllegalArgumentException; {:try_start_0 .. :try_end_0} :catch_0
+013109: 
+013110:     .line 36
+013111:     .line 37
+013112:     .line 38
+013113:     return-object p1
+013114: 
+013115:     .line 39
+013116:     :catch_0
+013117:     move-exception p2
+013118: 
+013119:     .line 40
+013120:     const-string v0, "recyclebin sdcard root"
+013121: 
+013122:     .line 41
+013123:     .line 42
+013124:     invoke-static {v0, p2}, Lax/U2/d;->c(Ljava/lang/String;Ljava/lang/Throwable;)V
+013125: 
+013126:     .line 43
+013127:     .line 44
+013128:     .line 45
+013129:     :cond_0
+013130:     return-object p1
+013131: 
+013132:     .line 46
+013133:     :cond_1
+013134:     invoke-virtual {p0}, Lcom/alphainventor/filemanager/file/m;->t()I
+013135: 
+013136:     .line 47
+013137:     .line 48
+013303:     :try_end_0
+013304:     .catchall {:try_start_0 .. :try_end_0} :catchall_0
+013305: 
+013306:     .line 23
+013307:     throw p1
+013308: 
+013309:     .line 24
+013310:     :cond_0
+013311:     new-instance p1, Lax/e3/j;
+013312: 
+013313:     .line 25
+013314:     .line 26
+013315:     const-string v0, "invalid recycle bin index path"
+013316: 
+013317:     .line 27
+013318:     .line 28
+013319:     invoke-direct {p1, v0}, Lax/e3/j;-><init>(Ljava/lang/String;)V
+013320: 
+013321:     .line 29
+013322:     .line 30
+013323:     .line 31
+013324:     throw p1
+013325:     .line 32
+013326:     .line 33
+013327:     .line 34
+013328:     .line 35
+013329:     .line 36
+013330:     .line 37
+013331:     .line 38
+013332:     .line 39
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/K.smali =====
+000021: .field private d1:Z
+000022: 
+000023: .field private e1:J
+000024: 
+000025: .field private f1:J
+000026: 
+000027: 
+000028: # direct methods
+000029: .method static constructor <clinit>()V
+000030:     .locals 1
+000031: 
+000032:     .line 1
+000033:     const-string v0, "FileManager.RecycleBinFileInfo"
+000034: 
+000035:     .line 2
+000036:     .line 3
+000037:     invoke-static {v0}, Ljava/util/logging/Logger;->getLogger(Ljava/lang/String;)Ljava/util/logging/Logger;
+000038: 
+000039:     .line 4
+000040:     .line 5
+000041:     .line 6
+000042:     move-result-object v0
+000043: 
+000044:     .line 7
+000045:     sput-object v0, Lcom/alphainventor/filemanager/file/K;->g1:Ljava/util/logging/Logger;
+000046: 
+000047:     .line 8
+000048:     .line 9
+000049:     return-void
+000050:     .line 10
+000637: 
+000638:     .line 185
+000639:     .line 186
+000640:     new-instance v1, Ljava/lang/StringBuilder;
+000641: 
+000642:     .line 187
+000643:     .line 188
+000644:     invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+000645: 
+000646:     .line 189
+000647:     .line 190
+000648:     .line 191
+000649:     const-string v2, "Invalid RecycleBin Index File : "
+000650: 
+000651:     .line 192
+000652:     .line 193
+000653:     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+000654: 
+000655:     .line 194
+000656:     .line 195
+000657:     .line 196
+000658:     invoke-virtual {v1, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+000659: 
+000660:     .line 197
+000661:     .line 198
+000662:     .line 199
+000663:     invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+000664: 
+000665:     .line 200
+000666:     .line 201
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/v.smali =====
+000786: 
+000787:     .line 51
+000788:     .line 52
+000789:     invoke-virtual {p6, p1, p0}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+000790: 
+000791:     .line 53
+000792:     .line 54
+000793:     .line 55
+000794:     return-object p0
+000795: 
+000796:     .line 56
+000797:     :cond_2
+000798:     const-string v3, ".nomedia"
+000799: 
+000800:     .line 57
+000801:     .line 58
+000802:     if-nez p4, :cond_3
+000803: 
+000804:     .line 59
+000805:     .line 60
+000806:     new-instance p4, Ljava/io/File;
+000807: 
+000808:     .line 61
+000809:     .line 62
+000810:     invoke-direct {p4, p1, v3}, Ljava/io/File;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+000811: 
+000812:     .line 63
+000813:     .line 64
+000814:     .line 65
+000815:     invoke-virtual {p4}, Ljava/io/File;->exists()Z
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/b.smali =====
+000478:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000479: 
+000480:     .line 6
+000481:     .line 7
+000482:     .line 8
+000483:     move-result v1
+000484: 
+000485:     .line 9
+000486:     if-nez v1, :cond_0
+000487: 
+000488:     .line 10
+000489:     .line 11
+000490:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+000491: 
+000492:     .line 12
+000493:     .line 13
+000494:     .line 14
+000495:     :cond_0
+000496:     new-instance v1, Ljava/io/File;
+000497: 
+000498:     .line 15
+000499:     .line 16
+000500:     invoke-virtual {p1}, Lcom/alphainventor/filemanager/file/n;->E()Ljava/lang/String;
+000501: 
+000502:     .line 17
+000503:     .line 18
+000504:     .line 19
+000505:     move-result-object p1
+000506: 
+000507:     .line 20
+000529:     invoke-virtual {p1}, Ljava/io/File;->exists()Z
+000530: 
+000531:     .line 32
+000532:     .line 33
+000533:     .line 34
+000534:     move-result p2
+000535: 
+000536:     .line 35
+000537:     if-nez p2, :cond_1
+000538: 
+000539:     .line 36
+000540:     .line 37
+000541:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+000542: 
+000543:     .line 38
+000544:     .line 39
+000545:     .line 40
+000546:     :cond_1
+000547:     return-object v1
+000548: .end method
+000549: 
+000550: .method private static C0(Landroid/content/Context;Lax/U2/f;I)Ljava/io/File;
+000551:     .locals 0
+000552: 
+000553:     .line 1
+000554:     invoke-static {p0, p1, p2}, Lax/c3/a;->i(Landroid/content/Context;Lax/U2/f;I)Ljava/io/File;
+000555: 
+000556:     .line 2
+000557:     .line 3
+000558:     .line 4
+001312:     .line 25
+001313:     .line 26
+001314:     invoke-direct {p1, p2}, Lax/e3/j;-><init>(Ljava/lang/String;)V
+001315: 
+001316:     .line 27
+001317:     .line 28
+001318:     .line 29
+001319:     throw p1
+001320: 
+001321:     .line 30
+001322:     :cond_2
+001323:     :goto_0
+001324:     invoke-virtual {p1, p2}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+001325: 
+001326:     .line 31
+001327:     .line 32
+001328:     .line 33
+001329:     move-result p1
+001330: 
+001331:     .line 34
+001332:     if-eqz p1, :cond_3
+001333: 
+001334:     .line 35
+001335:     .line 36
+001336:     const/4 p1, 0x1
+001337: 
+001338:     .line 37
+001339:     return p1
+001340: 
+001341:     .line 38
+015062:     invoke-virtual {p1}, Ljava/io/File;->exists()Z
+015063: 
+015064:     .line 78
+015065:     .line 79
+015066:     .line 80
+015067:     move-result v4
+015068: 
+015069:     .line 81
+015070:     if-nez v4, :cond_3
+015071: 
+015072:     .line 82
+015073:     .line 83
+015074:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+015075: 
+015076:     .line 84
+015077:     .line 85
+015078:     .line 86
+015079:     move-result v4
+015080: 
+015081:     .line 87
+015082:     if-nez v4, :cond_3
+015083: 
+015084:     .line 88
+015085:     .line 89
+015086:     return v1
+015087: 
+015088:     .line 90
+015089:     :cond_3
+015090:     invoke-virtual {v3, p1}, Lax/f3/a;->p0(Ljava/io/File;)V
+015091: 
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/file/x.smali =====
+005745:     .line 49
+005746:     move-result p1
+005747: 
+005748:     .line 50
+005749:     if-eqz p1, :cond_2
+005750: 
+005751:     .line 51
+005752:     .line 52
+005753:     new-instance p1, Lax/e3/j;
+005754: 
+005755:     .line 53
+005756:     .line 54
+005757:     const-string p2, "File.renameTo failed"
+005758: 
+005759:     .line 55
+005760:     .line 56
+005761:     invoke-direct {p1, p2}, Lax/e3/j;-><init>(Ljava/lang/String;)V
+005762: 
+005763:     .line 57
+005764:     .line 58
+005765:     .line 59
+005766:     throw p1
+005767: 
+005768:     .line 60
+005769:     :cond_2
+005770:     new-instance p1, Lax/e3/t;
+005771: 
+005772:     .line 61
+005773:     .line 62
+005774:     const-string p2, "move source not exist"
+030384:     .line 141
+030385:     .line 142
+030386:     move-result-object v13
+030387:     :try_end_0
+030388:     .catch Ljava/lang/RuntimeException; {:try_start_0 .. :try_end_0} :catch_0
+030389: 
+030390:     .line 143
+030391:     :try_start_1
+030392:     new-array v14, v12, [Lj$/nio/file/CopyOption;
+030393: 
+030394:     .line 144
+030395:     .line 145
+030396:     invoke-static {v0, v13, v14}, Lj$/nio/file/Files;->move(Lj$/nio/file/Path;Lj$/nio/file/Path;[Lj$/nio/file/CopyOption;)Lj$/nio/file/Path;
+030397:     :try_end_1
+030398:     .catch Ljava/io/IOException; {:try_start_1 .. :try_end_1} :catch_2
+030399:     .catch Ljava/lang/SecurityException; {:try_start_1 .. :try_end_1} :catch_1
+030400:     .catch Ljava/lang/RuntimeException; {:try_start_1 .. :try_end_1} :catch_0
+030401: 
+030402:     .line 146
+030403:     .line 147
+030404:     .line 148
+030405:     goto/16 :goto_4
+030406: 
+030407:     .line 149
+030408:     .line 150
+030409:     :catch_0
+030410:     move-exception v0
+030411: 
+030412:     .line 151
+030413:     goto/16 :goto_2
+030646:     .line 262
+030647:     move-result-object v13
+030648: 
+030649:     .line 263
+030650:     invoke-virtual {v1}, Lcom/alphainventor/filemanager/file/y;->G0()Ljava/io/File;
+030651: 
+030652:     .line 264
+030653:     .line 265
+030654:     .line 266
+030655:     move-result-object v14
+030656: 
+030657:     .line 267
+030658:     invoke-virtual {v13, v14}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+030659: 
+030660:     .line 268
+030661:     .line 269
+030662:     .line 270
+030663:     move-result v13
+030664: 
+030665:     .line 271
+030666:     if-nez v13, :cond_c
+030667: 
+030668:     .line 272
+030669:     .line 273
+030670:     invoke-direct {p0, v3, v2, v0}, Lcom/alphainventor/filemanager/file/x;->G1(Lcom/alphainventor/filemanager/file/n;Lcom/alphainventor/filemanager/file/n;Ljava/lang/Throwable;)V
+030671:     :try_end_2
+030672:     .catch Ljava/lang/RuntimeException; {:try_start_2 .. :try_end_2} :catch_0
+030673: 
+030674:     .line 274
+030675:     .line 275
+030685:     .line 280
+030686:     move-result-object v11
+030687: 
+030688:     .line 281
+030689:     invoke-virtual {v1}, Lcom/alphainventor/filemanager/file/y;->G0()Ljava/io/File;
+030690: 
+030691:     .line 282
+030692:     .line 283
+030693:     .line 284
+030694:     move-result-object v13
+030695: 
+030696:     .line 285
+030697:     invoke-virtual {v11, v13}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+030698: 
+030699:     .line 286
+030700:     .line 287
+030701:     .line 288
+030702:     move-result v11
+030703: 
+030704:     .line 289
+030705:     if-nez v11, :cond_a
+030706: 
+030707:     .line 290
+030708:     .line 291
+030709:     invoke-direct {p0, v3, v2, v7}, Lcom/alphainventor/filemanager/file/x;->G1(Lcom/alphainventor/filemanager/file/n;Lcom/alphainventor/filemanager/file/n;Ljava/lang/Throwable;)V
+030710: 
+030711:     .line 292
+030712:     .line 293
+030713:     .line 294
+030714:     goto :goto_3
+030810:     .line 342
+030811:     move-result-object v0
+030812: 
+030813:     .line 343
+030814:     invoke-virtual {v1}, Lcom/alphainventor/filemanager/file/y;->G0()Ljava/io/File;
+030815: 
+030816:     .line 344
+030817:     .line 345
+030818:     .line 346
+030819:     move-result-object v11
+030820: 
+030821:     .line 347
+030822:     invoke-virtual {v0, v11}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+030823: 
+030824:     .line 348
+030825:     .line 349
+030826:     .line 350
+030827:     move-result v0
+030828: 
+030829:     .line 351
+030830:     if-nez v0, :cond_c
+030831: 
+030832:     .line 352
+030833:     .line 353
+030834:     invoke-direct {p0, v3, v2, v7}, Lcom/alphainventor/filemanager/file/x;->G1(Lcom/alphainventor/filemanager/file/n;Lcom/alphainventor/filemanager/file/n;Ljava/lang/Throwable;)V
+030835: 
+030836:     .line 354
+030837:     .line 355
+030838:     .line 356
+030839:     :cond_c
+035207:     if-nez v2, :cond_4
+035208: 
+035209:     .line 36
+035210:     .line 37
+035211:     invoke-virtual {v0}, Lcom/alphainventor/filemanager/file/y;->G0()Ljava/io/File;
+035212: 
+035213:     .line 38
+035214:     .line 39
+035215:     .line 40
+035216:     move-result-object v0
+035217: 
+035218:     .line 41
+035219:     invoke-virtual {v0}, Ljava/io/File;->mkdir()Z
+035220: 
+035221:     .line 42
+035222:     .line 43
+035223:     .line 44
+035224:     move-result v0
+035225: 
+035226:     .line 45
+035227:     if-eqz v0, :cond_2
+035228: 
+035229:     .line 46
+035230:     .line 47
+035231:     const/4 v2, 0x1
+035232: 
+035233:     .line 48
+035234:     invoke-direct {p0, p1, v1, v2}, Lcom/alphainventor/filemanager/file/x;->X(Lcom/alphainventor/filemanager/file/n;ZZ)V
+035235: 
+035236:     .line 49
+037200:     if-eqz v6, :cond_6
+037201: 
+037202:     .line 152
+037203:     .line 153
+037204:     invoke-static {v5}, Lax/f3/B;->u(Ljava/io/File;)Ljava/io/File;
+037205: 
+037206:     .line 154
+037207:     .line 155
+037208:     .line 156
+037209:     move-result-object v6
+037210: 
+037211:     .line 157
+037212:     invoke-virtual {v5, v6}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+037213: 
+037214:     .line 158
+037215:     .line 159
+037216:     .line 160
+037217:     move-result v5
+037218: 
+037219:     .line 161
+037220:     if-eqz v5, :cond_6
+037221: 
+037222:     .line 162
+037223:     .line 163
+037224:     invoke-virtual {v6}, Ljava/io/File;->delete()Z
+037225: 
+037226:     .line 164
+037227:     .line 165
+037228:     .line 166
+037229:     :cond_6
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/activity/ArchiveActivity.smali =====
+002015: 
+002016:     .line 27
+002017:     .line 28
+002018:     .line 29
+002019:     move-result-object v2
+002020: 
+002021:     .line 30
+002022:     invoke-direct {v1, v0, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+002023: 
+002024:     .line 31
+002025:     .line 32
+002026:     .line 33
+002027:     invoke-virtual {v1}, Ljava/io/File;->mkdir()Z
+002028: 
+002029:     .line 34
+002030:     .line 35
+002031:     .line 36
+002032:     new-instance v0, Ljava/io/File;
+002033: 
+002034:     .line 37
+002035:     .line 38
+002036:     invoke-direct {v0, v1, p1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+002037: 
+002038:     .line 39
+002039:     .line 40
+002040:     .line 41
+002041:     return-object v0
+002042:     .line 42
+002043:     .line 43
+002044:     .line 44
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/ads/a.smali =====
+003645:     .line 63
+003646:     .line 64
+003647:     .line 65
+003648:     .line 66
+003649:     .line 67
+003650:     .line 68
+003651: .end method
+003652: 
+003653: .method private static q()Ljava/lang/String;
+003654:     .locals 2
+003655: 
+003656:     .line 1
+003657:     const-string v0, "recyclebin_native"
+003658: 
+003659:     .line 2
+003660:     .line 3
+003661:     invoke-static {v0}, Lax/y3/a;->a(Ljava/lang/String;)Ljava/lang/String;
+003662: 
+003663:     .line 4
+003664:     .line 5
+003665:     .line 6
+003666:     move-result-object v0
+003667: 
+003668:     .line 7
+003669:     invoke-static {v0}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+003670: 
+003671:     .line 8
+003672:     .line 9
+003673:     .line 10
+003674:     move-result v1
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/shizuku/b.smali =====
+001377:     .locals 1
+001378: 
+001379:     .line 1
+001380:     new-instance v0, Ljava/io/File;
+001381: 
+001382:     .line 2
+001383:     .line 3
+001384:     invoke-direct {v0, p0}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+001385: 
+001386:     .line 4
+001387:     .line 5
+001388:     .line 6
+001389:     invoke-virtual {v0}, Ljava/io/File;->mkdir()Z
+001390: 
+001391:     .line 7
+001392:     .line 8
+001393:     .line 9
+001394:     move-result p0
+001395: 
+001396:     .line 10
+001397:     return p0
+001398:     .line 11
+001399:     .line 12
+001400:     .line 13
+001401:     .line 14
+001402:     .line 15
+001403:     .line 16
+001404:     .line 17
+001405:     .line 18
+001406:     .line 19
+001423:     .line 4
+001424:     .line 5
+001425:     .line 6
+001426:     new-instance p0, Ljava/io/File;
+001427: 
+001428:     .line 7
+001429:     .line 8
+001430:     invoke-direct {p0, p1}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+001431: 
+001432:     .line 9
+001433:     .line 10
+001434:     .line 11
+001435:     invoke-virtual {v0, p0}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+001436: 
+001437:     .line 12
+001438:     .line 13
+001439:     .line 14
+001440:     move-result p0
+001441:     :try_end_0
+001442:     .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+001443: 
+001444:     .line 15
+001445:     return p0
+001446: 
+001447:     .line 16
+001448:     :catch_0
+001449:     const/4 p0, 0x0
+001450: 
+001451:     .line 17
+001452:     return p0
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/service/ScanService$b$b.smali =====
+000001: .class Lcom/alphainventor/filemanager/service/ScanService$b$b;
+000002: .super Ljava/lang/Object;
+000003: .source "SourceFile"
+000004: 
+000005: # interfaces
+000006: .implements Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;
+000007: 
+000008: 
+000009: # annotations
+000010: .annotation system Ldalvik/annotation/EnclosingClass;
+000011:     value = Lcom/alphainventor/filemanager/service/ScanService$b;
+000012: .end annotation
+000013: 
+000014: .annotation system Ldalvik/annotation/InnerClass;
+000015:     accessFlags = 0x0
+000016:     name = "b"
+000017: .end annotation
+000018: 
+000019: 
+000020: # instance fields
+000021: .field final a:Ljava/util/List;
+000022:     .annotation system Ldalvik/annotation/Signature;
+000023:         value = {
+000019: 
+000020: # instance fields
+000021: .field final a:Ljava/util/List;
+000022:     .annotation system Ldalvik/annotation/Signature;
+000023:         value = {
+000024:             "Ljava/util/List<",
+000025:             "Lcom/alphainventor/filemanager/service/ScanService$a;",
+000026:             ">;"
+000027:         }
+000028:     .end annotation
+000029: .end field
+000030: 
+000031: .field b:Landroid/media/MediaScannerConnection;
+000032: 
+000033: .field c:I
+000034: 
+000035: .field d:Lcom/alphainventor/filemanager/service/ScanService$a;
+000036: 
+000037: .field final synthetic e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000038: 
+000039: 
+000040: # direct methods
+000041: .method constructor <init>(Lcom/alphainventor/filemanager/service/ScanService$b;Ljava/util/List;)V
+000042:     .locals 0
+000043:     .annotation system Ldalvik/annotation/Signature;
+000044:         value = {
+000045:             "(",
+000046:             "Ljava/util/List<",
+000047:             "Lcom/alphainventor/filemanager/service/ScanService$a;",
+000048:             ">;)V"
+000115:     invoke-interface {v1}, Ljava/util/List;->size()I
+000116: 
+000117:     .line 6
+000118:     .line 7
+000119:     .line 8
+000120:     move-result v1
+000121: 
+000122:     .line 9
+000123:     if-lt v0, v1, :cond_0
+000124: 
+000125:     .line 10
+000126:     .line 11
+000127:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000128: 
+000129:     .line 12
+000130:     .line 13
+000131:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->disconnect()V
+000132: 
+000133:     .line 14
+000134:     .line 15
+000135:     .line 16
+000136:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000137: 
+000138:     .line 17
+000139:     .line 18
+000140:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$b;->l:Ljava/util/concurrent/CountDownLatch;
+000141: 
+000142:     .line 19
+000143:     .line 20
+000144:     invoke-virtual {v0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
+000119:     .line 8
+000120:     move-result v1
+000121: 
+000122:     .line 9
+000123:     if-lt v0, v1, :cond_0
+000124: 
+000125:     .line 10
+000126:     .line 11
+000127:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000128: 
+000129:     .line 12
+000130:     .line 13
+000131:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->disconnect()V
+000132: 
+000133:     .line 14
+000134:     .line 15
+000135:     .line 16
+000136:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000137: 
+000138:     .line 17
+000139:     .line 18
+000140:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$b;->l:Ljava/util/concurrent/CountDownLatch;
+000141: 
+000142:     .line 19
+000143:     .line 20
+000144:     invoke-virtual {v0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
+000145: 
+000146:     .line 21
+000147:     .line 22
+000148:     .line 23
+000165:     .line 31
+000166:     move-result-object v0
+000167: 
+000168:     .line 32
+000169:     check-cast v0, Lcom/alphainventor/filemanager/service/ScanService$a;
+000170: 
+000171:     .line 33
+000172:     .line 34
+000173:     iput-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->d:Lcom/alphainventor/filemanager/service/ScanService$a;
+000174: 
+000175:     .line 35
+000176:     .line 36
+000177:     iget-object v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000178: 
+000179:     .line 37
+000180:     .line 38
+000181:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$a;->a:Ljava/lang/String;
+000182: 
+000183:     .line 39
+000184:     .line 40
+000185:     const/4 v2, 0x0
+000186: 
+000187:     .line 41
+000188:     invoke-virtual {v1, v0, v2}, Landroid/media/MediaScannerConnection;->scanFile(Ljava/lang/String;Ljava/lang/String;)V
+000189: 
+000190:     .line 42
+000191:     .line 43
+000192:     .line 44
+000193:     iget v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000194: 
+000176:     .line 36
+000177:     iget-object v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000178: 
+000179:     .line 37
+000180:     .line 38
+000181:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$a;->a:Ljava/lang/String;
+000182: 
+000183:     .line 39
+000184:     .line 40
+000185:     const/4 v2, 0x0
+000186: 
+000187:     .line 41
+000188:     invoke-virtual {v1, v0, v2}, Landroid/media/MediaScannerConnection;->scanFile(Ljava/lang/String;Ljava/lang/String;)V
+000189: 
+000190:     .line 42
+000191:     .line 43
+000192:     .line 44
+000193:     iget v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000194: 
+000195:     .line 45
+000196:     .line 46
+000197:     add-int/lit8 v0, v0, 0x1
+000198: 
+000199:     .line 47
+000200:     .line 48
+000201:     iput v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000202: 
+000203:     .line 49
+000204:     .line 50
+000205:     return-void
+000214:     .line 59
+000215:     .line 60
+000216:     .line 61
+000217:     .line 62
+000218:     .line 63
+000219:     .line 64
+000220:     .line 65
+000221:     .line 66
+000222:     .line 67
+000223:     .line 68
+000224: .end method
+000225: 
+000226: .method public onMediaScannerConnected()V
+000227:     .locals 5
+000228: 
+000229:     .line 1
+000230:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000231: 
+000232:     .line 2
+000233:     .line 3
+000234:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->isConnected()Z
+000235: 
+000236:     .line 4
+000237:     .line 5
+000238:     .line 6
+000239:     move-result v0
+000240: 
+000241:     .line 7
+000242:     if-nez v0, :cond_0
+000243: 
+000218:     .line 63
+000219:     .line 64
+000220:     .line 65
+000221:     .line 66
+000222:     .line 67
+000223:     .line 68
+000224: .end method
+000225: 
+000226: .method public onMediaScannerConnected()V
+000227:     .locals 5
+000228: 
+000229:     .line 1
+000230:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000231: 
+000232:     .line 2
+000233:     .line 3
+000234:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->isConnected()Z
+000235: 
+000236:     .line 4
+000237:     .line 5
+000238:     .line 6
+000239:     move-result v0
+000240: 
+000241:     .line 7
+000242:     if-nez v0, :cond_0
+000243: 
+000244:     .line 8
+000245:     .line 9
+000246:     return-void
+000247: 
+000222:     .line 67
+000223:     .line 68
+000224: .end method
+000225: 
+000226: .method public onMediaScannerConnected()V
+000227:     .locals 5
+000228: 
+000229:     .line 1
+000230:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000231: 
+000232:     .line 2
+000233:     .line 3
+000234:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->isConnected()Z
+000235: 
+000236:     .line 4
+000237:     .line 5
+000238:     .line 6
+000239:     move-result v0
+000240: 
+000241:     .line 7
+000242:     if-nez v0, :cond_0
+000243: 
+000244:     .line 8
+000245:     .line 9
+000246:     return-void
+000247: 
+000248:     .line 10
+000249:     :cond_0
+000250:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000251: 
+000308:     .line 39
+000309:     move-result-object v2
+000310: 
+000311:     .line 40
+000312:     invoke-virtual {v2}, Lax/sb/b;->g()Lax/sb/b;
+000313: 
+000314:     .line 41
+000315:     .line 42
+000316:     .line 43
+000317:     move-result-object v2
+000318: 
+000319:     .line 44
+000320:     const-string v3, "MediaScanner connected after timeout"
+000321: 
+000322:     .line 45
+000323:     .line 46
+000324:     invoke-virtual {v2, v3}, Lax/sb/b;->b(Ljava/lang/String;)Lax/sb/b;
+000325: 
+000326:     .line 47
+000327:     .line 48
+000328:     .line 49
+000329:     move-result-object v2
+000330: 
+000331:     .line 50
+000332:     new-instance v3, Ljava/lang/StringBuilder;
+000333: 
+000334:     .line 51
+000335:     .line 52
+000336:     invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
+000337: 
+
+===== /tmp/apktool-out/smali/com/alphainventor/filemanager/service/ScanService$b.smali =====
+000455: 
+000456:     .line 71
+000457:     .line 72
+000458:     new-instance p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;
+000459: 
+000460:     .line 73
+000461:     .line 74
+000462:     invoke-direct {p1, p0, v0}, Lcom/alphainventor/filemanager/service/ScanService$b$b;-><init>(Lcom/alphainventor/filemanager/service/ScanService$b;Ljava/util/List;)V
+000463: 
+000464:     .line 75
+000465:     .line 76
+000466:     .line 77
+000467:     new-instance v0, Landroid/media/MediaScannerConnection;
+000468: 
+000469:     .line 78
+000470:     .line 79
+000471:     iget-object v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->n:Lcom/alphainventor/filemanager/service/ScanService;
+000472: 
+000473:     .line 80
+000474:     .line 81
+000475:     invoke-virtual {v2}, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+000476: 
+000477:     .line 82
+000478:     .line 83
+000479:     .line 84
+000480:     move-result-object v2
+000481: 
+000482:     .line 85
+000483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000484: 
+000471:     iget-object v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->n:Lcom/alphainventor/filemanager/service/ScanService;
+000472: 
+000473:     .line 80
+000474:     .line 81
+000475:     invoke-virtual {v2}, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+000476: 
+000477:     .line 82
+000478:     .line 83
+000479:     .line 84
+000480:     move-result-object v2
+000481: 
+000482:     .line 85
+000483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000484: 
+000485:     .line 86
+000486:     .line 87
+000487:     .line 88
+000488:     iput-object v0, p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000489: 
+000490:     .line 89
+000491:     .line 90
+000492:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->connect()V
+000493: 
+000494:     .line 91
+000495:     .line 92
+000496:     .line 93
+000497:     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+000498: 
+000499:     .line 94
+000500:     .line 95
+000476: 
+000477:     .line 82
+000478:     .line 83
+000479:     .line 84
+000480:     move-result-object v2
+000481: 
+000482:     .line 85
+000483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000484: 
+000485:     .line 86
+000486:     .line 87
+000487:     .line 88
+000488:     iput-object v0, p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000489: 
+000490:     .line 89
+000491:     .line 90
+000492:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->connect()V
+000493: 
+000494:     .line 91
+000495:     .line 92
+000496:     .line 93
+000497:     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+000498: 
+000499:     .line 94
+000500:     .line 95
+000501:     .line 96
+000502:     move-result-wide v2
+000503: 
+000504:     .line 97
+000505:     iput-wide v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->m:J
+000480:     move-result-object v2
+000481: 
+000482:     .line 85
+000483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000484: 
+000485:     .line 86
+000486:     .line 87
+000487:     .line 88
+000488:     iput-object v0, p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000489: 
+000490:     .line 89
+000491:     .line 90
+000492:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->connect()V
+000493: 
+000494:     .line 91
+000495:     .line 92
+000496:     .line 93
+000497:     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+000498: 
+000499:     .line 94
+000500:     .line 95
+000501:     .line 96
+000502:     move-result-wide v2
+000503: 
+000504:     .line 97
+000505:     iput-wide v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->m:J
+000506: 
+000507:     .line 98
+000508:     .line 99
+000509:     :try_start_0
+
+===== /tmp/apktool-out/smali/com/davemorrissey/labs/subscaleview/SubsamplingScaleImageView.smali =====
+003532:     .line 13
+003533:     .line 14
+003534:     .line 15
+003535:     .line 16
+003536:     .line 17
+003537:     .line 18
+003538:     .line 19
+003539:     .line 20
+003540:     .line 21
+003541:     .line 22
+003542: .end method
+003543: 
+003544: .method private calculateInSampleSize(F)I
+003545:     .locals 3
+003546: 
+003547:     .line 1
+003548:     iget v0, p0, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->minimumTileDpi:I
+003549: 
+003550:     .line 2
+003551:     .line 3
+003552:     if-lez v0, :cond_0
+003553: 
+003554:     .line 4
+003555:     .line 5
+003556:     invoke-virtual {p0}, Landroid/view/View;->getResources()Landroid/content/res/Resources;
+003557: 
+003558:     .line 6
+003559:     .line 7
+003560:     .line 8
+003561:     move-result-object v0
+006792:     iget-object v1, p0, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->satTemp:Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView$ScaleAndTranslate;
+006793: 
+006794:     .line 46
+006795:     .line 47
+006796:     invoke-static {v1}, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView$ScaleAndTranslate;->access$4700(Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView$ScaleAndTranslate;)F
+006797: 
+006798:     .line 48
+006799:     .line 49
+006800:     .line 50
+006801:     move-result v1
+006802: 
+006803:     .line 51
+006804:     invoke-direct {p0, v1}, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->calculateInSampleSize(F)I
+006805: 
+006806:     .line 52
+006807:     .line 53
+006808:     .line 54
+006809:     move-result v1
+006810: 
+006811:     .line 55
+006812:     iput v1, p0, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->fullImageSampleSize:I
+006813: 
+006814:     .line 56
+006815:     .line 57
+006816:     if-ne v1, v0, :cond_0
+006817: 
+006818:     .line 58
+006819:     .line 59
+006820:     iget-object v1, p0, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->sRegion:Landroid/graphics/Rect;
+006821: 
+013571: 
+013572:     .line 10
+013573:     .line 11
+013574:     :cond_0
+013575:     iget v0, p0, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->fullImageSampleSize:I
+013576: 
+013577:     .line 12
+013578:     .line 13
+013579:     iget v1, p0, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->scale:F
+013580: 
+013581:     .line 14
+013582:     .line 15
+013583:     invoke-direct {p0, v1}, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->calculateInSampleSize(F)I
+013584: 
+013585:     .line 16
+013586:     .line 17
+013587:     .line 18
+013588:     move-result v1
+013589: 
+013590:     .line 19
+013591:     invoke-static {v0, v1}, Ljava/lang/Math;->min(II)I
+013592: 
+013593:     .line 20
+013594:     .line 21
+013595:     .line 22
+013596:     move-result v0
+013597: 
+013598:     .line 23
+013599:     iget-object v1, p0, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->tileMap:Ljava/util/Map;
+013600: 
+019463:     if-eqz v0, :cond_1a
+019464: 
+019465:     .line 372
+019466:     .line 373
+019467:     iget v0, v1, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->fullImageSampleSize:I
+019468: 
+019469:     .line 374
+019470:     .line 375
+019471:     iget v6, v1, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->scale:F
+019472: 
+019473:     .line 376
+019474:     .line 377
+019475:     invoke-direct {v1, v6}, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->calculateInSampleSize(F)I
+019476: 
+019477:     .line 378
+019478:     .line 379
+019479:     .line 380
+019480:     move-result v6
+019481: 
+019482:     .line 381
+019483:     invoke-static {v0, v6}, Ljava/lang/Math;->min(II)I
+019484: 
+019485:     .line 382
+019486:     .line 383
+019487:     .line 384
+019488:     move-result v0
+019489: 
+019490:     .line 385
+019491:     iget-object v6, v1, Lcom/davemorrissey/labs/subscaleview/SubsamplingScaleImageView;->tileMap:Ljava/util/Map;
+019492: 
+
+===== /tmp/apktool-out/smali/com/box/androidsdk/content/views/DefaultAvatarController.smali =====
+000816:     invoke-virtual {p1}, Ljava/io/File;->exists()Z
+000817: 
+000818:     .line 15
+000819:     .line 16
+000820:     .line 17
+000821:     move-result v0
+000822: 
+000823:     .line 18
+000824:     if-nez v0, :cond_0
+000825: 
+000826:     .line 19
+000827:     .line 20
+000828:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+000829: 
+000830:     .line 21
+000831:     .line 22
+000832:     .line 23
+000833:     :cond_0
+000834:     const/16 v0, 0x1e
+000835: 
+000836:     .line 24
+000837:     .line 25
+000838:     invoke-virtual {p0, p1, v0}, Lcom/box/androidsdk/content/views/DefaultAvatarController;->c(Ljava/io/File;I)V
+000839: 
+000840:     .line 26
+000841:     .line 27
+000842:     .line 28
+000843:     return-object p1
+000844:     .line 29
+000845:     .line 30
+
+===== /tmp/apktool-out/smali/com/box/androidsdk/content/auth/OAuthActivity.smali =====
+000292: 
+000293:     .line 40
+000294:     .line 41
+000295:     .line 42
+000296:     move-result-object v0
+000297: 
+000298:     .line 43
+000299:     invoke-static {v0}, Lcom/box/androidsdk/content/utils/SdkUtils;->g(Ljava/io/File;)Z
+000300: 
+000301:     .line 44
+000302:     .line 45
+000303:     .line 46
+000304:     invoke-virtual {v0}, Ljava/io/File;->mkdir()Z
+000305: 
+000306:     .line 47
+000307:     .line 48
+000308:     .line 49
+000309:     return-void
+000310:     .line 50
+000311:     .line 51
+000312:     .line 52
+000313:     .line 53
+000314:     .line 54
+000315:     .line 55
+000316:     .line 56
+000317:     .line 57
+000318:     .line 58
+000319:     .line 59
+000320:     .line 60
+000321:     .line 61
+
+===== /tmp/apktool-out/smali/ax/Y2/c.smali =====
+000797:     invoke-virtual {p1}, Ljava/io/File;->exists()Z
+000798: 
+000799:     .line 2
+000800:     .line 3
+000801:     .line 4
+000802:     move-result v0
+000803: 
+000804:     .line 5
+000805:     if-nez v0, :cond_0
+000806: 
+000807:     .line 6
+000808:     .line 7
+000809:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+000810: 
+000811:     .line 8
+000812:     .line 9
+000813:     .line 10
+000814:     :cond_0
+000815:     invoke-virtual {p1}, Ljava/io/File;->exists()Z
+000816: 
+000817:     .line 11
+000818:     .line 12
+000819:     .line 13
+000820:     move-result v0
+000821: 
+000822:     .line 14
+000823:     if-nez v0, :cond_1
+000824: 
+000825:     .line 15
+000826:     .line 16
+
+===== /tmp/apktool-out/smali/ax/G2/A.smali =====
+000326:     .line 107
+000327:     .line 108
+000328:     .line 109
+000329:     move-result-object v4
+000330: 
+000331:     .line 110
+000332:     invoke-virtual {v2, v3, v4}, Lax/F2/h;->k(Ljava/lang/String;Ljava/lang/String;)V
+000333: 
+000334:     .line 111
+000335:     .line 112
+000336:     .line 113
+000337:     :cond_1
+000338:     invoke-virtual {v1, v0}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000339: 
+000340:     .line 114
+000341:     .line 115
+000342:     .line 116
+000343:     move-result v2
+000344: 
+000345:     .line 117
+000346:     if-eqz v2, :cond_2
+000347: 
+000348:     .line 118
+000349:     .line 119
+000350:     new-instance v2, Ljava/lang/StringBuilder;
+000351: 
+000352:     .line 120
+000353:     .line 121
+000354:     invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
+000355: 
+
+===== /tmp/apktool-out/smali/ax/d3/r$g.smali =====
+000356:     .line 41
+000357:     move-result-object p1
+000358: 
+000359:     .line 42
+000360:     invoke-virtual {p1}, Lax/sb/b;->g()Lax/sb/b;
+000361: 
+000362:     .line 43
+000363:     .line 44
+000364:     .line 45
+000365:     move-result-object p1
+000366: 
+000367:     .line 46
+000368:     const-string v0, "RECYCLEBIN EMPTY PERMISION NOT SDCARD"
+000369: 
+000370:     .line 47
+000371:     .line 48
+000372:     invoke-virtual {p1, v0}, Lax/sb/b;->b(Ljava/lang/String;)Lax/sb/b;
+000373: 
+000374:     .line 49
+000375:     .line 50
+000376:     .line 51
+000377:     move-result-object p1
+000378: 
+000379:     .line 52
+000380:     new-instance v0, Ljava/lang/StringBuilder;
+000381: 
+000382:     .line 53
+000383:     .line 54
+000384:     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
+000385: 
+000564:     return-void
+000565: 
+000566:     .line 149
+000567:     :cond_2
+000568:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+000569: 
+000570:     .line 150
+000571:     .line 151
+000572:     .line 152
+000573:     move-result-object p1
+000574: 
+000575:     .line 153
+000576:     const-string v2, "EMPTY_RECYCLE BIN"
+000577: 
+000578:     .line 154
+000579:     .line 155
+000580:     invoke-virtual {p1, v2}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+000581: 
+000582:     .line 156
+000583:     .line 157
+000584:     .line 158
+000585:     move-result-object p1
+000586: 
+000587:     .line 159
+000588:     iget-object v2, p0, Lax/d3/r$g;->i:Ljava/lang/Exception;
+000589: 
+000590:     .line 160
+000591:     .line 161
+000592:     invoke-virtual {p1, v2}, Lax/sb/b;->m(Ljava/lang/Throwable;)Lax/sb/b;
+000593: 
+
+===== /tmp/apktool-out/smali/ax/T2/a.smali =====
+000778:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000779: 
+000780:     .line 13
+000781:     .line 14
+000782:     .line 15
+000783:     move-result p0
+000784: 
+000785:     .line 16
+000786:     if-nez p0, :cond_0
+000787: 
+000788:     .line 17
+000789:     .line 18
+000790:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+000791: 
+000792:     .line 19
+000793:     .line 20
+000794:     .line 21
+000795:     :cond_0
+000796:     return-object v0
+000797:     .line 22
+000798: .end method
+000799: 
+000800: .method private static i(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)Ljava/io/File;
+000801:     .locals 1
+000802: 
+000803:     .line 1
+000804:     invoke-static {p0}, Lax/T2/a;->h(Landroid/content/Context;)Ljava/io/File;
+000805: 
+000806:     .line 2
+000807:     .line 3
+000930:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000931: 
+000932:     .line 13
+000933:     .line 14
+000934:     .line 15
+000935:     move-result p0
+000936: 
+000937:     .line 16
+000938:     if-nez p0, :cond_0
+000939: 
+000940:     .line 17
+000941:     .line 18
+000942:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+000943: 
+000944:     .line 19
+000945:     .line 20
+000946:     .line 21
+000947:     :cond_0
+000948:     return-object v0
+000949:     .line 22
+000950: .end method
+000951: 
+000952: .method public static k()Ljava/lang/String;
+000953:     .locals 5
+000954: 
+000955:     .line 1
+000956:     sget-object v0, Landroid/os/Build;->SUPPORTED_ABIS:[Ljava/lang/String;
+000957: 
+000958:     .line 2
+000959:     .line 3
+002825:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+002826: 
+002827:     .line 7
+002828:     .line 8
+002829:     .line 9
+002830:     move-result v1
+002831: 
+002832:     .line 10
+002833:     if-nez v1, :cond_0
+002834: 
+002835:     .line 11
+002836:     .line 12
+002837:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+002838: 
+002839:     .line 13
+002840:     .line 14
+002841:     .line 15
+002842:     :cond_0
+002843:     const/4 v1, 0x0
+002844: 
+002845:     .line 16
+002846:     const/4 v2, 0x0
+002847: 
+002848:     .line 17
+002849:     :try_start_0
+002850:     invoke-virtual {v0}, Ljava/io/File;->getCanonicalPath()Ljava/lang/String;
+002851: 
+002852:     .line 18
+002853:     .line 19
+002854:     .line 20
+003003: 
+003004:     .line 95
+003005:     .line 96
+003006:     .line 97
+003007:     move-result-object v7
+003008: 
+003009:     .line 98
+003010:     invoke-direct {v5, v7}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+003011: 
+003012:     .line 99
+003013:     .line 100
+003014:     .line 101
+003015:     invoke-virtual {v5}, Ljava/io/File;->mkdirs()Z
+003016: 
+003017:     .line 102
+003018:     .line 103
+003019:     .line 104
+003020:     invoke-virtual {p0}, Ljava/util/zip/ZipEntry;->isDirectory()Z
+003021: 
+003022:     .line 105
+003023:     .line 106
+003024:     .line 107
+003025:     move-result p0
+003026: 
+003027:     .line 108
+003028:     if-eqz p0, :cond_1
+003029: 
+003030:     .line 109
+003031:     .line 110
+003032:     invoke-virtual {v6}, Ljava/io/File;->mkdir()Z
+003020:     invoke-virtual {p0}, Ljava/util/zip/ZipEntry;->isDirectory()Z
+003021: 
+003022:     .line 105
+003023:     .line 106
+003024:     .line 107
+003025:     move-result p0
+003026: 
+003027:     .line 108
+003028:     if-eqz p0, :cond_1
+003029: 
+003030:     .line 109
+003031:     .line 110
+003032:     invoke-virtual {v6}, Ljava/io/File;->mkdir()Z
+003033: 
+003034:     .line 111
+003035:     .line 112
+003036:     .line 113
+003037:     goto :goto_4
+003038: 
+003039:     .line 114
+003040:     :catchall_0
+003041:     move-exception p0
+003042: 
+003043:     .line 115
+003044:     move-object p1, v2
+003045: 
+003046:     .line 116
+003047:     :goto_1
+003048:     move-object v2, v4
+003049: 
+
+===== /tmp/apktool-out/smali/ax/U2/f.smali =====
+001769:     const-string v67, "RECYCLE_BIN"
+001770: 
+001771:     const/16 v68, 0x37
+001772: 
+001773:     const-string v69, "recycle_bin"
+001774: 
+001775:     const-class v70, Lax/g3/i0;
+001776: 
+001777:     const-class v71, Lcom/alphainventor/filemanager/file/J;
+001778: 
+001779:     const-string v72, "/"
+001780: 
+001781:     const-string v73, "recyclebin"
+001782: 
+001783:     const/16 v74, 0x0
+001784: 
+001785:     const/16 v75, 0x0
+001786: 
+001787:     const/16 v76, 0x0
+001788: 
+001789:     invoke-direct/range {v66 .. v78}, Lax/U2/f;-><init>(Ljava/lang/String;ILjava/lang/String;Ljava/lang/Class;Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;Lax/U2/f;ZZZLjava/lang/String;)V
+001790: 
+001791:     move-object/from16 v32, v66
+001792: 
+001793:     sput-object v32, Lax/U2/f;->t1:Lax/U2/f;
+001794: 
+001795:     .line 57
+001796:     new-instance v66, Lax/U2/f;
+001797: 
+001798:     const/16 v78, 0x0
+
+===== /tmp/apktool-out/smali/ax/U2/e.smali =====
+007257:     invoke-virtual {p0}, Ljava/io/File;->exists()Z
+007258: 
+007259:     .line 15
+007260:     .line 16
+007261:     .line 17
+007262:     move-result v0
+007263: 
+007264:     .line 18
+007265:     if-nez v0, :cond_0
+007266: 
+007267:     .line 19
+007268:     .line 20
+007269:     invoke-virtual {p0}, Ljava/io/File;->mkdirs()Z
+007270: 
+007271:     .line 21
+007272:     .line 22
+007273:     .line 23
+007274:     :cond_0
+007275:     new-instance v0, Ljava/io/File;
+007276: 
+007277:     .line 24
+007278:     .line 25
+007279:     const-string v1, ".nomedia"
+007280: 
+007281:     .line 26
+007282:     .line 27
+007283:     invoke-direct {v0, p0, v1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+007284: 
+007285:     .line 28
+007286:     .line 29
+007267:     .line 19
+007268:     .line 20
+007269:     invoke-virtual {p0}, Ljava/io/File;->mkdirs()Z
+007270: 
+007271:     .line 21
+007272:     .line 22
+007273:     .line 23
+007274:     :cond_0
+007275:     new-instance v0, Ljava/io/File;
+007276: 
+007277:     .line 24
+007278:     .line 25
+007279:     const-string v1, ".nomedia"
+007280: 
+007281:     .line 26
+007282:     .line 27
+007283:     invoke-direct {v0, p0, v1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+007284: 
+007285:     .line 28
+007286:     .line 29
+007287:     .line 30
+007288:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+007289: 
+007290:     .line 31
+007291:     .line 32
+007292:     .line 33
+007293:     move-result v1
+007294: 
+007295:     .line 34
+007296:     if-nez v1, :cond_1
+008427:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+008428: 
+008429:     .line 13
+008430:     .line 14
+008431:     .line 15
+008432:     move-result p0
+008433: 
+008434:     .line 16
+008435:     if-nez p0, :cond_0
+008436: 
+008437:     .line 17
+008438:     .line 18
+008439:     invoke-virtual {v0}, Ljava/io/File;->mkdir()Z
+008440: 
+008441:     .line 19
+008442:     .line 20
+008443:     .line 21
+008444:     :cond_0
+008445:     return-object v0
+008446:     .line 22
+008447: .end method
+008448: 
+008449: .method public static x(Landroid/content/Context;)Ljava/lang/String;
+008450:     .locals 2
+008451: 
+008452:     .line 1
+008453:     sget-object v0, Lax/U2/e;->c:Lax/U2/e$e;
+008454: 
+008455:     .line 2
+008456:     .line 3
+
+===== /tmp/apktool-out/smali/ax/Z2/n$b.smali =====
+000232:     if-eqz v2, :cond_3
+000233: 
+000234:     .line 75
+000235:     .line 76
+000236:     invoke-virtual {v1}, Lcom/alphainventor/filemanager/file/n;->B()Ljava/lang/String;
+000237: 
+000238:     .line 77
+000239:     .line 78
+000240:     .line 79
+000241:     move-result-object v2
+000242: 
+000243:     .line 80
+000244:     const-string v3, ".nomedia"
+000245: 
+000246:     .line 81
+000247:     .line 82
+000248:     invoke-virtual {v3, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+000249: 
+000250:     .line 83
+000251:     .line 84
+000252:     .line 85
+000253:     move-result v2
+000254: 
+000255:     .line 86
+000256:     if-eqz v2, :cond_3
+000257: 
+000258:     .line 87
+000259:     .line 88
+000260:     iget-object v2, p0, Lax/Z2/n$b;->i:Lax/Z2/n;
+000261: 
+000287:     .line 102
+000288:     filled-new-array {v1}, [Ljava/lang/String;
+000289: 
+000290:     .line 103
+000291:     .line 104
+000292:     .line 105
+000293:     move-result-object v1
+000294: 
+000295:     .line 106
+000296:     const/4 v3, 0x0
+000297: 
+000298:     .line 107
+000299:     invoke-static {v2, v1, v3, v3}, Landroid/media/MediaScannerConnection;->scanFile(Landroid/content/Context;[Ljava/lang/String;[Ljava/lang/String;Landroid/media/MediaScannerConnection$OnScanCompletedListener;)V
+000300: 
+000301:     .line 108
+000302:     .line 109
+000303:     .line 110
+000304:     :cond_3
+000305:     return v0
+000306: 
+000307:     .line 111
+000308:     :goto_0
+000309:     invoke-virtual {v1}, Ljava/lang/Throwable;->printStackTrace()V
+000310: 
+000311:     .line 112
+000312:     .line 113
+000313:     .line 114
+000314:     iput-boolean v0, p0, Lax/Z2/n$b;->h:Z
+000315: 
+000316:     .line 115
+
+===== /tmp/apktool-out/smali/ax/Z2/q$b.smali =====
+000489:     .line 159
+000490:     move-result-object v6
+000491: 
+000492:     .line 160
+000493:     invoke-virtual {v6}, Lax/sb/b;->g()Lax/sb/b;
+000494: 
+000495:     .line 161
+000496:     .line 162
+000497:     .line 163
+000498:     move-result-object v6
+000499: 
+000500:     .line 164
+000501:     const-string v7, "DELETE RECYCLEBIN NOT EXIST"
+000502: 
+000503:     .line 165
+000504:     .line 166
+000505:     invoke-virtual {v6, v7}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+000506: 
+000507:     .line 167
+000508:     .line 168
+000509:     .line 169
+000510:     move-result-object v6
+000511: 
+000512:     .line 170
+000513:     move-object v7, v2
+000514: 
+000515:     .line 171
+000516:     check-cast v7, Lcom/alphainventor/filemanager/file/y;
+000517: 
+000518:     .line 172
+000635:     .line 226
+000636:     move-result-object v3
+000637: 
+000638:     .line 227
+000639:     invoke-virtual {v3}, Lax/sb/b;->g()Lax/sb/b;
+000640: 
+000641:     .line 228
+000642:     .line 229
+000643:     .line 230
+000644:     move-result-object v3
+000645: 
+000646:     .line 231
+000647:     const-string v7, "DELETE RECYCLEBIN NOT EXIST AFTER MOVE???"
+000648: 
+000649:     .line 232
+000650:     .line 233
+000651:     invoke-virtual {v3, v7}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+000652: 
+000653:     .line 234
+000654:     .line 235
+000655:     .line 236
+000656:     move-result-object v3
+000657: 
+000658:     .line 237
+000659:     invoke-virtual {v3, v6}, Lax/sb/b;->m(Ljava/lang/Throwable;)Lax/sb/b;
+000660: 
+000661:     .line 238
+000662:     .line 239
+000663:     .line 240
+000664:     move-result-object v3
+000941:     .line 378
+000942:     .line 379
+000943:     invoke-direct {v4}, Ljava/lang/StringBuilder;-><init>()V
+000944: 
+000945:     .line 380
+000946:     .line 381
+000947:     .line 382
+000948:     invoke-virtual {v4, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+000949: 
+000950:     .line 383
+000951:     .line 384
+000952:     .line 385
+000953:     const-string v9, ",recycleBinPath exists:"
+000954: 
+000955:     .line 386
+000956:     .line 387
+000957:     invoke-virtual {v4, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+000958: 
+000959:     .line 388
+000960:     .line 389
+000961:     .line 390
+000962:     invoke-virtual {v7}, Lcom/alphainventor/filemanager/file/y;->o()Z
+000963: 
+000964:     .line 391
+000965:     .line 392
+000966:     .line 393
+000967:     move-result v9
+000968: 
+000969:     .line 394
+000970:     invoke-virtual {v4, v9}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
+001535: 
+001536:     .line 682
+001537:     :cond_7
+001538:     :goto_5
+001539:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+001540: 
+001541:     .line 683
+001542:     .line 684
+001543:     .line 685
+001544:     move-result-object v4
+001545: 
+001546:     .line 686
+001547:     const-string v8, "DELETE TO RECYCLE BIN : DOCUMENT EXISTS"
+001548: 
+001549:     .line 687
+001550:     .line 688
+001551:     invoke-virtual {v4, v8}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+001552: 
+001553:     .line 689
+001554:     .line 690
+001555:     .line 691
+001556:     move-result-object v4
+001557: 
+001558:     .line 692
+001559:     invoke-virtual {v4, v5}, Lax/sb/b;->m(Ljava/lang/Throwable;)Lax/sb/b;
+001560: 
+001561:     .line 693
+001562:     .line 694
+001563:     .line 695
+001564:     move-result-object v4
+001703:     .line 760
+001704:     move-result-object v3
+001705: 
+001706:     .line 761
+001707:     invoke-virtual {v3}, Lax/sb/b;->g()Lax/sb/b;
+001708: 
+001709:     .line 762
+001710:     .line 763
+001711:     .line 764
+001712:     move-result-object v3
+001713: 
+001714:     .line 765
+001715:     const-string v4, "DELETE TO RECYCLEBIN FAILED"
+001716: 
+001717:     .line 766
+001718:     .line 767
+001719:     invoke-virtual {v3, v4}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+001720: 
+001721:     .line 768
+001722:     .line 769
+001723:     .line 770
+001724:     move-result-object v3
+001725: 
+001726:     .line 771
+001727:     invoke-virtual {v3, v6}, Lax/sb/b;->m(Ljava/lang/Throwable;)Lax/sb/b;
+001728: 
+001729:     .line 772
+001730:     .line 773
+001731:     .line 774
+001732:     move-result-object v3
+001972:     .line 890
+001973:     move-result-object v2
+001974: 
+001975:     .line 891
+001976:     invoke-virtual {v2}, Lax/sb/b;->g()Lax/sb/b;
+001977: 
+001978:     .line 892
+001979:     .line 893
+001980:     .line 894
+001981:     move-result-object v2
+001982: 
+001983:     .line 895
+001984:     const-string v3, "INIT RECYCLE BIN FOLDER FAIL!!"
+001985: 
+001986:     .line 896
+001987:     .line 897
+001988:     invoke-virtual {v2, v3}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+001989: 
+001990:     .line 898
+001991:     .line 899
+001992:     .line 900
+001993:     move-result-object v2
+001994: 
+001995:     .line 901
+001996:     invoke-virtual {v2, p1}, Lax/sb/b;->m(Ljava/lang/Throwable;)Lax/sb/b;
+001997: 
+001998:     .line 902
+001999:     .line 903
+002000:     .line 904
+002001:     move-result-object p1
+
+===== /tmp/apktool-out/smali/ax/Z2/y$c.smali =====
+000931:     if-eqz p1, :cond_0
+000932: 
+000933:     .line 18
+000934:     .line 19
+000935:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+000936: 
+000937:     .line 20
+000938:     .line 21
+000939:     .line 22
+000940:     move-result-object v0
+000941: 
+000942:     .line 23
+000943:     const-string v1, "PROCCED OVERWRITE RECYCLE BIN ERROR"
+000944: 
+000945:     .line 24
+000946:     .line 25
+000947:     invoke-virtual {v0, v1}, Lax/sb/b;->d(Ljava/lang/String;)Lax/sb/b;
+000948: 
+000949:     .line 26
+000950:     .line 27
+000951:     .line 28
+000952:     move-result-object v0
+000953: 
+000954:     .line 29
+000955:     invoke-static {p1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+000956: 
+000957:     .line 30
+000958:     .line 31
+000959:     .line 32
+000960:     move-result-object p1
+
+===== /tmp/apktool-out/smali/ax/Z2/p.smali =====
+000061:         }
+000062:     .end annotation
+000063: .end field
+000064: 
+000065: .field private z:Lcom/alphainventor/filemanager/file/n;
+000066: 
+000067: 
+000068: # direct methods
+000069: .method static constructor <clinit>()V
+000070:     .locals 1
+000071: 
+000072:     .line 1
+000073:     const-string v0, "FileManager.DeleteOperator"
+000074: 
+000075:     .line 2
+000076:     .line 3
+000077:     invoke-static {v0}, Ljava/util/logging/Logger;->getLogger(Ljava/lang/String;)Ljava/util/logging/Logger;
+000078: 
+000079:     .line 4
+000080:     .line 5
+000081:     .line 6
+000082:     move-result-object v0
+000083: 
+000084:     .line 7
+000085:     sput-object v0, Lax/Z2/p;->H:Ljava/util/logging/Logger;
+000086: 
+000087:     .line 8
+000088:     .line 9
+000089:     return-void
+000090:     .line 10
+
+===== /tmp/apktool-out/smali/ax/Z2/b.smali =====
+002588:     .line 53
+002589:     .line 54
+002590:     .line 55
+002591:     invoke-static {v12, v2}, Lax/c3/a;->f(Ljava/io/File;Z)Z
+002592: 
+002593:     .line 56
+002594:     .line 57
+002595:     .line 58
+002596:     const/4 v13, 0x1
+002597: 
+002598:     .line 59
+002599:     :try_start_0
+002600:     invoke-virtual {v12}, Ljava/io/File;->mkdirs()Z
+002601: 
+002602:     .line 60
+002603:     .line 61
+002604:     .line 62
+002605:     new-instance v4, Lcom/alphainventor/filemanager/data/ApkPlusInfo;
+002606: 
+002607:     .line 63
+002608:     .line 64
+002609:     invoke-direct {v4}, Lcom/alphainventor/filemanager/data/ApkPlusInfo;-><init>()V
+002610: 
+002611:     .line 65
+002612:     .line 66
+002613:     .line 67
+002614:     move-object/from16 v5, p2
+002615: 
+002616:     .line 68
+002617:     .line 69
+
+===== /tmp/apktool-out/smali/ax/m2/y.smali =====
+000782:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000783: 
+000784:     .line 108
+000785:     .line 109
+000786:     .line 110
+000787:     move-result v2
+000788: 
+000789:     .line 111
+000790:     if-nez v2, :cond_3
+000791: 
+000792:     .line 112
+000793:     .line 113
+000794:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+000795: 
+000796:     .line 114
+000797:     .line 115
+000798:     .line 116
+000799:     move-result v0
+000800: 
+000801:     .line 117
+000802:     if-eqz v0, :cond_2
+000803: 
+000804:     .line 118
+000805:     .line 119
+000806:     goto :goto_1
+000807: 
+000808:     .line 120
+000809:     :cond_2
+000810:     new-instance p2, Ljava/io/IOException;
+000811: 
+000865:     .line 148
+000866:     .line 149
+000867:     invoke-static {v1, v0}, Lax/uc/l;->e(Ljava/lang/Object;Ljava/lang/String;)V
+000868: 
+000869:     .line 150
+000870:     .line 151
+000871:     .line 152
+000872:     invoke-direct {p0, v1, p2}, Lax/m2/y;->f(Ljava/io/File;Z)V
+000873: 
+000874:     .line 153
+000875:     .line 154
+000876:     .line 155
+000877:     invoke-virtual {v1, p1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000878: 
+000879:     .line 156
+000880:     .line 157
+000881:     .line 158
+000882:     move-result p2
+000883: 
+000884:     .line 159
+000885:     if-eqz p2, :cond_4
+000886: 
+000887:     .line 160
+000888:     .line 161
+000889:     return-void
+000890: 
+000891:     .line 162
+000892:     :cond_4
+000893:     new-instance p2, Ljava/io/IOException;
+000894: 
+
+===== /tmp/apktool-out/smali/ax/Q3/a$c.smali =====
+000358:     iget-object v1, p0, Lax/Q3/a$c;->d:Lax/Q3/a;
+000359: 
+000360:     .line 47
+000361:     .line 48
+000362:     invoke-static {v1}, Lax/Q3/a;->h(Lax/Q3/a;)Ljava/io/File;
+000363: 
+000364:     .line 49
+000365:     .line 50
+000366:     .line 51
+000367:     move-result-object v1
+000368: 
+000369:     .line 52
+000370:     invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+000371: 
+000372:     .line 53
+000373:     .line 54
+000374:     .line 55
+000375:     :cond_1
+000376:     monitor-exit v0
+000377: 
+000378:     .line 56
+000379:     return-object p1
+000380: 
+000381:     .line 57
+000382:     :cond_2
+000383:     new-instance p1, Ljava/lang/IllegalStateException;
+000384: 
+000385:     .line 58
+000386:     .line 59
+000387:     invoke-direct {p1}, Ljava/lang/IllegalStateException;-><init>()V
+
+===== /tmp/apktool-out/smali/ax/Q3/a.smali =====
+000863:     .line 105
+000864:     invoke-virtual {p1, p0}, Ljava/io/PrintStream;->println(Ljava/lang/String;)V
+000865: 
+000866:     .line 106
+000867:     .line 107
+000868:     .line 108
+000869:     invoke-virtual {v3}, Lax/Q3/a;->delete()V
+000870: 
+000871:     .line 109
+000872:     .line 110
+000873:     .line 111
+000874:     :cond_2
+000875:     invoke-virtual {v4}, Ljava/io/File;->mkdirs()Z
+000876: 
+000877:     .line 112
+000878:     .line 113
+000879:     .line 114
+000880:     move-wide v8, v7
+000881: 
+000882:     .line 115
+000883:     move v7, v6
+000884: 
+000885:     .line 116
+000886:     move v6, v5
+000887: 
+000888:     .line 117
+000889:     move-object v5, v4
+000890: 
+000891:     .line 118
+000892:     new-instance v4, Lax/Q3/a;
+003840: 
+003841:     .line 1
+003842:     if-eqz p2, :cond_0
+003843: 
+003844:     .line 2
+003845:     .line 3
+003846:     invoke-static {p1}, Lax/Q3/a;->y(Ljava/io/File;)V
+003847: 
+003848:     .line 4
+003849:     .line 5
+003850:     .line 6
+003851:     :cond_0
+003852:     invoke-virtual {p0, p1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+003853: 
+003854:     .line 7
+003855:     .line 8
+003856:     .line 9
+003857:     move-result p0
+003858: 
+003859:     .line 10
+003860:     if-eqz p0, :cond_1
+003861: 
+003862:     .line 11
+003863:     .line 12
+003864:     return-void
+003865: 
+003866:     .line 13
+003867:     :cond_1
+003868:     new-instance p0, Ljava/io/IOException;
+003869: 
+004623:     if-eqz v2, :cond_4
+004624: 
+004625:     .line 96
+004626:     .line 97
+004627:     invoke-virtual {v0, v1}, Lax/Q3/a$d;->j(I)Ljava/io/File;
+004628: 
+004629:     .line 98
+004630:     .line 99
+004631:     .line 100
+004632:     move-result-object v2
+004633: 
+004634:     .line 101
+004635:     invoke-virtual {p1, v2}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+004636: 
+004637:     .line 102
+004638:     .line 103
+004639:     .line 104
+004640:     invoke-static {v0}, Lax/Q3/a$d;->a(Lax/Q3/a$d;)[J
+004641: 
+004642:     .line 105
+004643:     .line 106
+004644:     .line 107
+004645:     move-result-object p1
+004646: 
+004647:     .line 108
+004648:     aget-wide v3, p1, v1
+004649: 
+004650:     .line 109
+004651:     .line 110
+004652:     invoke-virtual {v2}, Ljava/io/File;->length()J
+
+===== /tmp/apktool-out/smali/ax/W2/h.smali =====
+006792: 
+006793:     .line 155
+006794:     .line 156
+006795:     .line 157
+006796:     invoke-virtual {p3}, Ljava/io/File;->getAbsoluteFile()Ljava/io/File;
+006797: 
+006798:     .line 158
+006799:     .line 159
+006800:     .line 160
+006801:     move-result-object p2
+006802: 
+006803:     .line 161
+006804:     invoke-virtual {p1, p2}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+006805: 
+006806:     .line 162
+006807:     .line 163
+006808:     .line 164
+006809:     iget-object p1, v5, Lax/W2/h$f;->i:Ljava/util/ArrayList;
+006810: 
+006811:     .line 165
+006812:     .line 166
+006813:     invoke-direct {p0, p1}, Lax/W2/h;->J0(Ljava/util/List;)V
+006814: 
+006815:     .line 167
+006816:     .line 168
+006817:     .line 169
+006818:     iget-object p1, v5, Lax/W2/h$f;->g:Ljava/util/ArrayList;
+006819: 
+006820:     .line 170
+006821:     .line 171
+
+===== /tmp/apktool-out/smali/ax/W2/l.smali =====
+001914:     invoke-virtual {v2}, Ljava/io/File;->exists()Z
+001915: 
+001916:     .line 25
+001917:     .line 26
+001918:     .line 27
+001919:     move-result v3
+001920: 
+001921:     .line 28
+001922:     if-nez v3, :cond_0
+001923: 
+001924:     .line 29
+001925:     .line 30
+001926:     invoke-virtual {v1, v2}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+001927: 
+001928:     .line 31
+001929:     .line 32
+001930:     .line 33
+001931:     iget-object v1, p0, Lax/W2/l;->b:Landroid/content/Context;
+001932: 
+001933:     .line 34
+001934:     .line 35
+001935:     iget-object v2, p0, Lax/W2/l;->c:Lax/f3/K;
+001936: 
+001937:     .line 36
+001938:     .line 37
+001939:     invoke-static {v1, v2}, Lax/W2/l;->c(Landroid/content/Context;Lax/f3/K;)Ljava/io/File;
+001940: 
+001941:     .line 38
+001942:     .line 39
+001943:     .line 40
+
+===== /tmp/apktool-out/smali/ax/d4/i.smali =====
+001541: 
+001542:     .line 143
+001543:     .line 144
+001544:     new-instance v1, Ljava/lang/StringBuilder;
+001545: 
+001546:     .line 145
+001547:     .line 146
+001548:     invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+001549: 
+001550:     .line 147
+001551:     .line 148
+001552:     .line 149
+001553:     const-string v3, "Calculate scaling, source: ["
+001554: 
+001555:     .line 150
+001556:     .line 151
+001557:     invoke-virtual {v1, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+001558: 
+001559:     .line 152
+001560:     .line 153
+001561:     .line 154
+001562:     invoke-virtual {v1, p2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+001563: 
+001564:     .line 155
+001565:     .line 156
+001566:     .line 157
+001567:     const-string p2, "x"
+001568: 
+001569:     .line 158
+001570:     .line 159
+002299: 
+002300:     .line 146
+002301:     .line 147
+002302:     new-instance v3, Ljava/lang/StringBuilder;
+002303: 
+002304:     .line 148
+002305:     .line 149
+002306:     invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
+002307: 
+002308:     .line 150
+002309:     .line 151
+002310:     .line 152
+002311:     const-string v13, "Calculated target ["
+002312: 
+002313:     .line 153
+002314:     .line 154
+002315:     invoke-virtual {v3, v13}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+002316: 
+002317:     .line 155
+002318:     .line 156
+002319:     .line 157
+002320:     invoke-virtual {v3, v6}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+002321: 
+002322:     .line 158
+002323:     .line 159
+002324:     .line 160
+002325:     const-string v13, "x"
+002326: 
+002327:     .line 161
+002328:     .line 162
+
+===== /tmp/apktool-out/smali/ax/Lb/a$j.smali =====
+000069:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000070: 
+000071:     .line 18
+000072:     .line 19
+000073:     .line 20
+000074:     move-result v1
+000075: 
+000076:     .line 21
+000077:     if-nez v1, :cond_0
+000078: 
+000079:     .line 22
+000080:     .line 23
+000081:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+000082: 
+000083:     .line 24
+000084:     .line 25
+000085:     .line 26
+000086:     :cond_0
+000087:     new-instance v0, Ljava/util/ArrayList;
+000088: 
+000089:     .line 27
+000090:     .line 28
+000091:     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+000092: 
+000093:     .line 29
+000094:     .line 30
+000095:     .line 31
+000096:     iput-object v0, p0, Lax/Lb/a$j;->b:Ljava/util/List;
+000097: 
+000098:     .line 32
+
+===== /tmp/apktool-out/smali/ax/y3/d.smali =====
+000791: 
+000792:     .line 364
+000793:     .line 365
+000794:     invoke-virtual {v0, v1, v3}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+000795: 
+000796:     .line 366
+000797:     .line 367
+000798:     .line 368
+000799:     iget-object v0, p0, Lax/y3/d;->c:Ljava/util/HashMap;
+000800: 
+000801:     .line 369
+000802:     .line 370
+000803:     const-string v1, "show_recyclebin_ads"
+000804: 
+000805:     .line 371
+000806:     .line 372
+000807:     invoke-virtual {v0, v1, v3}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+000808: 
+000809:     .line 373
+000810:     .line 374
+000811:     .line 375
+000812:     iget-object v0, p0, Lax/y3/d;->c:Ljava/util/HashMap;
+000813: 
+000814:     .line 376
+000815:     .line 377
+000816:     const-string v1, "show_analysis_ads"
+000817: 
+000818:     .line 378
+000819:     .line 379
+000820:     invoke-virtual {v0, v1, v3}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+002934:     .line 7
+002935:     const/4 v0, 0x0
+002936: 
+002937:     .line 8
+002938:     return v0
+002939: 
+002940:     .line 9
+002941:     :cond_0
+002942:     iget-object v0, p0, Lax/y3/d;->a:Lax/A3/b;
+002943: 
+002944:     .line 10
+002945:     .line 11
+002946:     const-string v1, "show_recyclebin_ads"
+002947: 
+002948:     .line 12
+002949:     .line 13
+002950:     invoke-virtual {v0, v1}, Lax/A3/b;->b(Ljava/lang/String;)Z
+002951: 
+002952:     .line 14
+002953:     .line 15
+002954:     .line 16
+002955:     move-result v0
+002956: 
+002957:     .line 17
+002958:     return v0
+002959:     .line 18
+002960:     .line 19
+002961:     .line 20
+002962:     .line 21
+002963: .end method
+
+===== /tmp/apktool-out/smali/ax/X2/d.smali =====
+007704:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+007705: 
+007706:     .line 6
+007707:     .line 7
+007708:     .line 8
+007709:     move-result v1
+007710: 
+007711:     .line 9
+007712:     if-nez v1, :cond_0
+007713: 
+007714:     .line 10
+007715:     .line 11
+007716:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+007717: 
+007718:     .line 12
+007719:     .line 13
+007720:     .line 14
+007721:     :cond_0
+007722:     return-void
+007723:     .line 15
+007724:     .line 16
+007725:     .line 17
+007726:     .line 18
+007727:     .line 19
+007728:     .line 20
+007729:     .line 21
+007730: .end method
+007731: 
+007732: .method public i(Ljava/util/List;Z)V
+007733:     .locals 12
+
+===== /tmp/apktool-out/smali/ax/f3/F.smali =====
+003339:     invoke-virtual {p1}, Ljava/io/File;->exists()Z
+003340: 
+003341:     .line 2
+003342:     .line 3
+003343:     .line 4
+003344:     move-result v0
+003345: 
+003346:     .line 5
+003347:     if-nez v0, :cond_0
+003348: 
+003349:     .line 6
+003350:     .line 7
+003351:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+003352: 
+003353:     .line 8
+003354:     .line 9
+003355:     .line 10
+003356:     :cond_0
+003357:     invoke-virtual {p1}, Ljava/io/File;->list()[Ljava/lang/String;
+003358: 
+003359:     .line 11
+003360:     .line 12
+003361:     .line 13
+003362:     move-result-object v0
+003363: 
+003364:     .line 14
+003365:     if-eqz v0, :cond_2
+003366: 
+003367:     .line 15
+003368:     .line 16
+003714:     invoke-virtual {v4}, Lax/rd/I;->isDirectory()Z
+003715: 
+003716:     .line 170
+003717:     .line 171
+003718:     .line 172
+003719:     move-result v7
+003720: 
+003721:     .line 173
+003722:     if-eqz v7, :cond_7
+003723: 
+003724:     .line 174
+003725:     .line 175
+003726:     invoke-virtual {v6}, Ljava/io/File;->mkdirs()Z
+003727: 
+003728:     .line 176
+003729:     .line 177
+003730:     .line 178
+003731:     goto :goto_3
+003732: 
+003733:     .line 179
+003734:     :cond_7
+003735:     new-instance v7, Ljava/io/File;
+003736: 
+003737:     .line 180
+003738:     .line 181
+003739:     invoke-virtual {v6}, Ljava/io/File;->getParent()Ljava/lang/String;
+003740: 
+003741:     .line 182
+003742:     .line 183
+003743:     .line 184
+003740: 
+003741:     .line 182
+003742:     .line 183
+003743:     .line 184
+003744:     move-result-object v8
+003745: 
+003746:     .line 185
+003747:     invoke-direct {v7, v8}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+003748: 
+003749:     .line 186
+003750:     .line 187
+003751:     .line 188
+003752:     invoke-virtual {v7}, Ljava/io/File;->mkdirs()Z
+003753:     :try_end_2
+003754:     .catch Ljava/io/IOException; {:try_start_2 .. :try_end_2} :catch_1
+003755:     .catchall {:try_start_2 .. :try_end_2} :catchall_1
+003756: 
+003757:     .line 189
+003758:     .line 190
+003759:     .line 191
+003760:     :try_start_3
+003761:     invoke-virtual {v2, v4}, Lax/rd/S;->p(Lax/rd/I;)Ljava/io/InputStream;
+003762: 
+003763:     .line 192
+003764:     .line 193
+003765:     .line 194
+003766:     move-result-object v4
+003767:     :try_end_3
+003768:     .catchall {:try_start_3 .. :try_end_3} :catchall_4
+003769: 
+
+===== /tmp/apktool-out/smali/ax/f3/O.smali =====
+003032: 
+003033:     .line 313
+003034:     .line 314
+003035:     .line 315
+003036:     invoke-virtual {p1}, Ljava/io/File;->getAbsoluteFile()Ljava/io/File;
+003037: 
+003038:     .line 316
+003039:     .line 317
+003040:     .line 318
+003041:     move-result-object p1
+003042: 
+003043:     .line 319
+003044:     invoke-virtual {v0, p1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+003045:     :try_end_b
+003046:     .catchall {:try_start_b .. :try_end_b} :catchall_4
+003047: 
+003048:     .line 320
+003049:     .line 321
+003050:     .line 322
+003051:     if-eqz v9, :cond_a
+003052: 
+003053:     .line 323
+003054:     .line 324
+003055:     :try_start_c
+003056:     invoke-virtual {v9}, Ljava/io/BufferedReader;->close()V
+003057:     :try_end_c
+003058:     .catch Ljava/io/IOException; {:try_start_c .. :try_end_c} :catch_1
+003059: 
+003060:     .line 325
+003061:     .line 326
+
+===== /tmp/apktool-out/smali/ax/f3/h.smali =====
+000482: 
+000483:     .line 10
+000484:     .line 11
+000485:     iget-object v2, p0, Lax/f3/h;->n:Ljava/lang/String;
+000486: 
+000487:     .line 12
+000488:     .line 13
+000489:     invoke-direct {v1, v0, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+000490: 
+000491:     .line 14
+000492:     .line 15
+000493:     .line 16
+000494:     invoke-virtual {v1}, Ljava/io/File;->mkdir()Z
+000495: 
+000496:     .line 17
+000497:     .line 18
+000498:     .line 19
+000499:     const/4 v0, 0x0
+000500: 
+000501:     .line 20
+000502:     invoke-static {v1, v0}, Lax/c3/a;->f(Ljava/io/File;Z)Z
+000503: 
+000504:     .line 21
+000505:     .line 22
+000506:     .line 23
+000507:     new-instance v0, Ljava/io/File;
+000508: 
+000509:     .line 24
+000510:     .line 25
+000511:     invoke-direct {v0, v1, p1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+
+===== /tmp/apktool-out/smali/ax/n0/m.smali =====
+001486:     .line 8
+001487:     move-result-object v0
+001488: 
+001489:     .line 9
+001490:     if-nez v0, :cond_0
+001491: 
+001492:     .line 10
+001493:     .line 11
+001494:     goto :goto_0
+001495: 
+001496:     .line 12
+001497:     :cond_0
+001498:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+001499: 
+001500:     .line 13
+001501:     .line 14
+001502:     .line 15
+001503:     invoke-virtual {v0}, Ljava/io/File;->isDirectory()Z
+001504: 
+001505:     .line 16
+001506:     .line 17
+001507:     .line 18
+001508:     move-result v0
+001509: 
+001510:     .line 19
+001511:     if-eqz v0, :cond_1
+001512: 
+001513:     .line 20
+001514:     .line 21
+001515:     :goto_0
+006023: 
+006024:     .line 148
+006025:     .line 149
+006026:     .line 150
+006027:     invoke-direct {v0}, Lax/n0/m;->q()Ljava/io/File;
+006028: 
+006029:     .line 151
+006030:     .line 152
+006031:     .line 153
+006032:     move-result-object p1
+006033: 
+006034:     .line 154
+006035:     invoke-virtual {v3, p1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+006036: 
+006037:     .line 155
+006038:     .line 156
+006039:     .line 157
+006040:     move-result p1
+006041:     :try_end_4
+006042:     .catch Ljava/io/IOException; {:try_start_4 .. :try_end_4} :catch_0
+006043: 
+006044:     .line 158
+006045:     if-eqz p1, :cond_4
+006046: 
+006047:     .line 159
+006048:     .line 160
+006049:     sget-object p1, Lax/gc/t;->a:Lax/gc/t;
+006050: 
+006051:     .line 161
+006052:     .line 162
+
+===== /tmp/apktool-out/smali/ax/r2/d$c.smali =====
+000688:     invoke-virtual {v1}, Ljava/io/File;->getParentFile()Ljava/io/File;
+000689: 
+000690:     .line 14
+000691:     .line 15
+000692:     .line 16
+000693:     move-result-object v1
+000694: 
+000695:     .line 17
+000696:     if-eqz v1, :cond_0
+000697: 
+000698:     .line 18
+000699:     .line 19
+000700:     invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+000701: 
+000702:     .line 20
+000703:     .line 21
+000704:     .line 22
+000705:     invoke-virtual {v1}, Ljava/io/File;->isDirectory()Z
+000706: 
+000707:     .line 23
+000708:     .line 24
+000709:     .line 25
+000710:     move-result v2
+000711: 
+000712:     .line 26
+000713:     if-nez v2, :cond_0
+000714: 
+000715:     .line 27
+000716:     .line 28
+000717:     new-instance v2, Ljava/lang/StringBuilder;
+
+===== /tmp/apktool-out/smali/ax/Y3/a.smali =====
+000236:     invoke-static {v0, v3}, Landroid/util/Log;->isLoggable(Ljava/lang/String;I)Z
+000237: 
+000238:     .line 36
+000239:     .line 37
+000240:     .line 38
+000241:     move-result v3
+000242: 
+000243:     .line 39
+000244:     if-eqz v3, :cond_0
+000245: 
+000246:     .line 40
+000247:     .line 41
+000248:     const-string v3, "Failed to calculate accurate cpu count"
+000249: 
+000250:     .line 42
+000251:     .line 43
+000252:     invoke-static {v0, v3, v2}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+000253:     :try_end_1
+000254:     .catchall {:try_start_1 .. :try_end_1} :catchall_1
+000255: 
+000256:     .line 44
+000257:     .line 45
+000258:     .line 46
+000259:     goto :goto_0
+000260: 
+000261:     .line 47
+000262:     :catchall_1
+000263:     move-exception v0
+000264: 
+000265:     .line 48
+
+===== /tmp/apktool-out/smali/ax/c3/j.smali =====
+009782:     return-wide v0
+009783: 
+009784:     .line 62
+009785:     :cond_3
+009786:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+009787: 
+009788:     .line 63
+009789:     .line 64
+009790:     .line 65
+009791:     move-result-object v0
+009792: 
+009793:     .line 66
+009794:     const-string v1, "INVALID RECYCLE BIN LOCATION 3"
+009795: 
+009796:     .line 67
+009797:     .line 68
+009798:     invoke-virtual {v0, v1}, Lax/sb/b;->b(Ljava/lang/String;)Lax/sb/b;
+009799: 
+009800:     .line 69
+009801:     .line 70
+009802:     .line 71
+009803:     move-result-object v0
+009804: 
+009805:     .line 72
+009806:     invoke-virtual {p1}, Lax/f3/K;->toString()Ljava/lang/String;
+009807: 
+009808:     .line 73
+009809:     .line 74
+009810:     .line 75
+009811:     move-result-object p1
+010206:     return-wide v0
+010207: 
+010208:     .line 98
+010209:     :cond_7
+010210:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+010211: 
+010212:     .line 99
+010213:     .line 100
+010214:     .line 101
+010215:     move-result-object v2
+010216: 
+010217:     .line 102
+010218:     const-string v3, "INVALID RECYCLE BIN LOCATION 2"
+010219: 
+010220:     .line 103
+010221:     .line 104
+010222:     invoke-virtual {v2, v3}, Lax/sb/b;->b(Ljava/lang/String;)Lax/sb/b;
+010223: 
+010224:     .line 105
+010225:     .line 106
+010226:     .line 107
+010227:     move-result-object v2
+010228: 
+010229:     .line 108
+010230:     invoke-virtual {p1}, Lax/f3/K;->toString()Ljava/lang/String;
+010231: 
+010232:     .line 109
+010233:     .line 110
+010234:     .line 111
+010235:     move-result-object p1
+011999:     return-wide v0
+012000: 
+012001:     .line 84
+012002:     :cond_3
+012003:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+012004: 
+012005:     .line 85
+012006:     .line 86
+012007:     .line 87
+012008:     move-result-object v0
+012009: 
+012010:     .line 88
+012011:     const-string v1, "INVALID RECYCLE BIN LOCATION 1"
+012012: 
+012013:     .line 89
+012014:     .line 90
+012015:     invoke-virtual {v0, v1}, Lax/sb/b;->b(Ljava/lang/String;)Lax/sb/b;
+012016: 
+012017:     .line 91
+012018:     .line 92
+012019:     .line 93
+012020:     move-result-object v0
+012021: 
+012022:     .line 94
+012023:     invoke-virtual {p1}, Lax/f3/K;->toString()Ljava/lang/String;
+012024: 
+012025:     .line 95
+012026:     .line 96
+012027:     .line 97
+012028:     move-result-object p1
+
+===== /tmp/apktool-out/smali/ax/c3/a.smali =====
+001036:     aget-object v4, v0, v3
+001037: 
+001038:     .line 13
+001039:     .line 14
+001040:     invoke-virtual {v4}, Ljava/io/File;->getName()Ljava/lang/String;
+001041: 
+001042:     .line 15
+001043:     .line 16
+001044:     .line 17
+001045:     move-result-object v5
+001046: 
+001047:     .line 18
+001048:     const-string v6, ".nomedia"
+001049: 
+001050:     .line 19
+001051:     .line 20
+001052:     invoke-virtual {v6, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+001053: 
+001054:     .line 21
+001055:     .line 22
+001056:     .line 23
+001057:     move-result v5
+001058: 
+001059:     .line 24
+001060:     if-nez v5, :cond_0
+001061: 
+001062:     .line 25
+001063:     .line 26
+001064:     invoke-static {v4, p1, p2}, Lax/c3/a;->e(Ljava/io/File;J)V
+001065: 
+001253:     invoke-virtual {p1}, Ljava/io/File;->exists()Z
+001254: 
+001255:     .line 31
+001256:     .line 32
+001257:     .line 33
+001258:     move-result p0
+001259: 
+001260:     .line 34
+001261:     if-nez p0, :cond_0
+001262: 
+001263:     .line 35
+001264:     .line 36
+001265:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+001266: 
+001267:     .line 37
+001268:     .line 38
+001269:     .line 39
+001270:     :cond_0
+001271:     return-object p1
+001272:     .line 40
+001273:     .line 41
+001274:     .line 42
+001275:     .line 43
+001276:     .line 44
+001277:     .line 45
+001278:     .line 46
+001279:     .line 47
+001280:     .line 48
+001281:     .line 49
+001282:     .line 50
+001383:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+001384: 
+001385:     .line 31
+001386:     .line 32
+001387:     .line 33
+001388:     move-result p0
+001389: 
+001390:     .line 34
+001391:     if-nez p0, :cond_0
+001392: 
+001393:     .line 35
+001394:     .line 36
+001395:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+001396: 
+001397:     .line 37
+001398:     .line 38
+001399:     .line 39
+001400:     :cond_0
+001401:     return-object v0
+001402:     .line 40
+001403: .end method
+001404: 
+001405: .method public static k(Landroid/content/Context;)Ljava/io/File;
+001406:     .locals 2
+001407: 
+001408:     .line 1
+001409:     invoke-static {}, Lax/a3/Q;->L()Z
+001410: 
+001411:     .line 2
+001412:     .line 3
+001623:     invoke-virtual {p1}, Ljava/io/File;->exists()Z
+001624: 
+001625:     .line 67
+001626:     .line 68
+001627:     .line 69
+001628:     move-result p0
+001629: 
+001630:     .line 70
+001631:     if-nez p0, :cond_0
+001632: 
+001633:     .line 71
+001634:     .line 72
+001635:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+001636: 
+001637:     .line 73
+001638:     .line 74
+001639:     .line 75
+001640:     :cond_0
+001641:     return-object p1
+001642:     .line 76
+001643:     .line 77
+001644:     .line 78
+001645:     .line 79
+001646:     .line 80
+001647:     .line 81
+001648:     .line 82
+001649:     .line 83
+001650:     .line 84
+001651:     .line 85
+001652:     .line 86
+001726:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+001727: 
+001728:     .line 11
+001729:     .line 12
+001730:     .line 13
+001731:     move-result p0
+001732: 
+001733:     .line 14
+001734:     if-nez p0, :cond_0
+001735: 
+001736:     .line 15
+001737:     .line 16
+001738:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+001739: 
+001740:     .line 17
+001741:     .line 18
+001742:     .line 19
+001743:     :cond_0
+001744:     return-object v0
+001745:     .line 20
+001746:     .line 21
+001747:     .line 22
+001748:     .line 23
+001749:     .line 24
+001750:     .line 25
+001751:     .line 26
+001752:     .line 27
+001753:     .line 28
+001754:     .line 29
+001755:     .line 30
+
+===== /tmp/apktool-out/smali/ax/a3/J.smali =====
+005135:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+005136: 
+005137:     .line 14
+005138:     .line 15
+005139:     .line 16
+005140:     move-result v1
+005141: 
+005142:     .line 17
+005143:     if-nez v1, :cond_1
+005144: 
+005145:     .line 18
+005146:     .line 19
+005147:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+005148: 
+005149:     .line 20
+005150:     .line 21
+005151:     .line 22
+005152:     :cond_1
+005153:     new-instance v1, Ljava/io/File;
+005154: 
+005155:     .line 23
+005156:     .line 24
+005157:     const-string v2, "deleteparam_test"
+005158: 
+005159:     .line 25
+005160:     .line 26
+005161:     invoke-direct {v1, v0, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+005162: 
+005163:     .line 27
+005164:     .line 28
+005479:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+005480: 
+005481:     .line 18
+005482:     .line 19
+005483:     .line 20
+005484:     move-result v1
+005485: 
+005486:     .line 21
+005487:     if-nez v1, :cond_1
+005488: 
+005489:     .line 22
+005490:     .line 23
+005491:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+005492: 
+005493:     .line 24
+005494:     .line 25
+005495:     .line 26
+005496:     :cond_1
+005497:     new-instance v1, Ljava/io/File;
+005498: 
+005499:     .line 27
+005500:     .line 28
+005501:     const-string v2, "mediastore_update_test"
+005502: 
+005503:     .line 29
+005504:     .line 30
+005505:     invoke-direct {v1, v0, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+005506: 
+005507:     .line 31
+005508:     .line 32
+
+===== /tmp/apktool-out/smali/ax/y0/a.smali =====
+029048:     .line 168
+029049:     .line 169
+029050:     invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+029051: 
+029052:     .line 170
+029053:     .line 171
+029054:     .line 172
+029055:     invoke-virtual {v2, v6}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+029056: 
+029057:     .line 173
+029058:     .line 174
+029059:     .line 175
+029060:     const-string v3, ", calculated CRC value: "
+029061: 
+029062:     .line 176
+029063:     .line 177
+029064:     invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+029065: 
+029066:     .line 178
+029067:     .line 179
+029068:     .line 180
+029069:     invoke-virtual {v9}, Ljava/util/zip/CRC32;->getValue()J
+029070: 
+029071:     .line 181
+029072:     .line 182
+029073:     .line 183
+029074:     move-result-wide v3
+029075: 
+029076:     .line 184
+029077:     invoke-virtual {v2, v3, v4}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+===== /tmp/apktool-out/smali/ax/X3/i.smali =====
+000326: 
+000327:     .line 144
+000328:     .line 145
+000329:     new-instance v2, Ljava/lang/StringBuilder;
+000330: 
+000331:     .line 146
+000332:     .line 147
+000333:     invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
+000334: 
+000335:     .line 148
+000336:     .line 149
+000337:     .line 150
+000338:     const-string v4, "Calculation complete, Calculated memory cache size: "
+000339: 
+000340:     .line 151
+000341:     .line 152
+000342:     invoke-virtual {v2, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+000343: 
+000344:     .line 153
+000345:     .line 154
+000346:     .line 155
+000347:     iget v4, p0, Lax/X3/i;->b:I
+000348: 
+000349:     .line 156
+000350:     .line 157
+000351:     invoke-direct {p0, v4}, Lax/X3/i;->g(I)Ljava/lang/String;
+000352: 
+000353:     .line 158
+000354:     .line 159
+000355:     .line 160
+
+===== /tmp/apktool-out/smali/ax/X3/d.smali =====
+000093:     .line 7
+000094:     const/4 v1, 0x0
+000095: 
+000096:     .line 8
+000097:     if-nez v0, :cond_0
+000098: 
+000099:     .line 9
+000100:     .line 10
+000101:     return-object v1
+000102: 
+000103:     .line 11
+000104:     :cond_0
+000105:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+000106: 
+000107:     .line 12
+000108:     .line 13
+000109:     .line 14
+000110:     move-result v2
+000111: 
+000112:     .line 15
+000113:     if-nez v2, :cond_2
+000114: 
+000115:     .line 16
+000116:     .line 17
+000117:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000118: 
+000119:     .line 18
+000120:     .line 19
+000121:     .line 20
+000122:     move-result v2
+
+===== /tmp/apktool-out/smali/ax/g3/h0.smali =====
+000343:     .line 3
+000344:     .line 4
+000345:     move-result-object v0
+000346: 
+000347:     .line 5
+000348:     const/4 v1, 0x1
+000349: 
+000350:     .line 6
+000351:     if-nez v0, :cond_0
+000352: 
+000353:     .line 7
+000354:     .line 8
+000355:     const-string p0, "no recycle bin info in analysis"
+000356: 
+000357:     .line 9
+000358:     .line 10
+000359:     invoke-static {p0}, Lax/z3/b;->g(Ljava/lang/String;)V
+000360: 
+000361:     .line 11
+000362:     .line 12
+000363:     .line 13
+000364:     return v1
+000365: 
+000366:     .line 14
+000367:     :cond_0
+000368:     invoke-virtual {p0}, Lax/W2/h;->b0()J
+000369: 
+000370:     .line 15
+000371:     .line 16
+000372:     .line 17
+
+===== /tmp/apktool-out/smali/ax/s2/a.smali =====
+000458:     invoke-virtual {p1}, Ljava/io/File;->getParentFile()Ljava/io/File;
+000459: 
+000460:     .line 11
+000461:     .line 12
+000462:     .line 13
+000463:     move-result-object p1
+000464: 
+000465:     .line 14
+000466:     if-eqz p1, :cond_0
+000467: 
+000468:     .line 15
+000469:     .line 16
+000470:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+000471: 
+000472:     .line 17
+000473:     .line 18
+000474:     .line 19
+000475:     goto :goto_0
+000476: 
+000477:     .line 20
+000478:     :catch_0
+000479:     move-exception p1
+000480: 
+000481:     .line 21
+000482:     goto :goto_1
+000483: 
+000484:     .line 22
+000485:     :cond_0
+000486:     :goto_0
+000487:     new-instance p1, Ljava/io/FileOutputStream;
+
+===== /tmp/apktool-out/smali/ax/w3/c.smali =====
+001096:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+001097: 
+001098:     .line 81
+001099:     .line 82
+001100:     .line 83
+001101:     move-result v3
+001102: 
+001103:     .line 84
+001104:     if-nez v3, :cond_5
+001105: 
+001106:     .line 85
+001107:     .line 86
+001108:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+001109: 
+001110:     .line 87
+001111:     .line 88
+001112:     .line 89
+001113:     :cond_5
+001114:     new-instance v3, Ljava/io/File;
+001115: 
+001116:     .line 90
+001117:     .line 91
+001118:     invoke-direct {v3, v0, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+001119: 
+001120:     .line 92
+001121:     .line 93
+001122:     .line 94
+001123:     invoke-static {p1, v1, v3}, Lax/f3/F;->k(Lax/f3/k;Ljava/lang/String;Ljava/io/File;)Z
+001124: 
+001125:     .line 95
+
+===== /tmp/apktool-out/smali/ax/w3/a.smali =====
+001223:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+001224: 
+001225:     .line 191
+001226:     .line 192
+001227:     .line 193
+001228:     move-result v1
+001229: 
+001230:     .line 194
+001231:     if-nez v1, :cond_4
+001232: 
+001233:     .line 195
+001234:     .line 196
+001235:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+001236: 
+001237:     .line 197
+001238:     .line 198
+001239:     .line 199
+001240:     move-result v1
+001241: 
+001242:     .line 200
+001243:     if-nez v1, :cond_4
+001244: 
+001245:     .line 201
+001246:     .line 202
+001247:     iget-object v1, p0, Lax/Da/a;->b:Ljava/io/File;
+001248: 
+001249:     .line 203
+001250:     .line 204
+001251:     if-eqz v1, :cond_4
+001252: 
+001259:     .line 209
+001260:     move-result v1
+001261: 
+001262:     .line 210
+001263:     if-nez v1, :cond_3
+001264: 
+001265:     .line 211
+001266:     .line 212
+001267:     iget-object v1, p0, Lax/Da/a;->b:Ljava/io/File;
+001268: 
+001269:     .line 213
+001270:     .line 214
+001271:     invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+001272: 
+001273:     .line 215
+001274:     .line 216
+001275:     .line 217
+001276:     move-result v1
+001277: 
+001278:     .line 218
+001279:     if-eqz v1, :cond_4
+001280: 
+001281:     .line 219
+001282:     .line 220
+001283:     :cond_3
+001284:     iget-object v0, p0, Lax/Da/a;->b:Ljava/io/File;
+001285: 
+001286:     .line 221
+001287:     .line 222
+001288:     :cond_4
+
+===== /tmp/apktool-out/smali/ax/w3/d.smali =====
+001455: 
+001456:     .line 95
+001457:     .line 96
+001458:     .line 97
+001459:     move-result-object v7
+001460: 
+001461:     .line 98
+001462:     invoke-direct {v6, v3, v7}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+001463: 
+001464:     .line 99
+001465:     .line 100
+001466:     .line 101
+001467:     invoke-virtual {v6}, Ljava/io/File;->mkdirs()Z
+001468: 
+001469:     .line 102
+001470:     .line 103
+001471:     .line 104
+001472:     new-instance v7, Ljava/io/File;
+001473: 
+001474:     .line 105
+001475:     .line 106
+001476:     new-instance v8, Ljava/lang/StringBuilder;
+001477: 
+001478:     .line 107
+001479:     .line 108
+001480:     invoke-direct {v8}, Ljava/lang/StringBuilder;-><init>()V
+001481: 
+001482:     .line 109
+001483:     .line 110
+001484:     .line 111
+
+===== /tmp/apktool-out/smali_classes3/com/microsoft/graph/extensions/CalculatedColumn.smali =====
+000001: .class public Lcom/microsoft/graph/extensions/CalculatedColumn;
+000002: .super Lcom/microsoft/graph/generated/BaseCalculatedColumn;
+000003: .source "SourceFile"
+
+===== /tmp/apktool-out/smali_classes3/com/microsoft/graph/generated/BaseCalculatedColumn.smali =====
+000001: .class public Lcom/microsoft/graph/generated/BaseCalculatedColumn;
+000002: .super Ljava/lang/Object;
+000003: .source "SourceFile"
+000004: 
+000005: # interfaces
+000006: .implements Lax/Aa/d;
+000007: 
+000008: 
+000009: # instance fields
+000010: .field public a:Ljava/lang/String;
+000011:     .annotation runtime Lax/Z8/a;
+000012:     .end annotation
+000013: 
+000014:     .annotation runtime Lax/Z8/c;
+000015:         value = "@odata.type"
+000016:     .end annotation
+000017: .end field
+000018: 
+000046: .end field
+000047: 
+000048: .field private transient f:Lax/Y8/l;
+000049: 
+000050: .field private transient g:Lax/Aa/e;
+000051: 
+000052: 
+000053: # virtual methods
+000054: .method public c(Lax/Aa/e;Lax/Y8/l;)V
+000055:     .locals 0
+000056: 
+000057:     .line 1
+000058:     iput-object p1, p0, Lcom/microsoft/graph/generated/BaseCalculatedColumn;->g:Lax/Aa/e;
+000059: 
+000060:     .line 2
+000061:     .line 3
+000062:     iput-object p2, p0, Lcom/microsoft/graph/generated/BaseCalculatedColumn;->f:Lax/Y8/l;
+000063: 
+000064:     .line 4
+000065:     .line 5
+000066:     return-void
+000067:     .line 6
+000068:     .line 7
+000069:     .line 8
+000070:     .line 9
+000071:     .line 10
+000072:     .line 11
+000073:     .line 12
+000074:     .line 13
+000075:     .line 14
+000050: .field private transient g:Lax/Aa/e;
+000051: 
+000052: 
+000053: # virtual methods
+000054: .method public c(Lax/Aa/e;Lax/Y8/l;)V
+000055:     .locals 0
+000056: 
+000057:     .line 1
+000058:     iput-object p1, p0, Lcom/microsoft/graph/generated/BaseCalculatedColumn;->g:Lax/Aa/e;
+000059: 
+000060:     .line 2
+000061:     .line 3
+000062:     iput-object p2, p0, Lcom/microsoft/graph/generated/BaseCalculatedColumn;->f:Lax/Y8/l;
+000063: 
+000064:     .line 4
+000065:     .line 5
+000066:     return-void
+000067:     .line 6
+000068:     .line 7
+000069:     .line 8
+000070:     .line 9
+000071:     .line 10
+000072:     .line 11
+000073:     .line 12
+000074:     .line 13
+000075:     .line 14
+000076:     .line 15
+000077:     .line 16
+000078:     .line 17
+000079:     .line 18
+000096:     .line 35
+000097:     .line 36
+000098:     .line 37
+000099:     .line 38
+000100:     .line 39
+000101:     .line 40
+000102: .end method
+000103: 
+000104: .method public final d()Lcom/microsoft/graph/serializer/a;
+000105:     .locals 1
+000106: 
+000107:     .line 1
+000108:     iget-object v0, p0, Lcom/microsoft/graph/generated/BaseCalculatedColumn;->b:Lcom/microsoft/graph/serializer/a;
+000109: 
+000110:     .line 2
+000111:     .line 3
+000112:     return-object v0
+000113:     .line 4
+000114:     .line 5
+000115:     .line 6
+000116:     .line 7
+000117:     .line 8
+000118:     .line 9
+000119:     .line 10
+000120:     .line 11
+000121:     .line 12
+000122:     .line 13
+000123:     .line 14
+000124:     .line 15
+000125:     .line 16
+
+===== /tmp/apktool-out/smali_classes3/com/microsoft/graph/generated/BaseColumnDefinition.smali =====
+000007: 
+000008: 
+000009: # instance fields
+000010: .field public f:Lcom/microsoft/graph/extensions/BooleanColumn;
+000011:     .annotation runtime Lax/Z8/a;
+000012:     .end annotation
+000013: 
+000014:     .annotation runtime Lax/Z8/c;
+000015:         value = "boolean"
+000016:     .end annotation
+000017: .end field
+000018: 
+000019: .field public g:Lcom/microsoft/graph/extensions/CalculatedColumn;
+000020:     .annotation runtime Lax/Z8/a;
+000021:     .end annotation
+000022: 
+000023:     .annotation runtime Lax/Z8/c;
+000024:         value = "calculated"
+000025:     .end annotation
+000026: .end field
+000027: 
+000028: .field public h:Lcom/microsoft/graph/extensions/ChoiceColumn;
+000029:     .annotation runtime Lax/Z8/a;
+000030:     .end annotation
+000031: 
+000032:     .annotation runtime Lax/Z8/c;
+000033:         value = "choice"
+000034:     .end annotation
+000035: .end field
+000036: 
+000012:     .end annotation
+000013: 
+000014:     .annotation runtime Lax/Z8/c;
+000015:         value = "boolean"
+000016:     .end annotation
+000017: .end field
+000018: 
+000019: .field public g:Lcom/microsoft/graph/extensions/CalculatedColumn;
+000020:     .annotation runtime Lax/Z8/a;
+000021:     .end annotation
+000022: 
+000023:     .annotation runtime Lax/Z8/c;
+000024:         value = "calculated"
+000025:     .end annotation
+000026: .end field
+000027: 
+000028: .field public h:Lcom/microsoft/graph/extensions/ChoiceColumn;
+000029:     .annotation runtime Lax/Z8/a;
+000030:     .end annotation
+000031: 
+000032:     .annotation runtime Lax/Z8/c;
+000033:         value = "choice"
+000034:     .end annotation
+000035: .end field
+000036: 
+000037: .field public i:Ljava/lang/String;
+000038:     .annotation runtime Lax/Z8/a;
+000039:     .end annotation
+000040: 
+000041:     .annotation runtime Lax/Z8/c;
+
+===== /tmp/apktool-out/smali_classes3/com/jcraft/jsch/KnownHosts.smali =====
+004835:     invoke-interface {p1, v3}, Lcom/jcraft/jsch/UserInfo;->g(Ljava/lang/String;)Z
+004836: 
+004837:     .line 83
+004838:     .line 84
+004839:     .line 85
+004840:     move-result v3
+004841: 
+004842:     .line 86
+004843:     if-eqz v3, :cond_2
+004844: 
+004845:     .line 87
+004846:     .line 88
+004847:     invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+004848: 
+004849:     .line 89
+004850:     .line 90
+004851:     .line 91
+004852:     move-result v4
+004853: 
+004854:     .line 92
+004855:     if-nez v4, :cond_1
+004856: 
+004857:     .line 93
+004858:     .line 94
+004859:     new-instance v3, Ljava/lang/StringBuilder;
+004860: 
+004861:     .line 95
+004862:     .line 96
+004863:     invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
+004864: 
+
+===== /tmp/apktool-out/smali_classes3/com/jcraft/jsch/KnownHosts$HashedHostKey.smali =====
+000885:     move-result-object v1
+000886: 
+000887:     .line 150
+000888:     new-instance v2, Ljava/lang/StringBuilder;
+000889: 
+000890:     .line 151
+000891:     .line 152
+000892:     invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
+000893: 
+000894:     .line 153
+000895:     .line 154
+000896:     .line 155
+000897:     const-string v3, "an error occurred while trying to calculate the hash for host "
+000898: 
+000899:     .line 156
+000900:     .line 157
+000901:     invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+000902: 
+000903:     .line 158
+000904:     .line 159
+000905:     .line 160
+000906:     iget-object v3, p0, Lcom/jcraft/jsch/HostKey;->b:Ljava/lang/String;
+000907: 
+000908:     .line 161
+000909:     .line 162
+000910:     invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+000911: 
+000912:     .line 163
+000913:     .line 164
+000914:     .line 165
+
+===== /tmp/apktool-out/smali_classes3/ax/z6/Ms.smali =====
+002568:     move-result v10
+002569: 
+002570:     .line 934
+002571:     new-instance v12, Ljava/lang/StringBuilder;
+002572: 
+002573:     .line 935
+002574:     .line 936
+002575:     invoke-direct {v12}, Ljava/lang/StringBuilder;-><init>()V
+002576: 
+002577:     .line 937
+002578:     .line 938
+002579:     .line 939
+002580:     const-string v14, "Calculate width with original width "
+002581: 
+002582:     .line 940
+002583:     .line 941
+002584:     invoke-virtual {v12, v14}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+002585: 
+002586:     .line 942
+002587:     .line 943
+002588:     .line 944
+002589:     invoke-virtual {v12, v6}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+002590: 
+002591:     .line 945
+002592:     .line 946
+002593:     .line 947
+002594:     const-string v14, ", videoHost.getVideoBoundingWidth() "
+002595: 
+002596:     .line 948
+002597:     .line 949
+002766:     move-result v6
+002767: 
+002768:     .line 1033
+002769:     new-instance v8, Ljava/lang/StringBuilder;
+002770: 
+002771:     .line 1034
+002772:     .line 1035
+002773:     invoke-direct {v8}, Ljava/lang/StringBuilder;-><init>()V
+002774: 
+002775:     .line 1036
+002776:     .line 1037
+002777:     .line 1038
+002778:     const-string v9, "Calculate height with original height "
+002779: 
+002780:     .line 1039
+002781:     .line 1040
+002782:     invoke-virtual {v8, v9}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+002783: 
+002784:     .line 1041
+002785:     .line 1042
+002786:     .line 1043
+002787:     invoke-virtual {v8, v3}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+002788: 
+002789:     .line 1044
+002790:     .line 1045
+002791:     .line 1046
+002792:     const-string v9, ", videoHost.getVideoBoundingHeight() "
+002793: 
+002794:     .line 1047
+002795:     .line 1048
+
+===== /tmp/apktool-out/smali_classes3/ax/z6/ct.smali =====
+000182:     .line 39
+000183:     const/4 v0, 0x0
+000184: 
+000185:     .line 40
+000186:     if-nez p1, :cond_2
+000187: 
+000188:     .line 41
+000189:     .line 42
+000190:     iget-object p1, p0, Lax/z6/ct;->Z:Ljava/io/File;
+000191: 
+000192:     .line 43
+000193:     .line 44
+000194:     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
+000195: 
+000196:     .line 45
+000197:     .line 46
+000198:     .line 47
+000199:     move-result p1
+000200: 
+000201:     .line 48
+000202:     if-eqz p1, :cond_1
+000203: 
+000204:     .line 49
+000205:     .line 50
+000206:     goto :goto_0
+000207: 
+000208:     .line 51
+000209:     :cond_1
+000210:     iget-object p1, p0, Lax/z6/ct;->Z:Ljava/io/File;
+000211: 
+
+===== /tmp/apktool-out/smali_classes3/ax/z6/yn.smali =====
+000182:     .line 29
+000183:     .line 30
+000184:     invoke-virtual {v1, p2, v0}, Landroid/app/DownloadManager$Request;->setDestinationInExternalPublicDir(Ljava/lang/String;Ljava/lang/String;)Landroid/app/DownloadManager$Request;
+000185: 
+000186:     .line 31
+000187:     .line 32
+000188:     .line 33
+000189:     invoke-static {}, Lax/P5/v;->t()Lax/T5/G0;
+000190: 
+000191:     .line 34
+000192:     .line 35
+000193:     .line 36
+000194:     invoke-virtual {v1}, Landroid/app/DownloadManager$Request;->allowScanningByMediaScanner()V
+000195: 
+000196:     .line 37
+000197:     .line 38
+000198:     .line 39
+000199:     const/4 p2, 0x1
+000200: 
+000201:     .line 40
+000202:     invoke-virtual {v1, p2}, Landroid/app/DownloadManager$Request;->setNotificationVisibility(I)Landroid/app/DownloadManager$Request;
+000203: 
+000204:     .line 41
+000205:     .line 42
+000206:     .line 43
+000207:     invoke-virtual {p1, v1}, Landroid/app/DownloadManager;->enqueue(Landroid/app/DownloadManager$Request;)J
+000208:     :try_end_0
+000209:     .catch Ljava/lang/IllegalStateException; {:try_start_0 .. :try_end_0} :catch_0
+000210: 
+000211:     .line 44
+
+===== /tmp/apktool-out/smali_classes3/ax/z6/Td0.smali =====
+000045:     invoke-virtual {p0}, Ljava/io/File;->exists()Z
+000046: 
+000047:     .line 19
+000048:     .line 20
+000049:     .line 21
+000050:     move-result p1
+000051: 
+000052:     .line 22
+000053:     if-nez p1, :cond_1
+000054: 
+000055:     .line 23
+000056:     .line 24
+000057:     invoke-virtual {p0}, Ljava/io/File;->mkdirs()Z
+000058: 
+000059:     .line 25
+000060:     .line 26
+000061:     .line 27
+000062:     :cond_1
+000063:     return-object p0
+000064:     .line 28
+000065:     .line 29
+000066:     .line 30
+000067:     .line 31
+000068:     .line 32
+000069:     .line 33
+000070:     .line 34
+000071:     .line 35
+000072:     .line 36
+000073:     .line 37
+000074:     .line 38
+
+===== /tmp/apktool-out/smali_classes3/ax/z6/ae0.smali =====
+001636:     .line 110
+001637:     .line 111
+001638:     .line 112
+001639:     invoke-direct {p0, v10, v7, v8}, Lax/z6/ae0;->i(IJ)V
+001640: 
+001641:     .line 113
+001642:     .line 114
+001643:     .line 115
+001644:     goto :goto_0
+001645: 
+001646:     .line 116
+001647:     :cond_3
+001648:     invoke-virtual {v4}, Ljava/io/File;->mkdirs()Z
+001649: 
+001650:     .line 117
+001651:     .line 118
+001652:     .line 119
+001653:     move-result v9
+001654: 
+001655:     .line 120
+001656:     if-nez v9, :cond_5
+001657: 
+001658:     .line 121
+001659:     .line 122
+001660:     invoke-virtual {v4}, Ljava/io/File;->canWrite()Z
+001661: 
+001662:     .line 123
+001663:     .line 124
+001664:     .line 125
+001665:     move-result p1
+
+===== /tmp/apktool-out/smali_classes3/ax/z6/Sd0.smali =====
+000132:     invoke-virtual {v1}, Ljava/io/File;->exists()Z
+000133: 
+000134:     .line 17
+000135:     .line 18
+000136:     .line 19
+000137:     move-result v0
+000138: 
+000139:     .line 20
+000140:     if-nez v0, :cond_0
+000141: 
+000142:     .line 21
+000143:     .line 22
+000144:     invoke-virtual {v1}, Ljava/io/File;->mkdir()Z
+000145: 
+000146:     .line 23
+000147:     .line 24
+000148:     .line 25
+000149:     :cond_0
+000150:     return-object v1
+000151:     .line 26
+000152:     .line 27
+000153:     .line 28
+000154:     .line 29
+000155:     .line 30
+000156:     .line 31
+000157:     .line 32
+000158:     .line 33
+000159:     .line 34
+000160:     .line 35
+000161:     .line 36
+000439: 
+000440:     .line 40
+000441:     .line 41
+000442:     invoke-static {v3}, Lax/z6/Td0;->d(Ljava/io/File;)Z
+000443: 
+000444:     .line 42
+000445:     .line 43
+000446:     .line 44
+000447:     iget-object v3, p0, Lax/z6/Sd0;->b:Ljava/io/File;
+000448: 
+000449:     .line 45
+000450:     .line 46
+000451:     invoke-virtual {v3}, Ljava/io/File;->mkdirs()Z
+000452: 
+000453:     .line 47
+000454:     .line 48
+000455:     .line 49
+000456:     iget-object v3, p0, Lax/z6/Sd0;->b:Ljava/io/File;
+000457: 
+000458:     .line 50
+000459:     .line 51
+000460:     invoke-static {v0, v3}, Lax/z6/Td0;->c(Ljava/lang/String;Ljava/io/File;)Ljava/io/File;
+000461: 
+000462:     .line 52
+000463:     .line 53
+000464:     .line 54
+000465:     move-result-object v3
+000466: 
+000467:     .line 55
+000468:     invoke-virtual {v3}, Ljava/io/File;->mkdirs()Z
+000456:     iget-object v3, p0, Lax/z6/Sd0;->b:Ljava/io/File;
+000457: 
+000458:     .line 50
+000459:     .line 51
+000460:     invoke-static {v0, v3}, Lax/z6/Td0;->c(Ljava/lang/String;Ljava/io/File;)Ljava/io/File;
+000461: 
+000462:     .line 52
+000463:     .line 53
+000464:     .line 54
+000465:     move-result-object v3
+000466: 
+000467:     .line 55
+000468:     invoke-virtual {v3}, Ljava/io/File;->mkdirs()Z
+000469: 
+000470:     .line 56
+000471:     .line 57
+000472:     .line 58
+000473:     iget-object v3, p0, Lax/z6/Sd0;->b:Ljava/io/File;
+000474: 
+000475:     .line 59
+000476:     .line 60
+000477:     const-string v5, "pcam.jar"
+000478: 
+000479:     .line 61
+000480:     .line 62
+000481:     invoke-static {v0, v5, v3}, Lax/z6/Td0;->b(Ljava/lang/String;Ljava/lang/String;Ljava/io/File;)Ljava/io/File;
+000482: 
+000483:     .line 63
+000484:     .line 64
+000485:     .line 65
+000703:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000704: 
+000705:     .line 168
+000706:     .line 169
+000707:     .line 170
+000708:     move-result v3
+000709: 
+000710:     .line 171
+000711:     if-eqz v3, :cond_6
+000712: 
+000713:     .line 172
+000714:     .line 173
+000715:     invoke-virtual {v0, v5}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000716: 
+000717:     .line 174
+000718:     .line 175
+000719:     .line 176
+000720:     move-result v0
+000721: 
+000722:     .line 177
+000723:     if-nez v0, :cond_6
+000724: 
+000725:     .line 178
+000726:     .line 179
+000727:     goto :goto_1
+000728: 
+000729:     .line 180
+000730:     :cond_6
+000731:     invoke-virtual {v2}, Ljava/io/File;->exists()Z
+000732: 
+000731:     invoke-virtual {v2}, Ljava/io/File;->exists()Z
+000732: 
+000733:     .line 181
+000734:     .line 182
+000735:     .line 183
+000736:     move-result v0
+000737: 
+000738:     .line 184
+000739:     if-eqz v0, :cond_4
+000740: 
+000741:     .line 185
+000742:     .line 186
+000743:     invoke-virtual {v2, p2}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000744: 
+000745:     .line 187
+000746:     .line 188
+000747:     .line 189
+000748:     move-result p2
+000749: 
+000750:     .line 190
+000751:     if-eqz p2, :cond_4
+000752: 
+000753:     .line 191
+000754:     .line 192
+000755:     invoke-static {}, Lax/z6/Eb;->g0()Lax/z6/Cb;
+000756: 
+000757:     .line 193
+000758:     .line 194
+000759:     .line 195
+000760:     move-result-object p2
+
+===== /tmp/apktool-out/smali_classes3/ax/z6/B7.smali =====
+002740:     invoke-virtual {v2}, Ljava/io/File;->exists()Z
+002741: 
+002742:     .line 11
+002743:     .line 12
+002744:     .line 13
+002745:     move-result v3
+002746: 
+002747:     .line 14
+002748:     if-nez v3, :cond_0
+002749: 
+002750:     .line 15
+002751:     .line 16
+002752:     invoke-virtual {v2}, Ljava/io/File;->mkdirs()Z
+002753: 
+002754:     .line 17
+002755:     .line 18
+002756:     .line 19
+002757:     move-result v3
+002758: 
+002759:     .line 20
+002760:     if-nez v3, :cond_1
+002761: 
+002762:     .line 21
+002763:     .line 22
+002764:     invoke-virtual {v2}, Ljava/io/File;->getAbsolutePath()Ljava/lang/String;
+002765: 
+002766:     .line 23
+002767:     .line 24
+002768:     .line 25
+002769:     move-result-object v2
+
+===== /tmp/apktool-out/smali_classes3/ax/z6/ce0.smali =====
+000360:     invoke-virtual {v2}, Ljava/io/File;->exists()Z
+000361: 
+000362:     .line 41
+000363:     .line 42
+000364:     .line 43
+000365:     move-result v3
+000366: 
+000367:     .line 44
+000368:     if-nez v3, :cond_1
+000369: 
+000370:     .line 45
+000371:     .line 46
+000372:     invoke-virtual {v2}, Ljava/io/File;->mkdirs()Z
+000373: 
+000374:     .line 47
+000375:     .line 48
+000376:     .line 49
+000377:     goto :goto_0
+000378: 
+000379:     .line 50
+000380:     :catchall_0
+000381:     move-exception p1
+000382: 
+000383:     .line 51
+000384:     goto :goto_2
+000385: 
+000386:     .line 52
+000387:     :catch_0
+000388:     move-exception p1
+000389: 
+
+===== /tmp/apktool-out/smali_classes3/ax/v8/g.smali =====
+000802:     goto :goto_0
+000803: 
+000804:     .line 51
+000805:     :catchall_0
+000806:     move-exception p0
+000807: 
+000808:     .line 52
+000809:     goto :goto_1
+000810: 
+000811:     .line 53
+000812:     :cond_1
+000813:     :goto_0
+000814:     invoke-virtual {p0}, Ljava/io/File;->mkdirs()Z
+000815: 
+000816:     .line 54
+000817:     .line 55
+000818:     .line 56
+000819:     move-result v1
+000820: 
+000821:     .line 57
+000822:     if-nez v1, :cond_2
+000823: 
+000824:     .line 58
+000825:     .line 59
+000826:     invoke-static {}, Lax/n8/g;->f()Lax/n8/g;
+000827: 
+000828:     .line 60
+000829:     .line 61
+000830:     .line 62
+000831:     move-result-object v1
+000991:     .line 191
+000992:     .line 192
+000993:     .line 193
+000994:     .line 194
+000995:     .line 195
+000996:     .line 196
+000997: .end method
+000998: 
+000999: .method private static t(Ljava/io/File;)Ljava/io/File;
+001000:     .locals 0
+001001: 
+001002:     .line 1
+001003:     invoke-virtual {p0}, Ljava/io/File;->mkdirs()Z
+001004: 
+001005:     .line 2
+001006:     .line 3
+001007:     .line 4
+001008:     return-object p0
+001009:     .line 5
+001010:     .line 6
+001011:     .line 7
+001012:     .line 8
+001013:     .line 9
+001014:     .line 10
+001015:     .line 11
+001016:     .line 12
+001017:     .line 13
+001018:     .line 14
+001019:     .line 15
+001020:     .line 16
+
+===== /tmp/apktool-out/smali_classes3/ax/Ra/f.smali =====
+000378:     invoke-virtual {v1}, Ljava/io/File;->exists()Z
+000379: 
+000380:     .line 36
+000381:     .line 37
+000382:     .line 38
+000383:     move-result p0
+000384: 
+000385:     .line 39
+000386:     if-nez p0, :cond_1
+000387: 
+000388:     .line 40
+000389:     .line 41
+000390:     invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+000391: 
+000392:     .line 42
+000393:     .line 43
+000394:     .line 44
+000395:     move-result p0
+000396: 
+000397:     .line 45
+000398:     const/4 v0, 0x0
+000399: 
+000400:     .line 46
+000401:     if-nez p0, :cond_0
+000402: 
+000403:     .line 47
+000404:     .line 48
+000405:     const-string p0, "Unable to create external cache directory"
+000406: 
+000407:     .line 49
+000418:     const/4 p0, 0x0
+000419: 
+000420:     .line 56
+000421:     return-object p0
+000422: 
+000423:     .line 57
+000424:     :cond_0
+000425:     :try_start_0
+000426:     new-instance p0, Ljava/io/File;
+000427: 
+000428:     .line 58
+000429:     .line 59
+000430:     const-string v2, ".nomedia"
+000431: 
+000432:     .line 60
+000433:     .line 61
+000434:     invoke-direct {p0, v1, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+000435: 
+000436:     .line 62
+000437:     .line 63
+000438:     .line 64
+000439:     invoke-virtual {p0}, Ljava/io/File;->createNewFile()Z
+000440:     :try_end_0
+000441:     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_0} :catch_0
+000442: 
+000443:     .line 65
+000444:     .line 66
+000445:     .line 67
+000446:     return-object v1
+000447: 
+000438:     .line 64
+000439:     invoke-virtual {p0}, Ljava/io/File;->createNewFile()Z
+000440:     :try_end_0
+000441:     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_0} :catch_0
+000442: 
+000443:     .line 65
+000444:     .line 66
+000445:     .line 67
+000446:     return-object v1
+000447: 
+000448:     .line 68
+000449:     :catch_0
+000450:     const-string p0, "Can\'t create \".nomedia\" file in application external cache directory"
+000451: 
+000452:     .line 69
+000453:     .line 70
+000454:     new-array v0, v0, [Ljava/lang/Object;
+000455: 
+000456:     .line 71
+000457:     .line 72
+000458:     invoke-static {p0, v0}, Lax/Ra/d;->d(Ljava/lang/String;[Ljava/lang/Object;)V
+000459: 
+000460:     .line 73
+000461:     .line 74
+000462:     .line 75
+000463:     :cond_1
+000464:     return-object v1
+000465:     .line 76
+000466:     .line 77
+000467:     .line 78
+000643:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000644: 
+000645:     .line 11
+000646:     .line 12
+000647:     .line 13
+000648:     move-result p1
+000649: 
+000650:     .line 14
+000651:     if-nez p1, :cond_0
+000652: 
+000653:     .line 15
+000654:     .line 16
+000655:     invoke-virtual {v0}, Ljava/io/File;->mkdir()Z
+000656: 
+000657:     .line 17
+000658:     .line 18
+000659:     .line 19
+000660:     move-result p1
+000661: 
+000662:     .line 20
+000663:     if-nez p1, :cond_0
+000664: 
+000665:     .line 21
+000666:     .line 22
+000667:     return-object p0
+000668: 
+000669:     .line 23
+000670:     :cond_0
+000671:     return-object v0
+000672:     .line 24
+
+===== /tmp/apktool-out/smali_classes3/ax/K8/c.smali =====
+000684: 
+000685:     .line 110
+000686:     .line 111
+000687:     .line 112
+000688:     invoke-direct {p0}, Lax/K8/c;->a()Ljava/io/File;
+000689: 
+000690:     .line 113
+000691:     .line 114
+000692:     .line 115
+000693:     move-result-object v0
+000694: 
+000695:     .line 116
+000696:     invoke-virtual {v1, v0}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000697: 
+000698:     .line 117
+000699:     .line 118
+000700:     .line 119
+000701:     move-result v0
+000702: 
+000703:     .line 120
+000704:     if-eqz v0, :cond_0
+000705: 
+000706:     .line 121
+000707:     .line 122
+000708:     goto :goto_0
+000709: 
+000710:     .line 123
+000711:     :cond_0
+000712:     new-instance v0, Ljava/io/IOException;
+000713: 
+
+===== /tmp/apktool-out/smali_classes3/ax/Da/a.smali =====
+000328:     .catchall {:try_start_0 .. :try_end_0} :catchall_0
+000329: 
+000330:     .line 51
+000331:     invoke-static {v1}, Lax/Ra/c;->a(Ljava/io/Closeable;)V
+000332: 
+000333:     .line 52
+000334:     .line 53
+000335:     .line 54
+000336:     if-eqz v2, :cond_0
+000337: 
+000338:     .line 55
+000339:     .line 56
+000340:     invoke-virtual {v0, p1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000341: 
+000342:     .line 57
+000343:     .line 58
+000344:     .line 59
+000345:     move-result p1
+000346: 
+000347:     .line 60
+000348:     if-nez p1, :cond_0
+000349: 
+000350:     .line 61
+000351:     .line 62
+000352:     const/4 v2, 0x0
+000353: 
+000354:     .line 63
+000355:     :cond_0
+000356:     if-nez v2, :cond_1
+000357: 
+000593:     :try_start_2
+000594:     invoke-static {v2}, Lax/Ra/c;->a(Ljava/io/Closeable;)V
+000595:     :try_end_2
+000596:     .catchall {:try_start_2 .. :try_end_2} :catchall_0
+000597: 
+000598:     .line 51
+000599:     .line 52
+000600:     .line 53
+000601:     if-eqz p2, :cond_0
+000602: 
+000603:     .line 54
+000604:     .line 55
+000605:     invoke-virtual {v0, p1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000606: 
+000607:     .line 56
+000608:     .line 57
+000609:     .line 58
+000610:     move-result p1
+000611: 
+000612:     .line 59
+000613:     if-nez p1, :cond_0
+000614: 
+000615:     .line 60
+000616:     .line 61
+000617:     goto :goto_0
+000618: 
+000619:     .line 62
+000620:     :cond_0
+000621:     move v1, p2
+000622: 
+000660:     :catchall_2
+000661:     move-exception p3
+000662: 
+000663:     .line 77
+000664:     const/4 p2, 0x0
+000665: 
+000666:     .line 78
+000667:     :goto_1
+000668:     if-eqz p2, :cond_2
+000669: 
+000670:     .line 79
+000671:     .line 80
+000672:     invoke-virtual {v0, p1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000673: 
+000674:     .line 81
+000675:     .line 82
+000676:     .line 83
+000677:     move-result p1
+000678: 
+000679:     .line 84
+000680:     if-nez p1, :cond_2
+000681: 
+000682:     .line 85
+000683:     .line 86
+000684:     goto :goto_2
+000685: 
+000686:     .line 87
+000687:     :cond_2
+000688:     move v1, p2
+000689: 
+001097:     .line 12
+001098:     move-result v1
+001099: 
+001100:     .line 13
+001101:     if-nez v1, :cond_1
+001102: 
+001103:     .line 14
+001104:     .line 15
+001105:     iget-object v1, p0, Lax/Da/a;->a:Ljava/io/File;
+001106: 
+001107:     .line 16
+001108:     .line 17
+001109:     invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+001110: 
+001111:     .line 18
+001112:     .line 19
+001113:     .line 20
+001114:     move-result v1
+001115: 
+001116:     .line 21
+001117:     if-nez v1, :cond_1
+001118: 
+001119:     .line 22
+001120:     .line 23
+001121:     iget-object v1, p0, Lax/Da/a;->b:Ljava/io/File;
+001122: 
+001123:     .line 24
+001124:     .line 25
+001125:     if-eqz v1, :cond_1
+001126: 
+001133:     .line 30
+001134:     move-result v1
+001135: 
+001136:     .line 31
+001137:     if-nez v1, :cond_0
+001138: 
+001139:     .line 32
+001140:     .line 33
+001141:     iget-object v1, p0, Lax/Da/a;->b:Ljava/io/File;
+001142: 
+001143:     .line 34
+001144:     .line 35
+001145:     invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+001146: 
+001147:     .line 36
+001148:     .line 37
+001149:     .line 38
+001150:     move-result v1
+001151: 
+001152:     .line 39
+001153:     if-eqz v1, :cond_1
+001154: 
+001155:     .line 40
+001156:     .line 41
+001157:     :cond_0
+001158:     iget-object v0, p0, Lax/Da/a;->b:Ljava/io/File;
+001159: 
+001160:     .line 42
+001161:     .line 43
+001162:     :cond_1
+
+===== /tmp/apktool-out/smali_classes3/ax/Ea/a$c.smali =====
+000430:     iget-object v1, p0, Lax/Ea/a$c;->e:Lax/Ea/a;
+000431: 
+000432:     .line 41
+000433:     .line 42
+000434:     invoke-static {v1}, Lax/Ea/a;->i(Lax/Ea/a;)Ljava/io/File;
+000435: 
+000436:     .line 43
+000437:     .line 44
+000438:     .line 45
+000439:     move-result-object v1
+000440: 
+000441:     .line 46
+000442:     invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+000443:     :try_end_2
+000444:     .catchall {:try_start_2 .. :try_end_2} :catchall_0
+000445: 
+000446:     .line 47
+000447:     .line 48
+000448:     .line 49
+000449:     :try_start_3
+000450:     new-instance v1, Ljava/io/FileOutputStream;
+000451: 
+000452:     .line 50
+000453:     .line 51
+000454:     invoke-direct {v1, p1}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
+000455:     :try_end_3
+000456:     .catch Ljava/io/FileNotFoundException; {:try_start_3 .. :try_end_3} :catch_1
+000457:     .catchall {:try_start_3 .. :try_end_3} :catchall_0
+000458: 
+000459:     .line 52
+
+===== /tmp/apktool-out/smali_classes3/ax/Ea/a.smali =====
+000756:     if-eqz v3, :cond_4
+000757: 
+000758:     .line 97
+000759:     .line 98
+000760:     invoke-virtual {v0, v1}, Lax/Ea/a$d;->j(I)Ljava/io/File;
+000761: 
+000762:     .line 99
+000763:     .line 100
+000764:     .line 101
+000765:     move-result-object v3
+000766: 
+000767:     .line 102
+000768:     invoke-virtual {p1, v3}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000769: 
+000770:     .line 103
+000771:     .line 104
+000772:     .line 105
+000773:     invoke-static {v0}, Lax/Ea/a$d;->a(Lax/Ea/a$d;)[J
+000774: 
+000775:     .line 106
+000776:     .line 107
+000777:     .line 108
+000778:     move-result-object p1
+000779: 
+000780:     .line 109
+000781:     aget-wide v4, p1, v1
+000782: 
+000783:     .line 110
+000784:     .line 111
+000785:     invoke-virtual {v3}, Ljava/io/File;->length()J
+002429:     .line 130
+002430:     invoke-virtual {v3, v0}, Ljava/io/PrintStream;->println(Ljava/lang/String;)V
+002431: 
+002432:     .line 131
+002433:     .line 132
+002434:     .line 133
+002435:     invoke-virtual {v2}, Lax/Ea/a;->delete()V
+002436: 
+002437:     .line 134
+002438:     .line 135
+002439:     .line 136
+002440:     :cond_2
+002441:     invoke-virtual {p0}, Ljava/io/File;->mkdirs()Z
+002442: 
+002443:     .line 137
+002444:     .line 138
+002445:     .line 139
+002446:     new-instance v0, Lax/Ea/a;
+002447: 
+002448:     .line 140
+002449:     .line 141
+002450:     move-object v1, p0
+002451: 
+002452:     .line 142
+002453:     move v2, p1
+002454: 
+002455:     .line 143
+002456:     move v3, p2
+002457: 
+002458:     .line 144
+005825: 
+005826:     .line 1
+005827:     if-eqz p2, :cond_0
+005828: 
+005829:     .line 2
+005830:     .line 3
+005831:     invoke-static {p1}, Lax/Ea/a;->B(Ljava/io/File;)V
+005832: 
+005833:     .line 4
+005834:     .line 5
+005835:     .line 6
+005836:     :cond_0
+005837:     invoke-virtual {p0, p1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+005838: 
+005839:     .line 7
+005840:     .line 8
+005841:     .line 9
+005842:     move-result p0
+005843: 
+005844:     .line 10
+005845:     if-eqz p0, :cond_1
+005846: 
+005847:     .line 11
+005848:     .line 12
+005849:     return-void
+005850: 
+005851:     .line 13
+005852:     :cond_1
+005853:     new-instance p0, Ljava/io/IOException;
+005854: 
+
+===== /tmp/apktool-out/smali_classes3/ax/Ia/a.smali =====
+000776:     invoke-virtual {v0}, Ljava/io/File;->exists()Z
+000777: 
+000778:     .line 14
+000779:     .line 15
+000780:     .line 16
+000781:     move-result v1
+000782: 
+000783:     .line 17
+000784:     if-nez v1, :cond_1
+000785: 
+000786:     .line 18
+000787:     .line 19
+000788:     invoke-virtual {v0}, Ljava/io/File;->mkdir()Z
+000789: 
+000790:     .line 20
+000791:     .line 21
+000792:     .line 22
+000793:     move-result v1
+000794: 
+000795:     .line 23
+000796:     if-eqz v1, :cond_0
+000797: 
+000798:     .line 24
+000799:     .line 25
+000800:     goto :goto_0
+000801: 
+000802:     .line 26
+000803:     :cond_0
+000804:     return-object p0
+000805: 
+
+===== /tmp/apktool-out/smali_classes3/ax/S9/g.smali =====
+000473:     aget-byte v5, v2, v3
+000474: 
+000475:     .line 79
+000476:     .line 80
+000477:     if-eq v4, v5, :cond_0
+000478: 
+000479:     .line 81
+000480:     .line 82
+000481:     sget-object v3, Lax/S9/g;->b:Lax/Me/d;
+000482: 
+000483:     .line 83
+000484:     .line 84
+000485:     const-string v4, "Signatures for packet {} do not match (received: {}, calculated: {})"
+000486: 
+000487:     .line 85
+000488:     .line 86
+000489:     invoke-static {v2}, Ljava/util/Arrays;->toString([B)Ljava/lang/String;
+000490: 
+000491:     .line 87
+000492:     .line 88
+000493:     .line 89
+000494:     move-result-object v2
+000495: 
+000496:     .line 90
+000497:     invoke-static {p2}, Ljava/util/Arrays;->toString([B)Ljava/lang/String;
+000498: 
+000499:     .line 91
+000500:     .line 92
+000501:     .line 93
+000502:     move-result-object p2
+
+===== /tmp/apktool-out/smali_classes3/ax/r8/g.smali =====
+002483:     invoke-virtual {v1, v2}, Ljava/io/RandomAccessFile;->write([B)V
+002484:     :try_end_0
+002485:     .catchall {:try_start_0 .. :try_end_0} :catchall_0
+002486: 
+002487:     .line 56
+002488:     .line 57
+002489:     .line 58
+002490:     invoke-virtual {v1}, Ljava/io/RandomAccessFile;->close()V
+002491: 
+002492:     .line 59
+002493:     .line 60
+002494:     .line 61
+002495:     invoke-virtual {v0, p0}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+002496: 
+002497:     .line 62
+002498:     .line 63
+002499:     .line 64
+002500:     move-result p0
+002501: 
+002502:     .line 65
+002503:     if-eqz p0, :cond_0
+002504: 
+002505:     .line 66
+002506:     .line 67
+002507:     return-void
+002508: 
+002509:     .line 68
+002510:     :cond_0
+002511:     new-instance p0, Ljava/io/IOException;
+002512: 
+
+===== /tmp/apktool-out/smali_classes2/j$/desugar/sun/nio/fs/l.smali =====
+000639:     invoke-direct {p2, p1}, Ljava/nio/file/NoSuchFileException;-><init>(Ljava/lang/String;)V
+000640: 
+000641:     throw p2
+000642: 
+000643:     .line 124
+000644:     :cond_1
+000645:     :goto_0
+000646:     invoke-interface {p1}, Lj$/nio/file/Path;->toFile()Ljava/io/File;
+000647: 
+000648:     move-result-object p2
+000649: 
+000650:     .line 125
+000651:     invoke-virtual {p2}, Ljava/io/File;->mkdirs()Z
+000652: 
+000653:     move-result p2
+000654: 
+000655:     if-eqz p2, :cond_2
+000656: 
+000657:     return-void
+000658: 
+000659:     .line 127
+000660:     :cond_2
+000661:     new-instance p2, Ljava/nio/file/FileAlreadyExistsException;
+000662: 
+000663:     invoke-interface {p1}, Lj$/nio/file/Path;->toString()Ljava/lang/String;
+000664: 
+000665:     move-result-object p1
+000666: 
+000667:     invoke-direct {p2, p1}, Ljava/nio/file/FileAlreadyExistsException;-><init>(Ljava/lang/String;)V
+000668: 
+001237: 
+001238:     .line 223
+001239:     invoke-interface {p1}, Lj$/nio/file/Path;->toFile()Ljava/io/File;
+001240: 
+001241:     move-result-object p1
+001242: 
+001243:     .line 224
+001244:     invoke-interface {p2}, Lj$/nio/file/Path;->toFile()Ljava/io/File;
+001245: 
+001246:     move-result-object p2
+001247: 
+001248:     .line 225
+001249:     invoke-virtual {p1, p2}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+001250: 
+001251:     return-void
+001252: 
+001253:     .line 221
+001254:     :cond_2
+001255:     new-instance p1, Ljava/lang/UnsupportedOperationException;
+001256: 
+001257:     const-string p2, "Unsupported copy option"
+001258: 
+001259:     invoke-direct {p1, p2}, Ljava/lang/UnsupportedOperationException;-><init>(Ljava/lang/String;)V
+001260: 
+001261:     throw p1
+001262: .end method
+001263: 
+001264: .method public final varargs p(Lj$/nio/file/Path;Ljava/util/Set;Ljava/util/concurrent/ExecutorService;[Lj$/nio/file/attribute/FileAttribute;)Lj$/nio/channels/a;
+001265:     .locals 0
+001266: 
+
+===== /tmp/apktool-out/smali_classes4/okhttp3/internal/io/FileSystem$Companion$SystemFileSystem.smali =====
+000112:     return-object p1
+000113: 
+000114:     .line 11
+000115:     :catch_0
+000116:     invoke-virtual {p1}, Ljava/io/File;->getParentFile()Ljava/io/File;
+000117: 
+000118:     .line 12
+000119:     .line 13
+000120:     .line 14
+000121:     move-result-object v0
+000122: 
+000123:     .line 15
+000124:     invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
+000125: 
+000126:     .line 16
+000127:     .line 17
+000128:     .line 18
+000129:     invoke-static {p1}, Lax/ld/p;->a(Ljava/io/File;)Lax/ld/A;
+000130: 
+000131:     .line 19
+000132:     .line 20
+000133:     .line 21
+000134:     move-result-object p1
+000135: 
+000136:     .line 22
+000137:     return-object p1
+000138:     .line 23
+000139:     .line 24
+000140:     .line 25
+000141:     .line 26
+001159:     .line 7
+001160:     .line 8
+001161:     invoke-static {p2, v0}, Lax/uc/l;->f(Ljava/lang/Object;Ljava/lang/String;)V
+001162: 
+001163:     .line 9
+001164:     .line 10
+001165:     .line 11
+001166:     invoke-virtual {p0, p2}, Lokhttp3/internal/io/FileSystem$Companion$SystemFileSystem;->delete(Ljava/io/File;)V
+001167: 
+001168:     .line 12
+001169:     .line 13
+001170:     .line 14
+001171:     invoke-virtual {p1, p2}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+001172: 
+001173:     .line 15
+001174:     .line 16
+001175:     .line 17
+001176:     move-result v0
+001177: 
+001178:     .line 18
+001179:     if-eqz v0, :cond_0
+001180: 
+001181:     .line 19
+001182:     .line 20
+001183:     return-void
+001184: 
+001185:     .line 21
+001186:     :cond_0
+001187:     new-instance v0, Ljava/io/IOException;
+001188: 
+001361:     return-object p1
+001362: 
+001363:     .line 14
+001364:     :catch_0
+001365:     invoke-virtual {p1}, Ljava/io/File;->getParentFile()Ljava/io/File;
+001366: 
+001367:     .line 15
+001368:     .line 16
+001369:     .line 17
+001370:     move-result-object v3
+001371: 
+001372:     .line 18
+001373:     invoke-virtual {v3}, Ljava/io/File;->mkdirs()Z
+001374: 
+001375:     .line 19
+001376:     .line 20
+001377:     .line 21
+001378:     invoke-static {p1, v2, v1, v0}, Lax/ld/p;->i(Ljava/io/File;ZILjava/lang/Object;)Lax/ld/A;
+001379: 
+001380:     .line 22
+001381:     .line 23
+001382:     .line 24
+001383:     move-result-object p1
+001384: 
+001385:     .line 25
+001386:     return-object p1
+001387:     .line 26
+001388:     .line 27
+001389:     .line 28
+001390:     .line 29
+
+===== /tmp/apktool-out/smali_classes4/ax/rd/X.smali =====
+000881: 
+000882:     .line 44
+000883:     .line 45
+000884:     invoke-virtual {v0}, Ljava/io/OutputStream;->close()V
+000885: 
+000886:     .line 46
+000887:     .line 47
+000888:     .line 48
+000889:     iget-object v0, p0, Lax/rd/X;->X:Ljava/io/File;
+000890: 
+000891:     .line 49
+000892:     .line 50
+000893:     invoke-virtual {v0, v1}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+000894: 
+000895:     .line 51
+000896:     .line 52
+000897:     .line 53
+000898:     move-result v0
+000899: 
+000900:     .line 54
+000901:     if-eqz v0, :cond_0
+000902: 
+000903:     .line 55
+000904:     .line 56
+000905:     const/4 v0, 0x1
+000906: 
+000907:     .line 57
+000908:     iput-boolean v0, p0, Lax/rd/X;->l0:Z
+000909: 
+000910:     .line 58
+001348:     invoke-direct {p0, v0}, Lax/rd/X;->a(Ljava/lang/Integer;)Ljava/io/File;
+001349: 
+001350:     .line 16
+001351:     .line 17
+001352:     .line 18
+001353:     move-result-object v0
+001354: 
+001355:     .line 19
+001356:     iget-object v2, p0, Lax/rd/X;->X:Ljava/io/File;
+001357: 
+001358:     .line 20
+001359:     .line 21
+001360:     invoke-virtual {v2, v0}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
+001361: 
+001362:     .line 22
+001363:     .line 23
+001364:     .line 24
+001365:     move-result v2
+001366: 
+001367:     .line 25
+001368:     if-eqz v2, :cond_0
+001369: 
+001370:     .line 26
+001371:     .line 27
+001372:     goto :goto_0
+001373: 
+001374:     .line 28
+001375:     :cond_0
+001376:     new-instance v1, Ljava/io/IOException;
+001377: 
+
+===== /tmp/apktool-out/smali_classes4/ax/dc/b0.smali =====
+004535: 
+004536:     .line 18
+004537:     .line 19
+004538:     new-instance v2, Ljava/lang/StringBuilder;
+004539: 
+004540:     .line 20
+004541:     .line 21
+004542:     invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
+004543: 
+004544:     .line 22
+004545:     .line 23
+004546:     .line 24
+004547:     const-string v3, "mkdir: "
+004548: 
+004549:     .line 25
+004550:     .line 26
+004551:     invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+004552: 
+004553:     .line 27
+004554:     .line 28
+004555:     .line 29
+004556:     invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+004557: 
+004558:     .line 30
+004559:     .line 31
+004560:     .line 32
+004561:     invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+004562: 
+004563:     .line 33
+004564:     .line 34
+006724: 
+006725:     .line 63
+006726:     .line 64
+006727:     new-instance v1, Ljava/lang/StringBuilder;
+006728: 
+006729:     .line 65
+006730:     .line 66
+006731:     invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+006732: 
+006733:     .line 67
+006734:     .line 68
+006735:     .line 69
+006736:     const-string v2, "renameTo: "
+006737: 
+006738:     .line 70
+006739:     .line 71
+006740:     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+006741: 
+006742:     .line 72
+006743:     .line 73
+006744:     .line 74
+006745:     iget-object v2, p0, Lax/dc/b0;->u0:Ljava/lang/String;
+006746: 
+006747:     .line 75
+006748:     .line 76
+006749:     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+006750: 
+006751:     .line 77
+006752:     .line 78
+006753:     .line 79
