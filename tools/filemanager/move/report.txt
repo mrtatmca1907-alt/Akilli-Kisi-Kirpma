@@ -1,0 +1,1238 @@
+FILE smali/com/alphainventor/filemanager/file/J.smali
+METHOD .method private static q2(Lcom/alphainventor/filemanager/file/o;Lcom/alphainventor/filemanager/file/n;Lcom/alphainventor/filemanager/file/n;Lax/z3/c;Lax/l3/i;)V
+HIT 6490:     const-string p1, "Create folder failed in move directory"
+006465:     .line 42
+006466:     invoke-virtual {p2}, Lcom/alphainventor/filemanager/file/n;->E()Ljava/lang/String;
+006467: 
+006468:     .line 43
+006469:     .line 44
+006470:     .line 45
+006471:     move-result-object p2
+006472: 
+006473:     .line 46
+006474:     invoke-virtual {p0, p2}, Lcom/alphainventor/filemanager/file/o;->a1(Ljava/lang/String;)Lcom/alphainventor/filemanager/file/n;
+006475: 
+006476:     .line 47
+006477:     .line 48
+006478:     .line 49
+006479:     move-result-object p2
+006480: 
+006481:     .line 50
+006482:     goto :goto_1
+006483: 
+006484:     .line 51
+006485:     :cond_1
+006486:     new-instance p0, Lax/e3/j;
+006487: 
+006488:     .line 52
+006489:     .line 53
+006490:     const-string p1, "Create folder failed in move directory"
+006491: 
+006492:     .line 54
+006493:     .line 55
+006494:     invoke-direct {p0, p1}, Lax/e3/j;-><init>(Ljava/lang/String;)V
+006495: 
+006496:     .line 56
+006497:     .line 57
+006498:     .line 58
+006499:     throw p0
+006500: 
+006501:     .line 59
+006502:     :cond_2
+006503:     :goto_0
+006504:     invoke-virtual {p0, p1, p2, p3, p4}, Lcom/alphainventor/filemanager/file/o;->i1(Lcom/alphainventor/filemanager/file/n;Lcom/alphainventor/filemanager/file/n;Lax/z3/c;Lax/l3/i;)V
+006505: 
+006506:     .line 60
+006507:     .line 61
+006508:     .line 62
+006509:     return-void
+006510: 
+006511:     .line 63
+006512:     :cond_3
+006513:     :goto_1
+006514:     invoke-interface {p2}, Lax/f3/b;->isDirectory()Z
+006515: 
+006516:     .line 64
+006517:     .line 65
+006518:     .line 66
+006519:     move-result v0
+006520: 
+006521:     .line 67
+006522:     if-eqz v0, :cond_6
+006523: 
+006524:     .line 68
+006525:     .line 69
+006526:     invoke-virtual {p0, p1}, Lcom/alphainventor/filemanager/file/o;->N(Lcom/alphainventor/filemanager/file/n;)Ljava/util/List;
+006527: 
+006528:     .line 70
+006529:     .line 71
+006530:     .line 72
+006531:     move-result-object p1
+006532: 
+006533:     .line 73
+006534:     invoke-interface {p1}, Ljava/util/List;->iterator()Ljava/util/Iterator;
+---
+FILE smali/com/alphainventor/filemanager/file/x.smali
+METHOD .method private G1(Lcom/alphainventor/filemanager/file/n;Lcom/alphainventor/filemanager/file/n;Ljava/lang/Throwable;)V
+HIT 5757:     const-string p2, "File.renameTo failed"
+005732:     invoke-virtual {p2}, Lcom/alphainventor/filemanager/file/y;->s1()V
+005733: 
+005734:     .line 42
+005735:     .line 43
+005736:     .line 44
+005737:     if-nez p3, :cond_3
+005738: 
+005739:     .line 45
+005740:     .line 46
+005741:     invoke-interface {p1}, Lax/f3/b;->o()Z
+005742: 
+005743:     .line 47
+005744:     .line 48
+005745:     .line 49
+005746:     move-result p1
+005747: 
+005748:     .line 50
+005749:     if-eqz p1, :cond_2
+005750: 
+005751:     .line 51
+005752:     .line 52
+005753:     new-instance p1, Lax/e3/j;
+005754: 
+005755:     .line 53
+005756:     .line 54
+005757:     const-string p2, "File.renameTo failed"
+005758: 
+005759:     .line 55
+005760:     .line 56
+005761:     invoke-direct {p1, p2}, Lax/e3/j;-><init>(Ljava/lang/String;)V
+005762: 
+005763:     .line 57
+005764:     .line 58
+005765:     .line 59
+005766:     throw p1
+005767: 
+005768:     .line 60
+005769:     :cond_2
+005770:     new-instance p1, Lax/e3/t;
+005771: 
+005772:     .line 61
+005773:     .line 62
+005774:     const-string p2, "move source not exist"
+005775: 
+005776:     .line 63
+005777:     .line 64
+005778:     invoke-direct {p1, p2}, Lax/e3/t;-><init>(Ljava/lang/String;)V
+005779: 
+005780:     .line 65
+005781:     .line 66
+005782:     .line 67
+005783:     throw p1
+005784: 
+005785:     .line 68
+005786:     :cond_3
+005787:     invoke-interface {p1}, Lax/f3/b;->o()Z
+005788: 
+005789:     .line 69
+005790:     .line 70
+005791:     .line 71
+005792:     move-result p1
+005793: 
+005794:     .line 72
+005795:     if-eqz p1, :cond_4
+005796: 
+005797:     .line 73
+005798:     .line 74
+005799:     new-instance p1, Lax/e3/j;
+005800: 
+005801:     .line 75
+---
+FILE smali/com/alphainventor/filemanager/file/x.smali
+METHOD .method private G1(Lcom/alphainventor/filemanager/file/n;Lcom/alphainventor/filemanager/file/n;Ljava/lang/Throwable;)V
+HIT 5803:     const-string p2, "Files.move failed"
+005778:     invoke-direct {p1, p2}, Lax/e3/t;-><init>(Ljava/lang/String;)V
+005779: 
+005780:     .line 65
+005781:     .line 66
+005782:     .line 67
+005783:     throw p1
+005784: 
+005785:     .line 68
+005786:     :cond_3
+005787:     invoke-interface {p1}, Lax/f3/b;->o()Z
+005788: 
+005789:     .line 69
+005790:     .line 70
+005791:     .line 71
+005792:     move-result p1
+005793: 
+005794:     .line 72
+005795:     if-eqz p1, :cond_4
+005796: 
+005797:     .line 73
+005798:     .line 74
+005799:     new-instance p1, Lax/e3/j;
+005800: 
+005801:     .line 75
+005802:     .line 76
+005803:     const-string p2, "Files.move failed"
+005804: 
+005805:     .line 77
+005806:     .line 78
+005807:     invoke-direct {p1, p2, p3}, Lax/e3/j;-><init>(Ljava/lang/String;Ljava/lang/Throwable;)V
+005808: 
+005809:     .line 79
+005810:     .line 80
+005811:     .line 81
+005812:     throw p1
+005813: 
+005814:     .line 82
+005815:     :cond_4
+005816:     new-instance p1, Lax/e3/t;
+005817: 
+005818:     .line 83
+005819:     .line 84
+005820:     invoke-direct {p1, p3}, Lax/e3/t;-><init>(Ljava/lang/Throwable;)V
+005821: 
+005822:     .line 85
+005823:     .line 86
+005824:     .line 87
+005825:     throw p1
+005826: 
+005827:     .line 88
+005828:     :cond_5
+005829:     return-void
+005830:     .line 89
+005831:     .line 90
+005832:     .line 91
+005833:     .line 92
+005834:     .line 93
+005835:     .line 94
+005836:     .line 95
+005837:     .line 96
+005838:     .line 97
+005839:     .line 98
+005840:     .line 99
+005841:     .line 100
+005842:     .line 101
+005843:     .line 102
+005844:     .line 103
+005845:     .line 104
+005846:     .line 105
+005847:     .line 106
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b$b.smali
+METHOD 
+HIT 6: .implements Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;
+000001: .class Lcom/alphainventor/filemanager/service/ScanService$b$b;
+000002: .super Ljava/lang/Object;
+000003: .source "SourceFile"
+000004: 
+000005: # interfaces
+000006: .implements Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;
+000007: 
+000008: 
+000009: # annotations
+000010: .annotation system Ldalvik/annotation/EnclosingClass;
+000011:     value = Lcom/alphainventor/filemanager/service/ScanService$b;
+000012: .end annotation
+000013: 
+000014: .annotation system Ldalvik/annotation/InnerClass;
+000015:     accessFlags = 0x0
+000016:     name = "b"
+000017: .end annotation
+000018: 
+000019: 
+000020: # instance fields
+000021: .field final a:Ljava/util/List;
+000022:     .annotation system Ldalvik/annotation/Signature;
+000023:         value = {
+000024:             "Ljava/util/List<",
+000025:             "Lcom/alphainventor/filemanager/service/ScanService$a;",
+000026:             ">;"
+000027:         }
+000028:     .end annotation
+000029: .end field
+000030: 
+000031: .field b:Landroid/media/MediaScannerConnection;
+000032: 
+000033: .field c:I
+000034: 
+000035: .field d:Lcom/alphainventor/filemanager/service/ScanService$a;
+000036: 
+000037: .field final synthetic e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000038: 
+000039: 
+000040: # direct methods
+000041: .method constructor <init>(Lcom/alphainventor/filemanager/service/ScanService$b;Ljava/util/List;)V
+000042:     .locals 0
+000043:     .annotation system Ldalvik/annotation/Signature;
+000044:         value = {
+000045:             "(",
+000046:             "Ljava/util/List<",
+000047:             "Lcom/alphainventor/filemanager/service/ScanService$a;",
+000048:             ">;)V"
+000049:         }
+000050:     .end annotation
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b$b.smali
+METHOD 
+HIT 31: .field b:Landroid/media/MediaScannerConnection;
+000006: .implements Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;
+000007: 
+000008: 
+000009: # annotations
+000010: .annotation system Ldalvik/annotation/EnclosingClass;
+000011:     value = Lcom/alphainventor/filemanager/service/ScanService$b;
+000012: .end annotation
+000013: 
+000014: .annotation system Ldalvik/annotation/InnerClass;
+000015:     accessFlags = 0x0
+000016:     name = "b"
+000017: .end annotation
+000018: 
+000019: 
+000020: # instance fields
+000021: .field final a:Ljava/util/List;
+000022:     .annotation system Ldalvik/annotation/Signature;
+000023:         value = {
+000024:             "Ljava/util/List<",
+000025:             "Lcom/alphainventor/filemanager/service/ScanService$a;",
+000026:             ">;"
+000027:         }
+000028:     .end annotation
+000029: .end field
+000030: 
+000031: .field b:Landroid/media/MediaScannerConnection;
+000032: 
+000033: .field c:I
+000034: 
+000035: .field d:Lcom/alphainventor/filemanager/service/ScanService$a;
+000036: 
+000037: .field final synthetic e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000038: 
+000039: 
+000040: # direct methods
+000041: .method constructor <init>(Lcom/alphainventor/filemanager/service/ScanService$b;Ljava/util/List;)V
+000042:     .locals 0
+000043:     .annotation system Ldalvik/annotation/Signature;
+000044:         value = {
+000045:             "(",
+000046:             "Ljava/util/List<",
+000047:             "Lcom/alphainventor/filemanager/service/ScanService$a;",
+000048:             ">;)V"
+000049:         }
+000050:     .end annotation
+000051: 
+000052:     .line 1
+000053:     iput-object p1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000054: 
+000055:     .line 2
+000056:     .line 3
+000057:     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+000058: 
+000059:     .line 4
+000060:     .line 5
+000061:     .line 6
+000062:     iput-object p2, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->a:Ljava/util/List;
+000063: 
+000064:     .line 7
+000065:     .line 8
+000066:     return-void
+000067:     .line 9
+000068:     .line 10
+000069:     .line 11
+000070:     .line 12
+000071:     .line 13
+000072:     .line 14
+000073:     .line 15
+000074:     .line 16
+000075:     .line 17
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b$b.smali
+METHOD .method a()V
+HIT 127:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000102: # virtual methods
+000103: .method a()V
+000104:     .locals 3
+000105: 
+000106:     .line 1
+000107:     iget v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000108: 
+000109:     .line 2
+000110:     .line 3
+000111:     iget-object v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->a:Ljava/util/List;
+000112: 
+000113:     .line 4
+000114:     .line 5
+000115:     invoke-interface {v1}, Ljava/util/List;->size()I
+000116: 
+000117:     .line 6
+000118:     .line 7
+000119:     .line 8
+000120:     move-result v1
+000121: 
+000122:     .line 9
+000123:     if-lt v0, v1, :cond_0
+000124: 
+000125:     .line 10
+000126:     .line 11
+000127:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000128: 
+000129:     .line 12
+000130:     .line 13
+000131:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->disconnect()V
+000132: 
+000133:     .line 14
+000134:     .line 15
+000135:     .line 16
+000136:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000137: 
+000138:     .line 17
+000139:     .line 18
+000140:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$b;->l:Ljava/util/concurrent/CountDownLatch;
+000141: 
+000142:     .line 19
+000143:     .line 20
+000144:     invoke-virtual {v0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
+000145: 
+000146:     .line 21
+000147:     .line 22
+000148:     .line 23
+000149:     return-void
+000150: 
+000151:     .line 24
+000152:     :cond_0
+000153:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->a:Ljava/util/List;
+000154: 
+000155:     .line 25
+000156:     .line 26
+000157:     iget v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000158: 
+000159:     .line 27
+000160:     .line 28
+000161:     invoke-interface {v0, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+000162: 
+000163:     .line 29
+000164:     .line 30
+000165:     .line 31
+000166:     move-result-object v0
+000167: 
+000168:     .line 32
+000169:     check-cast v0, Lcom/alphainventor/filemanager/service/ScanService$a;
+000170: 
+000171:     .line 33
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b$b.smali
+METHOD .method a()V
+HIT 131:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->disconnect()V
+000106:     .line 1
+000107:     iget v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000108: 
+000109:     .line 2
+000110:     .line 3
+000111:     iget-object v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->a:Ljava/util/List;
+000112: 
+000113:     .line 4
+000114:     .line 5
+000115:     invoke-interface {v1}, Ljava/util/List;->size()I
+000116: 
+000117:     .line 6
+000118:     .line 7
+000119:     .line 8
+000120:     move-result v1
+000121: 
+000122:     .line 9
+000123:     if-lt v0, v1, :cond_0
+000124: 
+000125:     .line 10
+000126:     .line 11
+000127:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000128: 
+000129:     .line 12
+000130:     .line 13
+000131:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->disconnect()V
+000132: 
+000133:     .line 14
+000134:     .line 15
+000135:     .line 16
+000136:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000137: 
+000138:     .line 17
+000139:     .line 18
+000140:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$b;->l:Ljava/util/concurrent/CountDownLatch;
+000141: 
+000142:     .line 19
+000143:     .line 20
+000144:     invoke-virtual {v0}, Ljava/util/concurrent/CountDownLatch;->countDown()V
+000145: 
+000146:     .line 21
+000147:     .line 22
+000148:     .line 23
+000149:     return-void
+000150: 
+000151:     .line 24
+000152:     :cond_0
+000153:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->a:Ljava/util/List;
+000154: 
+000155:     .line 25
+000156:     .line 26
+000157:     iget v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000158: 
+000159:     .line 27
+000160:     .line 28
+000161:     invoke-interface {v0, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+000162: 
+000163:     .line 29
+000164:     .line 30
+000165:     .line 31
+000166:     move-result-object v0
+000167: 
+000168:     .line 32
+000169:     check-cast v0, Lcom/alphainventor/filemanager/service/ScanService$a;
+000170: 
+000171:     .line 33
+000172:     .line 34
+000173:     iput-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->d:Lcom/alphainventor/filemanager/service/ScanService$a;
+000174: 
+000175:     .line 35
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b$b.smali
+METHOD .method a()V
+HIT 177:     iget-object v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000152:     :cond_0
+000153:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->a:Ljava/util/List;
+000154: 
+000155:     .line 25
+000156:     .line 26
+000157:     iget v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000158: 
+000159:     .line 27
+000160:     .line 28
+000161:     invoke-interface {v0, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+000162: 
+000163:     .line 29
+000164:     .line 30
+000165:     .line 31
+000166:     move-result-object v0
+000167: 
+000168:     .line 32
+000169:     check-cast v0, Lcom/alphainventor/filemanager/service/ScanService$a;
+000170: 
+000171:     .line 33
+000172:     .line 34
+000173:     iput-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->d:Lcom/alphainventor/filemanager/service/ScanService$a;
+000174: 
+000175:     .line 35
+000176:     .line 36
+000177:     iget-object v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000178: 
+000179:     .line 37
+000180:     .line 38
+000181:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$a;->a:Ljava/lang/String;
+000182: 
+000183:     .line 39
+000184:     .line 40
+000185:     const/4 v2, 0x0
+000186: 
+000187:     .line 41
+000188:     invoke-virtual {v1, v0, v2}, Landroid/media/MediaScannerConnection;->scanFile(Ljava/lang/String;Ljava/lang/String;)V
+000189: 
+000190:     .line 42
+000191:     .line 43
+000192:     .line 44
+000193:     iget v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000194: 
+000195:     .line 45
+000196:     .line 46
+000197:     add-int/lit8 v0, v0, 0x1
+000198: 
+000199:     .line 47
+000200:     .line 48
+000201:     iput v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000202: 
+000203:     .line 49
+000204:     .line 50
+000205:     return-void
+000206:     .line 51
+000207:     .line 52
+000208:     .line 53
+000209:     .line 54
+000210:     .line 55
+000211:     .line 56
+000212:     .line 57
+000213:     .line 58
+000214:     .line 59
+000215:     .line 60
+000216:     .line 61
+000217:     .line 62
+000218:     .line 63
+000219:     .line 64
+000220:     .line 65
+000221:     .line 66
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b$b.smali
+METHOD .method a()V
+HIT 188:     invoke-virtual {v1, v0, v2}, Landroid/media/MediaScannerConnection;->scanFile(Ljava/lang/String;Ljava/lang/String;)V
+000163:     .line 29
+000164:     .line 30
+000165:     .line 31
+000166:     move-result-object v0
+000167: 
+000168:     .line 32
+000169:     check-cast v0, Lcom/alphainventor/filemanager/service/ScanService$a;
+000170: 
+000171:     .line 33
+000172:     .line 34
+000173:     iput-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->d:Lcom/alphainventor/filemanager/service/ScanService$a;
+000174: 
+000175:     .line 35
+000176:     .line 36
+000177:     iget-object v1, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000178: 
+000179:     .line 37
+000180:     .line 38
+000181:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$a;->a:Ljava/lang/String;
+000182: 
+000183:     .line 39
+000184:     .line 40
+000185:     const/4 v2, 0x0
+000186: 
+000187:     .line 41
+000188:     invoke-virtual {v1, v0, v2}, Landroid/media/MediaScannerConnection;->scanFile(Ljava/lang/String;Ljava/lang/String;)V
+000189: 
+000190:     .line 42
+000191:     .line 43
+000192:     .line 44
+000193:     iget v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000194: 
+000195:     .line 45
+000196:     .line 46
+000197:     add-int/lit8 v0, v0, 0x1
+000198: 
+000199:     .line 47
+000200:     .line 48
+000201:     iput v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->c:I
+000202: 
+000203:     .line 49
+000204:     .line 50
+000205:     return-void
+000206:     .line 51
+000207:     .line 52
+000208:     .line 53
+000209:     .line 54
+000210:     .line 55
+000211:     .line 56
+000212:     .line 57
+000213:     .line 58
+000214:     .line 59
+000215:     .line 60
+000216:     .line 61
+000217:     .line 62
+000218:     .line 63
+000219:     .line 64
+000220:     .line 65
+000221:     .line 66
+000222:     .line 67
+000223:     .line 68
+000224: .end method
+000225: 
+000226: .method public onMediaScannerConnected()V
+000227:     .locals 5
+000228: 
+000229:     .line 1
+000230:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000231: 
+000232:     .line 2
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b$b.smali
+METHOD .method public onMediaScannerConnected()V
+HIT 230:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000205:     return-void
+000206:     .line 51
+000207:     .line 52
+000208:     .line 53
+000209:     .line 54
+000210:     .line 55
+000211:     .line 56
+000212:     .line 57
+000213:     .line 58
+000214:     .line 59
+000215:     .line 60
+000216:     .line 61
+000217:     .line 62
+000218:     .line 63
+000219:     .line 64
+000220:     .line 65
+000221:     .line 66
+000222:     .line 67
+000223:     .line 68
+000224: .end method
+000225: 
+000226: .method public onMediaScannerConnected()V
+000227:     .locals 5
+000228: 
+000229:     .line 1
+000230:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000231: 
+000232:     .line 2
+000233:     .line 3
+000234:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->isConnected()Z
+000235: 
+000236:     .line 4
+000237:     .line 5
+000238:     .line 6
+000239:     move-result v0
+000240: 
+000241:     .line 7
+000242:     if-nez v0, :cond_0
+000243: 
+000244:     .line 8
+000245:     .line 9
+000246:     return-void
+000247: 
+000248:     .line 10
+000249:     :cond_0
+000250:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000251: 
+000252:     .line 11
+000253:     .line 12
+000254:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$b;->l:Ljava/util/concurrent/CountDownLatch;
+000255: 
+000256:     .line 13
+000257:     .line 14
+000258:     invoke-virtual {v0}, Ljava/util/concurrent/CountDownLatch;->getCount()J
+000259: 
+000260:     .line 15
+000261:     .line 16
+000262:     .line 17
+000263:     move-result-wide v0
+000264: 
+000265:     .line 18
+000266:     const-wide/16 v2, 0x0
+000267: 
+000268:     .line 19
+000269:     .line 20
+000270:     cmp-long v4, v0, v2
+000271: 
+000272:     .line 21
+000273:     .line 22
+000274:     if-nez v4, :cond_1
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b$b.smali
+METHOD .method public onMediaScannerConnected()V
+HIT 234:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->isConnected()Z
+000209:     .line 54
+000210:     .line 55
+000211:     .line 56
+000212:     .line 57
+000213:     .line 58
+000214:     .line 59
+000215:     .line 60
+000216:     .line 61
+000217:     .line 62
+000218:     .line 63
+000219:     .line 64
+000220:     .line 65
+000221:     .line 66
+000222:     .line 67
+000223:     .line 68
+000224: .end method
+000225: 
+000226: .method public onMediaScannerConnected()V
+000227:     .locals 5
+000228: 
+000229:     .line 1
+000230:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000231: 
+000232:     .line 2
+000233:     .line 3
+000234:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->isConnected()Z
+000235: 
+000236:     .line 4
+000237:     .line 5
+000238:     .line 6
+000239:     move-result v0
+000240: 
+000241:     .line 7
+000242:     if-nez v0, :cond_0
+000243: 
+000244:     .line 8
+000245:     .line 9
+000246:     return-void
+000247: 
+000248:     .line 10
+000249:     :cond_0
+000250:     iget-object v0, p0, Lcom/alphainventor/filemanager/service/ScanService$b$b;->e:Lcom/alphainventor/filemanager/service/ScanService$b;
+000251: 
+000252:     .line 11
+000253:     .line 12
+000254:     iget-object v0, v0, Lcom/alphainventor/filemanager/service/ScanService$b;->l:Ljava/util/concurrent/CountDownLatch;
+000255: 
+000256:     .line 13
+000257:     .line 14
+000258:     invoke-virtual {v0}, Ljava/util/concurrent/CountDownLatch;->getCount()J
+000259: 
+000260:     .line 15
+000261:     .line 16
+000262:     .line 17
+000263:     move-result-wide v0
+000264: 
+000265:     .line 18
+000266:     const-wide/16 v2, 0x0
+000267: 
+000268:     .line 19
+000269:     .line 20
+000270:     cmp-long v4, v0, v2
+000271: 
+000272:     .line 21
+000273:     .line 22
+000274:     if-nez v4, :cond_1
+000275: 
+000276:     .line 23
+000277:     .line 24
+000278:     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b.smali
+METHOD .method protected varargs w([Ljava/lang/Void;)Ljava/lang/Void;
+HIT 467:     new-instance v0, Landroid/media/MediaScannerConnection;
+000442:     goto :goto_0
+000443: 
+000444:     .line 66
+000445:     :cond_1
+000446:     invoke-virtual {v0}, Ljava/util/ArrayList;->size()I
+000447: 
+000448:     .line 67
+000449:     .line 68
+000450:     .line 69
+000451:     move-result p1
+000452: 
+000453:     .line 70
+000454:     if-lez p1, :cond_3
+000455: 
+000456:     .line 71
+000457:     .line 72
+000458:     new-instance p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;
+000459: 
+000460:     .line 73
+000461:     .line 74
+000462:     invoke-direct {p1, p0, v0}, Lcom/alphainventor/filemanager/service/ScanService$b$b;-><init>(Lcom/alphainventor/filemanager/service/ScanService$b;Ljava/util/List;)V
+000463: 
+000464:     .line 75
+000465:     .line 76
+000466:     .line 77
+000467:     new-instance v0, Landroid/media/MediaScannerConnection;
+000468: 
+000469:     .line 78
+000470:     .line 79
+000471:     iget-object v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->n:Lcom/alphainventor/filemanager/service/ScanService;
+000472: 
+000473:     .line 80
+000474:     .line 81
+000475:     invoke-virtual {v2}, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+000476: 
+000477:     .line 82
+000478:     .line 83
+000479:     .line 84
+000480:     move-result-object v2
+000481: 
+000482:     .line 85
+000483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000484: 
+000485:     .line 86
+000486:     .line 87
+000487:     .line 88
+000488:     iput-object v0, p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000489: 
+000490:     .line 89
+000491:     .line 90
+000492:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->connect()V
+000493: 
+000494:     .line 91
+000495:     .line 92
+000496:     .line 93
+000497:     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+000498: 
+000499:     .line 94
+000500:     .line 95
+000501:     .line 96
+000502:     move-result-wide v2
+000503: 
+000504:     .line 97
+000505:     iput-wide v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->m:J
+000506: 
+000507:     .line 98
+000508:     .line 99
+000509:     :try_start_0
+000510:     invoke-static {}, Lax/a3/Q;->S()Z
+000511: 
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b.smali
+METHOD .method protected varargs w([Ljava/lang/Void;)Ljava/lang/Void;
+HIT 483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000458:     new-instance p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;
+000459: 
+000460:     .line 73
+000461:     .line 74
+000462:     invoke-direct {p1, p0, v0}, Lcom/alphainventor/filemanager/service/ScanService$b$b;-><init>(Lcom/alphainventor/filemanager/service/ScanService$b;Ljava/util/List;)V
+000463: 
+000464:     .line 75
+000465:     .line 76
+000466:     .line 77
+000467:     new-instance v0, Landroid/media/MediaScannerConnection;
+000468: 
+000469:     .line 78
+000470:     .line 79
+000471:     iget-object v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->n:Lcom/alphainventor/filemanager/service/ScanService;
+000472: 
+000473:     .line 80
+000474:     .line 81
+000475:     invoke-virtual {v2}, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+000476: 
+000477:     .line 82
+000478:     .line 83
+000479:     .line 84
+000480:     move-result-object v2
+000481: 
+000482:     .line 85
+000483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000484: 
+000485:     .line 86
+000486:     .line 87
+000487:     .line 88
+000488:     iput-object v0, p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000489: 
+000490:     .line 89
+000491:     .line 90
+000492:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->connect()V
+000493: 
+000494:     .line 91
+000495:     .line 92
+000496:     .line 93
+000497:     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+000498: 
+000499:     .line 94
+000500:     .line 95
+000501:     .line 96
+000502:     move-result-wide v2
+000503: 
+000504:     .line 97
+000505:     iput-wide v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->m:J
+000506: 
+000507:     .line 98
+000508:     .line 99
+000509:     :try_start_0
+000510:     invoke-static {}, Lax/a3/Q;->S()Z
+000511: 
+000512:     .line 100
+000513:     .line 101
+000514:     .line 102
+000515:     move-result p1
+000516: 
+000517:     .line 103
+000518:     if-eqz p1, :cond_2
+000519: 
+000520:     .line 104
+000521:     .line 105
+000522:     const-wide/16 v2, 0x7
+000523: 
+000524:     .line 106
+000525:     .line 107
+000526:     goto :goto_1
+000527: 
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b.smali
+METHOD .method protected varargs w([Ljava/lang/Void;)Ljava/lang/Void;
+HIT 488:     iput-object v0, p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000463: 
+000464:     .line 75
+000465:     .line 76
+000466:     .line 77
+000467:     new-instance v0, Landroid/media/MediaScannerConnection;
+000468: 
+000469:     .line 78
+000470:     .line 79
+000471:     iget-object v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->n:Lcom/alphainventor/filemanager/service/ScanService;
+000472: 
+000473:     .line 80
+000474:     .line 81
+000475:     invoke-virtual {v2}, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+000476: 
+000477:     .line 82
+000478:     .line 83
+000479:     .line 84
+000480:     move-result-object v2
+000481: 
+000482:     .line 85
+000483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000484: 
+000485:     .line 86
+000486:     .line 87
+000487:     .line 88
+000488:     iput-object v0, p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000489: 
+000490:     .line 89
+000491:     .line 90
+000492:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->connect()V
+000493: 
+000494:     .line 91
+000495:     .line 92
+000496:     .line 93
+000497:     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+000498: 
+000499:     .line 94
+000500:     .line 95
+000501:     .line 96
+000502:     move-result-wide v2
+000503: 
+000504:     .line 97
+000505:     iput-wide v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->m:J
+000506: 
+000507:     .line 98
+000508:     .line 99
+000509:     :try_start_0
+000510:     invoke-static {}, Lax/a3/Q;->S()Z
+000511: 
+000512:     .line 100
+000513:     .line 101
+000514:     .line 102
+000515:     move-result p1
+000516: 
+000517:     .line 103
+000518:     if-eqz p1, :cond_2
+000519: 
+000520:     .line 104
+000521:     .line 105
+000522:     const-wide/16 v2, 0x7
+000523: 
+000524:     .line 106
+000525:     .line 107
+000526:     goto :goto_1
+000527: 
+000528:     .line 108
+000529:     :cond_2
+000530:     const-wide/16 v2, 0x19
+000531: 
+000532:     .line 109
+---
+FILE smali/com/alphainventor/filemanager/service/ScanService$b.smali
+METHOD .method protected varargs w([Ljava/lang/Void;)Ljava/lang/Void;
+HIT 492:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->connect()V
+000467:     new-instance v0, Landroid/media/MediaScannerConnection;
+000468: 
+000469:     .line 78
+000470:     .line 79
+000471:     iget-object v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->n:Lcom/alphainventor/filemanager/service/ScanService;
+000472: 
+000473:     .line 80
+000474:     .line 81
+000475:     invoke-virtual {v2}, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+000476: 
+000477:     .line 82
+000478:     .line 83
+000479:     .line 84
+000480:     move-result-object v2
+000481: 
+000482:     .line 85
+000483:     invoke-direct {v0, v2, p1}, Landroid/media/MediaScannerConnection;-><init>(Landroid/content/Context;Landroid/media/MediaScannerConnection$MediaScannerConnectionClient;)V
+000484: 
+000485:     .line 86
+000486:     .line 87
+000487:     .line 88
+000488:     iput-object v0, p1, Lcom/alphainventor/filemanager/service/ScanService$b$b;->b:Landroid/media/MediaScannerConnection;
+000489: 
+000490:     .line 89
+000491:     .line 90
+000492:     invoke-virtual {v0}, Landroid/media/MediaScannerConnection;->connect()V
+000493: 
+000494:     .line 91
+000495:     .line 92
+000496:     .line 93
+000497:     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+000498: 
+000499:     .line 94
+000500:     .line 95
+000501:     .line 96
+000502:     move-result-wide v2
+000503: 
+000504:     .line 97
+000505:     iput-wide v2, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->m:J
+000506: 
+000507:     .line 98
+000508:     .line 99
+000509:     :try_start_0
+000510:     invoke-static {}, Lax/a3/Q;->S()Z
+000511: 
+000512:     .line 100
+000513:     .line 101
+000514:     .line 102
+000515:     move-result p1
+000516: 
+000517:     .line 103
+000518:     if-eqz p1, :cond_2
+000519: 
+000520:     .line 104
+000521:     .line 105
+000522:     const-wide/16 v2, 0x7
+000523: 
+000524:     .line 106
+000525:     .line 107
+000526:     goto :goto_1
+000527: 
+000528:     .line 108
+000529:     :cond_2
+000530:     const-wide/16 v2, 0x19
+000531: 
+000532:     .line 109
+000533:     .line 110
+000534:     :goto_1
+000535:     iget-object p1, p0, Lcom/alphainventor/filemanager/service/ScanService$b;->k:Ljava/util/concurrent/CountDownLatch;
+000536: 
+---
+FILE smali/ax/Z2/n$b.smali
+METHOD .method private w()Z
+HIT 299:     invoke-static {v2, v1, v3, v3}, Landroid/media/MediaScannerConnection;->scanFile(Landroid/content/Context;[Ljava/lang/String;[Ljava/lang/String;Landroid/media/MediaScannerConnection$OnScanCompletedListener;)V
+000274:     .line 95
+000275:     .line 96
+000276:     .line 97
+000277:     move-result-object v2
+000278: 
+000279:     .line 98
+000280:     invoke-virtual {v1}, Lcom/alphainventor/filemanager/file/n;->E()Ljava/lang/String;
+000281: 
+000282:     .line 99
+000283:     .line 100
+000284:     .line 101
+000285:     move-result-object v1
+000286: 
+000287:     .line 102
+000288:     filled-new-array {v1}, [Ljava/lang/String;
+000289: 
+000290:     .line 103
+000291:     .line 104
+000292:     .line 105
+000293:     move-result-object v1
+000294: 
+000295:     .line 106
+000296:     const/4 v3, 0x0
+000297: 
+000298:     .line 107
+000299:     invoke-static {v2, v1, v3, v3}, Landroid/media/MediaScannerConnection;->scanFile(Landroid/content/Context;[Ljava/lang/String;[Ljava/lang/String;Landroid/media/MediaScannerConnection$OnScanCompletedListener;)V
+000300: 
+000301:     .line 108
+000302:     .line 109
+000303:     .line 110
+000304:     :cond_3
+000305:     return v0
+000306: 
+000307:     .line 111
+000308:     :goto_0
+000309:     invoke-virtual {v1}, Ljava/lang/Throwable;->printStackTrace()V
+000310: 
+000311:     .line 112
+000312:     .line 113
+000313:     .line 114
+000314:     iput-boolean v0, p0, Lax/Z2/n$b;->h:Z
+000315: 
+000316:     .line 115
+000317:     .line 116
+000318:     return v0
+000319:     .line 117
+000320:     .line 118
+000321:     .line 119
+000322:     .line 120
+000323:     .line 121
+000324:     .line 122
+000325:     .line 123
+000326:     .line 124
+000327:     .line 125
+000328:     .line 126
+000329:     .line 127
+000330:     .line 128
+000331:     .line 129
+000332:     .line 130
+000333:     .line 131
+000334:     .line 132
+000335:     .line 133
+000336:     .line 134
+000337:     .line 135
+000338:     .line 136
+000339:     .line 137
+000340:     .line 138
+000341:     .line 139
+000342:     .line 140
+000343:     .line 141
+---
+FILE smali/ax/Z2/e$j.smali
+METHOD .method private Q(Lcom/alphainventor/filemanager/file/n;Lcom/alphainventor/filemanager/file/n;Lax/Z2/j$f;)V
+HIT 6210:     const-string v3, "MOVE FILE COUNT NOT MATCH"
+006185:     .line 591
+006186:     invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+006187: 
+006188:     .line 592
+006189:     .line 593
+006190:     .line 594
+006191:     move-result-object v0
+006192: 
+006193:     .line 595
+006194:     invoke-static {}, Lax/sb/c;->h()Lax/sb/b;
+006195: 
+006196:     .line 596
+006197:     .line 597
+006198:     .line 598
+006199:     move-result-object v2
+006200: 
+006201:     .line 599
+006202:     invoke-virtual {v2}, Lax/sb/b;->g()Lax/sb/b;
+006203: 
+006204:     .line 600
+006205:     .line 601
+006206:     .line 602
+006207:     move-result-object v2
+006208: 
+006209:     .line 603
+006210:     const-string v3, "MOVE FILE COUNT NOT MATCH"
+006211: 
+006212:     .line 604
+006213:     .line 605
+006214:     invoke-virtual {v2, v3}, Lax/sb/b;->b(Ljava/lang/String;)Lax/sb/b;
+006215: 
+006216:     .line 606
+006217:     .line 607
+006218:     .line 608
+006219:     move-result-object v2
+006220: 
+006221:     .line 609
+006222:     invoke-virtual {v2, v0}, Lax/sb/b;->h(Ljava/lang/Object;)Lax/sb/b;
+006223: 
+006224:     .line 610
+006225:     .line 611
+006226:     .line 612
+006227:     move-result-object v0
+006228: 
+006229:     .line 613
+006230:     invoke-virtual {v0}, Lax/sb/b;->i()V
+006231: 
+006232:     .line 614
+006233:     .line 615
+006234:     .line 616
+006235:     :cond_c
+006236:     iget-object v0, v1, Lax/Z2/e$j;->k:Lax/Z2/e;
+006237: 
+006238:     .line 617
+006239:     .line 618
+006240:     invoke-static {v0}, Lax/Z2/e;->E1(Lax/Z2/e;)Lcom/alphainventor/filemanager/file/n;
+006241: 
+006242:     .line 619
+006243:     .line 620
+006244:     .line 621
+006245:     move-result-object v2
+006246: 
+006247:     .line 622
+006248:     invoke-static {v0, v2}, Lax/Z2/e;->F1(Lax/Z2/e;Lcom/alphainventor/filemanager/file/n;)V
+006249: 
+006250:     .line 623
+006251:     .line 624
+006252:     .line 625
+006253:     iget-object v0, v1, Lax/Z2/e$j;->k:Lax/Z2/e;
+006254: 
+---
