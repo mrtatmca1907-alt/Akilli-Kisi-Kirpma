@@ -32,44 +32,40 @@ jobs:
         run: |
           apktool d -f /tmp/filemanager.apk -o /tmp/apktool-out
 
-      - name: Build focused report
+      - name: Collect focused smali
         run: |
-          mkdir -p tools/filemanager
+          rm -rf tools/filemanager/selected
+          mkdir -p tools/filemanager/selected
           python3 - <<'PY'
-          import os,re
-          roots=[p for p in os.listdir('/tmp/apktool-out') if p.startswith('smali')]
-          pats=[
-            r'Recycle Bin',r'RecycleBin',r'DeleteOperator',r'DELETE TO RECYCLE',r'CREATE RECYCLE BIN',
-            r'\.nomedia',r'MediaScanner',r'renameTo',r'Files;->move',r'mkdirs?',r'calculate',r'folder size'
-          ]
-          rx=re.compile('|'.join(pats),re.I)
-          out=[]
-          for root in roots:
-            base='/tmp/apktool-out/'+root
+          import os,re,shutil
+          bases=[os.path.join('/tmp/apktool-out',x) for x in os.listdir('/tmp/apktool-out') if x.startswith('smali')]
+          rx=re.compile(r'Recycle Bin|RecycleBin|DeleteOperator|DELETE TO RECYCLE|CREATE RECYCLE BIN|FAILED MOVE TO RECYCLE|\.nomedia|MediaScanner|renameTo|Files;->move|BATCH DELETE|permanentDelete|deleteFileRecursively',re.I)
+          chosen=[]
+          for base in bases:
             for dp,_,fs in os.walk(base):
               for fn in fs:
                 if not fn.endswith('.smali'): continue
                 p=os.path.join(dp,fn)
-                try: lines=open(p,'r',errors='ignore').read().splitlines()
+                try: s=open(p,'r',errors='ignore').read()
                 except: continue
-                hits=[i for i,l in enumerate(lines) if rx.search(l)]
-                if not hits: continue
-                out.append('\n===== '+p+' =====')
-                seen=set()
-                for i in hits[:30]:
-                  a=max(0,i-12); b=min(len(lines),i+18)
-                  key=(a,b)
-                  if key in seen: continue
-                  seen.add(key)
-                  out.extend(f'{n+1:06d}: {lines[n]}' for n in range(a,b))
-          open('tools/filemanager/inspection-report.txt','w').write('\n'.join(out[:30000]))
-          print('report lines',min(len(out),30000))
+                if rx.search(s):
+                  rel=os.path.relpath(p,'/tmp/apktool-out')
+                  chosen.append((rel,p))
+          # prioritize app package and direct recycle/delete strings
+          chosen.sort(key=lambda x:(0 if 'com/alphainventor/filemanager' in x[0] else 1, x[0]))
+          lines=[]
+          for rel,p in chosen[:120]:
+            safe=rel.replace('/','__')
+            shutil.copy2(p,os.path.join('tools/filemanager/selected',safe))
+            lines.append(rel)
+          open('tools/filemanager/selected-files.txt','w').write('\n'.join(lines))
+          print('selected',len(lines))
           PY
 
-      - name: Commit report
+      - name: Commit focused sources
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add tools/filemanager/inspection-report.txt
-          git diff --cached --quiet || git commit -m 'Add File Manager smali inspection report'
+          git add tools/filemanager/selected tools/filemanager/selected-files.txt
+          git diff --cached --quiet || git commit -m 'Collect File Manager file-operation smali'
           git push
