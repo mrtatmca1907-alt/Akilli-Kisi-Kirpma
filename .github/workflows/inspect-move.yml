@@ -16,49 +16,41 @@ jobs:
           curl -L --fail --retry 3 -A 'Mozilla/5.0' -o /tmp/a.apk 'https://d.apkpure.net/b/APK/com.alphainventor.filemanager?version=latest'
           echo '2528b7ac9e2ada91c17f5a853dd4d0ec8556354dd578e647a1caba0c69a547cb  /tmp/a.apk' | sha256sum -c -
           apktool d -f /tmp/a.apk -o /tmp/a >/dev/null
-      - name: Map move scan size paths
+      - name: Extract exact hot methods
         run: |
-          mkdir -p /tmp/report-out/sources
+          mkdir -p /tmp/report-out
           python3 - <<'PY'
-          import os,shutil
-          needles=['File.renameTo failed','Files.move failed','Create folder failed in move directory','MoveOperator','MOVE FILE','MOVE DIRECTORY','MediaScannerConnection','SCAN AFTER','folder size','CALCULATE SIZE']
-          out=[]
-          hitfiles=[]
+          import os,re
+          needles=[
+            'Lj$/nio/file/Files;->move','Ljava/io/File;->renameTo','MOVE FILE COUNT NOT MATCH',
+            'MediaScannerConnection','ScanService','.nomedia','Create folder failed in move directory'
+          ]
+          interesting=[]
+          wanted_prefixes=('smali/ax/Z2/e','smali/com/alphainventor/filemanager/file/J','smali/com/alphainventor/filemanager/file/x','smali/com/alphainventor/filemanager/file/o','smali/com/alphainventor/filemanager/service/ScanService')
           for root,_,fs in os.walk('/tmp/a'):
             for fn in fs:
               if not fn.endswith('.smali'): continue
-              p=os.path.join(root,fn)
-              try: lines=open(p,errors='ignore').read().splitlines()
+              p=os.path.join(root,fn); rel=os.path.relpath(p,'/tmp/a')
+              if not rel.startswith(wanted_prefixes): continue
+              try: s=open(p,errors='ignore').read()
               except: continue
-              matched=False
-              for i,l in enumerate(lines):
-                if not any(n.lower() in l.lower() for n in needles): continue
-                matched=True
-                m=''
-                for j in range(i,-1,-1):
-                  if lines[j].startswith('.method '): m=lines[j]; break
-                out.append(f'FILE {os.path.relpath(p,"/tmp/a")}\nMETHOD {m}\nHIT {i+1}: {l}')
-                a=max(0,i-25); b=min(len(lines),i+45)
-                out.extend(f'{k+1:06d}: {lines[k]}' for k in range(a,b))
-                out.append('---')
-              if matched: hitfiles.append(p)
-          open('/tmp/report-out/report.txt','w').write('\n'.join(out[:40000]))
-          # Always retain the exact move implementation/factory and storage backend.
-          extra=['/tmp/a/smali/ax/Z2/e.smali','/tmp/a/smali/ax/Z2/e$j.smali','/tmp/a/smali/com/alphainventor/filemanager/file/x.smali']
-          for p in dict.fromkeys(hitfiles+extra):
-            if os.path.exists(p): shutil.copy2(p,'/tmp/report-out/sources/'+os.path.relpath(p,'/tmp/a').replace('/','__'))
-          print('hits',sum(1 for x in out if x.startswith('FILE ')),'files',len(hitfiles))
+              # Split complete methods so context is never ambiguous.
+              for m in re.finditer(r'(?ms)^\.method .*?^\.end method\s*',s):
+                body=m.group(0)
+                if any(n in body for n in needles) or (rel.endswith('e$j.smali') and '->P(' in body):
+                  sig=body.splitlines()[0]
+                  interesting.append(f'===== {rel}\n{sig} =====\n{body}')
+          open('/tmp/report-out/method-report.txt','w').write('\n'.join(interesting))
+          print('methods',len(interesting))
           PY
-      - name: Commit report without losing concurrent branch updates
+      - name: Commit method report race-safe
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git fetch origin filemanager-patch
           git reset --hard origin/filemanager-patch
-          rm -rf tools/filemanager/move/sources
-          mkdir -p tools/filemanager/move/sources
-          cp /tmp/report-out/report.txt tools/filemanager/move/report.txt
-          cp /tmp/report-out/sources/* tools/filemanager/move/sources/ || true
-          git add tools/filemanager/move
-          git diff --cached --quiet || git commit -m 'Collect full move operator sources'
+          mkdir -p tools/filemanager/move
+          cp /tmp/report-out/method-report.txt tools/filemanager/move/method-report.txt
+          git add tools/filemanager/move/method-report.txt
+          git diff --cached --quiet || git commit -m 'Extract exact File Manager move hot methods'
           git push origin HEAD:filemanager-patch
