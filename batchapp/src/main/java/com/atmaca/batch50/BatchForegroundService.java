@@ -46,29 +46,23 @@ public class BatchForegroundService extends Service {
         try {
             File work = AppPaths.workRoot();
             if (hasFiles(work)) { send(0, 0, "Pictures/ATMACA_50 dolu. Önce onu sil."); return; }
-            File originals = AppPaths.originalDir(), crops = AppPaths.croppedDir();
+            File originals = AppPaths.originalDir();
             if (!originals.mkdirs() && !originals.isDirectory()) throw new IllegalStateException("ORJINAL klasörü oluşturulamadı");
-            if (!crops.mkdirs() && !crops.isDirectory()) throw new IllegalStateException("KIRPILAN klasörü oluşturulamadı");
             List<String> paths = db.nextPending(50);
             if (paths.isEmpty()) { send(0, 0, "Bekleyen fotoğraf kalmadı."); return; }
             int done = 0;
-            try (BatchCropEngine engine = new BatchCropEngine(this)) {
-                for (String path : paths) {
-                    File src = new File(path);
-                    if (!src.isFile()) { db.mark(path, BatchQueueDb.MISSING); continue; }
-                    engine.cropPeople(src, crops);
-                    File out = BatchCropEngine.unique(originals, src.getName());
-                    copyFast(src, out);
-                    galleryFiles.add(out.getAbsolutePath());
-                    db.mark(path, BatchQueueDb.DONE);
-                    done++;
-                    send(done, paths.size(), done + "/" + paths.size() + " hazırlandı");
-                }
+            for (String path : paths) {
+                File src = new File(path);
+                if (!src.isFile()) { db.mark(path, BatchQueueDb.MISSING); continue; }
+                File out = unique(originals, src.getName());
+                copyFast(src, out);
+                galleryFiles.add(out.getAbsolutePath());
+                db.mark(path, BatchQueueDb.DONE);
+                done++;
+                send(done, paths.size(), done + "/" + paths.size() + " hazırlandı");
             }
-            File[] cropFiles = crops.listFiles();
-            if (cropFiles != null) for (File f : cropFiles) if (f.isFile()) galleryFiles.add(f.getAbsolutePath());
             if (!galleryFiles.isEmpty()) MediaScannerConnection.scanFile(this, galleryFiles.toArray(new String[0]), null, null);
-            send(done, paths.size(), "Hazır. Galeride ATMACA_50 klasörünü açabilirsin.");
+            send(done, paths.size(), "Hazır. Galeride ATMACA_50/ORJINAL klasörünü açabilirsin.");
         } catch (Throwable t) {
             send(0, 0, "Hata: " + (t.getMessage() == null ? t.getClass().getSimpleName() : t.getMessage()));
         } finally {
@@ -82,6 +76,16 @@ public class BatchForegroundService extends Service {
             while(pos<size){ long n=in.transferTo(pos, Math.min(16L*1024*1024,size-pos), out); if(n<=0)break; pos+=n; }
             if(pos<size) throw new java.io.IOException("Kopyalama tamamlanamadı: " + src.getName());
         }
+    }
+
+    private static File unique(File dir, String name) {
+        File direct = new File(dir, name);
+        if (!direct.exists()) return direct;
+        String base=name, ext="";
+        int dot=name.lastIndexOf('.');
+        if(dot>0){base=name.substring(0,dot);ext=name.substring(dot);}
+        for(int i=1;i<1000000;i++){File f=new File(dir,base+" ("+i+")"+ext);if(!f.exists())return f;}
+        return new File(dir,base+"_"+System.currentTimeMillis()+ext);
     }
 
     private static boolean hasFiles(File dir) {
