@@ -24,6 +24,6 @@ jobs:
       - run: gradle :batchapp:assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         with:
-          name: ATMACA-50-v1.3.0-ORJINAL-HIZ
+          name: ATMACA-50-v1.3.1-NOMEDIA-FIX
           path: batchapp/build/outputs/apk/debug/batchapp-debug.apk
           if-no-files-found: error
