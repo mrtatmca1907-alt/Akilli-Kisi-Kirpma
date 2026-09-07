@@ -18,7 +18,7 @@ jobs:
           apktool d -f /tmp/a.apk -o /tmp/a >/dev/null
       - name: Map move scan size paths
         run: |
-          mkdir -p tools/filemanager/move
+          mkdir -p /tmp/report-out
           python3 - <<'PY'
           import os
           needles=['File.renameTo failed','Files.move failed','Create folder failed in move directory','MoveOperator','MOVE FILE','MOVE DIRECTORY','MediaScannerConnection','SCAN AFTER','folder size','CALCULATE SIZE']
@@ -38,12 +38,17 @@ jobs:
                 a=max(0,i-25); b=min(len(lines),i+45)
                 out.extend(f'{k+1:06d}: {lines[k]}' for k in range(a,b))
                 out.append('---')
-          open('tools/filemanager/move/report.txt','w').write('\n'.join(out[:40000]))
+          open('/tmp/report-out/report.txt','w').write('\n'.join(out[:40000]))
           print('hits',sum(1 for x in out if x.startswith('FILE ')))
           PY
-      - run: |
+      - name: Commit report without losing concurrent branch updates
+        run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git fetch origin filemanager-patch
+          git reset --hard origin/filemanager-patch
+          mkdir -p tools/filemanager/move
+          cp /tmp/report-out/report.txt tools/filemanager/move/report.txt
           git add tools/filemanager/move/report.txt
           git diff --cached --quiet || git commit -m 'Map move and refresh hot paths'
-          git push
+          git push origin HEAD:filemanager-patch
