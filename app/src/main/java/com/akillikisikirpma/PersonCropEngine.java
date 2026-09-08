@@ -19,7 +19,10 @@ import org.tensorflow.lite.task.vision.detector.Detection;
 import org.tensorflow.lite.task.vision.detector.ObjectDetector;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,8 +104,8 @@ final class PersonCropEngine implements AutoCloseable {
                 }
             }
 
-            // Bütün okuma/kırpma bittikten sonra büyük orijinali KOPYALAMADAN hedefe taşı.
-            result.originalSaved = moveOriginalDirect(uri, outputDir, displayName);
+            // Kaynak görsel artık taşınmaz veya silinmez; çıktı klasörüne güvenli bir kopya bırakılır.
+            result.originalSaved = copyOriginal(uri, outputDir, displayName);
             if (!result.originalSaved) result.failed++;
         } catch (Throwable t) {
             result.failed++;
@@ -113,18 +116,30 @@ final class PersonCropEngine implements AutoCloseable {
         return result;
     }
 
-    private boolean moveOriginalDirect(Uri uri, File outputDir, String displayName) {
-        if (!"file".equalsIgnoreCase(uri.getScheme()) || uri.getPath() == null) return false;
-        File source = new File(uri.getPath());
-        if (!source.isFile()) return false;
-        String name = (displayName == null || displayName.trim().isEmpty()) ? source.getName() : displayName;
+    private boolean copyOriginal(Uri uri, File outputDir, String displayName) {
+        String name = (displayName == null || displayName.trim().isEmpty()) ? "orijinal.jpg" : displayName;
         File out = new File(outputDir, name);
+        if (out.isFile() && out.length() > 0) return true;
+        if (out.exists()) out = uniqueFile(outputDir, name);
 
-        if (out.isFile()) {
-            if (out.length() == source.length() && source.length() > 0) return source.delete();
-            out = uniqueFile(outputDir, name);
+        try (InputStream in = openInput(uri); OutputStream os = new FileOutputStream(out)) {
+            if (in == null) return false;
+            byte[] buffer = new byte[1024 * 1024];
+            int n;
+            while ((n = in.read(buffer)) != -1) os.write(buffer, 0, n);
+            os.flush();
+            return out.length() > 0;
+        } catch (Throwable t) {
+            try { out.delete(); } catch (Throwable ignored) {}
+            return false;
         }
-        return source.renameTo(out);
+    }
+
+    private InputStream openInput(Uri uri) throws Exception {
+        if ("file".equalsIgnoreCase(uri.getScheme()) && uri.getPath() != null) {
+            return new FileInputStream(new File(uri.getPath()));
+        }
+        return context.getContentResolver().openInputStream(uri);
     }
 
     private File uniqueFile(File dir, String name) {
