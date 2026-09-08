@@ -3,7 +3,7 @@ name: Build Akilli Kisi Kirpma APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, unified-crop-screenshot-v2 ]
 
 jobs:
   build:
@@ -48,6 +48,6 @@ jobs:
       - name: APK yukle
         uses: actions/upload-artifact@v4
         with:
-          name: Akilli-Kisi-Kirpma-v1.7.0-GERCEK-TURBO
+          name: ATMACA-Kisi-Kirpma-Birlesik-v2
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
