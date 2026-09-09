@@ -1,8 +1,11 @@
 package com.atmaca.dosyalar;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,11 +25,15 @@ import java.util.concurrent.ExecutorService;
  */
 public class FastFileActivity extends MainActivity {
     private static final String HOOK_TAG = "atmaca_fast_move_hook";
+    private static final String NOMEDIA_TAG = "atmaca_1907_nomedia_cleanup";
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override public void onGlobalLayout() { hookPasteButton(); }
+            @Override public void onGlobalLayout() {
+                hookPasteButton();
+                hookNomediaCleanupButton();
+            }
         });
     }
 
@@ -37,6 +44,61 @@ public class FastFileActivity extends MainActivity {
             paste.setTag(HOOK_TAG);
             paste.setOnClickListener(v -> pasteFast());
         } catch (Throwable ignored) { }
+    }
+
+    private void hookNomediaCleanupButton() {
+        try {
+            Object current = field("currentDir").get(this);
+            if (current != null) return; // Home screen only.
+            LinearLayout content = (LinearLayout) field("content").get(this);
+            if (content == null || content.findViewWithTag(NOMEDIA_TAG) != null) return;
+
+            Button clean = new Button(this);
+            clean.setTag(NOMEDIA_TAG);
+            clean.setText("1907 .nomedia temizle");
+            clean.setAllCaps(false);
+            clean.setOnClickListener(v -> clean1907Nomedia());
+            int m = dpReflect(14);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(m, m / 2, m, m);
+            content.addView(clean, lp);
+        } catch (Throwable ignored) { }
+    }
+
+    private void clean1907Nomedia() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+                Toast.makeText(this, "Önce dosya erişim iznini ver, sonra düğmeye tekrar bas", Toast.LENGTH_LONG).show();
+                invoke("requestStorageAccess");
+                return;
+            }
+
+            File root = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "1907");
+            if (!root.isDirectory()) {
+                Toast.makeText(this, "Pictures/1907 bulunamadı", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            ExecutorService io = (ExecutorService) field("io").get(this);
+            Toast.makeText(this, "1907 içinde .nomedia aranıyor…", Toast.LENGTH_SHORT).show();
+            io.execute(() -> {
+                NomediaCleaner.Result result = NomediaCleaner.clean(root);
+                runOnUiThread(() -> {
+                    String msg;
+                    if (result.deleted == 0 && result.failed == 0) {
+                        msg = ".nomedia bulunamadı";
+                    } else {
+                        msg = result.deleted + " .nomedia silindi";
+                        if (result.failed > 0) msg += " • " + result.failed + " silinemedi";
+                    }
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                });
+            });
+        } catch (Throwable t) {
+            Toast.makeText(this, ".nomedia temizliği başlatılamadı", Toast.LENGTH_LONG).show();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -104,6 +166,10 @@ public class FastFileActivity extends MainActivity {
         Method m = MainActivity.class.getDeclaredMethod(name);
         m.setAccessible(true);
         m.invoke(this);
+    }
+
+    private int dpReflect(int value) {
+        return Math.max(1, Math.round(value * getResources().getDisplayMetrics().density));
     }
 
     private Field field(String name) throws Exception {
