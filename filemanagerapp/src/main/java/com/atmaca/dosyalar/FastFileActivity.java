@@ -1,8 +1,11 @@
 package com.atmaca.dosyalar;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -18,21 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-/**
- * Thin fast-ops layer over MainActivity. The existing browser/UI stays intact,
- * while local move operations try a real filesystem move first. SAF/cloud
- * targets keep the existing copy/delete fallback.
- */
+/** Fast local file operations plus one-tap background photo collection. */
 public class FastFileActivity extends MainActivity {
     private static final String HOOK_TAG = "atmaca_fast_move_hook";
-    private static final String NOMEDIA_TAG = "atmaca_1907_nomedia_cleanup";
+    private static final String COLLECT_TAG = "atmaca_collect_all_photos";
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override public void onGlobalLayout() {
                 hookPasteButton();
-                hookNomediaCleanupButton();
+                hookPhotoCollectorButton();
             }
         });
     }
@@ -46,58 +45,45 @@ public class FastFileActivity extends MainActivity {
         } catch (Throwable ignored) { }
     }
 
-    private void hookNomediaCleanupButton() {
+    private void hookPhotoCollectorButton() {
         try {
             Object current = field("currentDir").get(this);
-            if (current != null) return; // Home screen only.
+            if (current != null) return;
             LinearLayout content = (LinearLayout) field("content").get(this);
-            if (content == null || content.findViewWithTag(NOMEDIA_TAG) != null) return;
+            if (content == null || content.findViewWithTag(COLLECT_TAG) != null) return;
 
-            Button clean = new Button(this);
-            clean.setTag(NOMEDIA_TAG);
-            clean.setText("1907 .nomedia temizle");
-            clean.setAllCaps(false);
-            clean.setOnClickListener(v -> clean1907Nomedia());
+            Button collect = new Button(this);
+            collect.setTag(COLLECT_TAG);
+            collect.setText("Tüm Fotoğrafları Topla");
+            collect.setAllCaps(false);
+            collect.setOnClickListener(v -> startPhotoCollection());
             int m = dpReflect(14);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
             lp.setMargins(m, m / 2, m, m);
-            content.addView(clean, lp);
+            content.addView(collect, lp);
         } catch (Throwable ignored) { }
     }
 
-    private void clean1907Nomedia() {
+    private void startPhotoCollection() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-                Toast.makeText(this, "Önce dosya erişim iznini ver, sonra düğmeye tekrar bas", Toast.LENGTH_LONG).show();
-                invoke("requestStorageAccess");
+                Toast.makeText(this, "Önce tüm dosyalara erişim iznini ver", Toast.LENGTH_LONG).show();
+                try {
+                    startActivity(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                            Uri.parse("package:" + getPackageName())));
+                } catch (Exception e) {
+                    startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+                }
                 return;
             }
-
-            File root = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "1907");
-            if (!root.isDirectory()) {
-                Toast.makeText(this, "Pictures/1907 bulunamadı", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            ExecutorService io = (ExecutorService) field("io").get(this);
-            Toast.makeText(this, "1907 içinde .nomedia aranıyor…", Toast.LENGTH_SHORT).show();
-            io.execute(() -> {
-                NomediaCleaner.Result result = NomediaCleaner.clean(root);
-                runOnUiThread(() -> {
-                    String msg;
-                    if (result.deleted == 0 && result.failed == 0) {
-                        msg = ".nomedia bulunamadı";
-                    } else {
-                        msg = result.deleted + " .nomedia silindi";
-                        if (result.failed > 0) msg += " • " + result.failed + " silinemedi";
-                    }
-                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                });
-            });
+            Intent service = new Intent(this, PhotoCollectService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(service);
+            else startService(service);
+            Toast.makeText(this, "Fotoğraflar Pictures/TUM_FOTOGRAFLAR içine taşınıyor", Toast.LENGTH_LONG).show();
         } catch (Throwable t) {
-            Toast.makeText(this, ".nomedia temizliği başlatılamadı", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Fotoğraf taşıma başlatılamadı", Toast.LENGTH_LONG).show();
         }
     }
 
