@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
@@ -13,6 +14,8 @@ import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PhotoCollectService extends Service {
     public static final String ACTION_STATUS = "com.atmaca.dosyalar.PHOTO_COLLECT_STATUS";
@@ -31,28 +34,35 @@ public class PhotoCollectService extends Service {
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         if (running) return START_STICKY;
         running = true;
-        startForeground(NOTIFICATION_ID, notification("Fotoğraflar hazırlanıyor", 0, 0));
+        startForeground(NOTIFICATION_ID, notification("Fotoğraflar hazırlanıyor", true));
         new Thread(this::runCollection, "ATMACA-PhotoCollector").start();
         return START_STICKY;
     }
 
     private void runCollection() {
         int moved = 0, failed = 0;
+        List<String> scanBatch = new ArrayList<>(100);
         try {
             File root = Environment.getExternalStorageDirectory();
             File pictures = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             File target = new File(pictures, "TUM_FOTOGRAFLAR");
-            PhotoCollector.Result result = PhotoCollector.movePhotos(root, target, (m, f, current) -> {
+            PhotoCollector.Result result = PhotoCollector.movePhotos(root, target, (m, f, destination) -> {
+                if (destination != null) {
+                    scanBatch.add(destination.getAbsolutePath());
+                    if (scanBatch.size() >= 100) flushScanBatch(scanBatch);
+                }
                 if ((m + f) % 25 == 0) {
                     notifyProgress(m, f);
                     broadcast(m, f, false);
                 }
             });
+            flushScanBatch(scanBatch);
             moved = result.moved;
             failed = result.failed;
             notifyDone(moved, failed);
             broadcast(moved, failed, true);
         } catch (Throwable t) {
+            flushScanBatch(scanBatch);
             failed++;
             notifyDone(moved, failed);
             broadcast(moved, failed, true);
@@ -61,6 +71,13 @@ public class PhotoCollectService extends Service {
             stopForeground(false);
             stopSelf();
         }
+    }
+
+    private void flushScanBatch(List<String> paths) {
+        if (paths.isEmpty()) return;
+        String[] batch = paths.toArray(new String[0]);
+        paths.clear();
+        MediaScannerConnection.scanFile(this, batch, null, null);
     }
 
     private void broadcast(int moved, int failed, boolean done) {
@@ -74,16 +91,17 @@ public class PhotoCollectService extends Service {
 
     private void notifyProgress(int moved, int failed) {
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(NOTIFICATION_ID, notification(moved + " fotoğraf taşındı", moved, failed));
+        String text = moved + " fotoğraf taşındı" + (failed > 0 ? " • " + failed + " hata" : "");
+        nm.notify(NOTIFICATION_ID, notification(text, true));
     }
 
     private void notifyDone(int moved, int failed) {
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         String text = moved + " fotoğraf taşındı" + (failed > 0 ? " • " + failed + " hata" : "");
-        nm.notify(NOTIFICATION_ID, notification(text, moved, failed));
+        nm.notify(NOTIFICATION_ID, notification(text, false));
     }
 
-    private Notification notification(String text, int moved, int failed) {
+    private Notification notification(String text, boolean ongoing) {
         Intent open = new Intent(this, FastFileActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, open,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
@@ -92,7 +110,7 @@ public class PhotoCollectService extends Service {
                 .setContentTitle("ATMACA • Tüm Fotoğrafları Topla")
                 .setContentText(text)
                 .setContentIntent(pi)
-                .setOngoing(!text.contains("hata") && !text.contains("taşındı") ? true : false)
+                .setOngoing(ongoing)
                 .setOnlyAlertOnce(true)
                 .build();
     }
