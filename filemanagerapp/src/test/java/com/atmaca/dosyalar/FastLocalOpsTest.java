@@ -43,26 +43,31 @@ public class FastLocalOpsTest {
         assertTrue(nested.isDirectory());
     }
 
-    @Test public void collectsPhotosFrom1907AndSubfolders() throws Exception {
-        File sandbox = Files.createTempDirectory("atmaca-photo-collector").toFile();
-        File source = new File(sandbox, "Pictures/1907");
-        File deep = new File(source, "a/b/c");
-        File target = new File(sandbox, "Pictures/TUM_FOTOGRAFLAR");
-        assertTrue(deep.mkdirs());
+    @Test public void collectsAllInternalPhotosIncluding1907Subfolders() throws Exception {
+        File storage = Files.createTempDirectory("atmaca-photo-collector").toFile();
+        File deep1907 = new File(storage, "Pictures/1907/a/b/c");
+        File camera = new File(storage, "DCIM/Camera");
+        File downloads = new File(storage, "Download");
+        File target = new File(storage, "Pictures/TUM_FOTOGRAFLAR");
+        assertTrue(deep1907.mkdirs());
+        assertTrue(camera.mkdirs());
+        assertTrue(downloads.mkdirs());
         assertTrue(target.mkdirs());
 
-        File jpg = new File(source, "foto.jpg");
-        File png = new File(deep, "resim.png");
-        File heic = new File(deep, "telefon.heic");
-        File video = new File(deep, "video.mp4");
-        File nomedia = new File(deep, ".nomedia");
+        File jpg = new File(deep1907, "foto.jpg");
+        File png = new File(camera, "resim.png");
+        File heic = new File(downloads, "telefon.heic");
+        File video = new File(deep1907, "video.mp4");
+        File nomedia = new File(deep1907, ".nomedia");
+        File alreadyTarget = new File(target, "zaten.jpg");
         Files.write(jpg.toPath(), "jpg".getBytes(StandardCharsets.UTF_8));
         Files.write(png.toPath(), "png".getBytes(StandardCharsets.UTF_8));
         Files.write(heic.toPath(), "heic".getBytes(StandardCharsets.UTF_8));
         Files.write(video.toPath(), "video".getBytes(StandardCharsets.UTF_8));
+        Files.write(alreadyTarget.toPath(), "existing".getBytes(StandardCharsets.UTF_8));
         assertTrue(nomedia.createNewFile());
 
-        PhotoCollector.Result result = PhotoCollector.movePhotos(source, target, null);
+        PhotoCollector.Result result = PhotoCollector.movePhotos(storage, target, null);
 
         assertEquals(3, result.moved);
         assertEquals(0, result.failed);
@@ -71,6 +76,7 @@ public class FastLocalOpsTest {
         assertFalse(heic.exists());
         assertTrue(video.exists());
         assertTrue(nomedia.exists());
+        assertTrue(alreadyTarget.exists());
         assertTrue(new File(target, "foto.jpg").isFile());
         assertTrue(new File(target, "resim.png").isFile());
         assertTrue(new File(target, "telefon.heic").isFile());
@@ -78,20 +84,20 @@ public class FastLocalOpsTest {
 
     @Test public void keepsBothPhotosWhenNamesCollide() throws Exception {
         File sandbox = Files.createTempDirectory("atmaca-photo-collision").toFile();
-        File source = new File(sandbox, "1907");
+        File source = new File(sandbox, "storage");
         File one = new File(source, "one");
         File two = new File(source, "two");
-        File target = new File(sandbox, "TUM_FOTOGRAFLAR");
+        File target = new File(source, "Pictures/TUM_FOTOGRAFLAR");
         assertTrue(one.mkdirs());
         assertTrue(two.mkdirs());
         assertTrue(target.mkdirs());
-        Files.write(new File(one, "aynı.jpg").toPath(), "1".getBytes(StandardCharsets.UTF_8));
-        Files.write(new File(two, "aynı.jpg").toPath(), "2".getBytes(StandardCharsets.UTF_8));
+        Files.write(new File(one, "ayni.jpg").toPath(), "1".getBytes(StandardCharsets.UTF_8));
+        Files.write(new File(two, "ayni.jpg").toPath(), "2".getBytes(StandardCharsets.UTF_8));
 
         PhotoCollector.Result result = PhotoCollector.movePhotos(source, target, null);
 
         assertEquals(2, result.moved);
-        assertTrue(new File(target, "aynı.jpg").isFile());
-        assertTrue(new File(target, "aynı (1).jpg").isFile());
+        assertTrue(new File(target, "ayni.jpg").isFile());
+        assertTrue(new File(target, "ayni (1).jpg").isFile());
     }
 }
