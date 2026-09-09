@@ -3,6 +3,7 @@ package com.atmaca.dosyalar;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class FastLocalOpsTest {
@@ -11,10 +12,10 @@ public class FastLocalOpsTest {
         File src = new File(dir, "a.txt");
         File dstDir = new File(dir, "dst");
         assertTrue(dstDir.mkdir());
-        Files.writeString(src.toPath(), "1907");
+        Files.write(src.toPath(), "1907".getBytes(StandardCharsets.UTF_8));
         File out = FastLocalOps.moveRenameFirst(src, dstDir, "a.txt");
         assertFalse(src.exists());
         assertTrue(out.isFile());
-        assertEquals("1907", Files.readString(out.toPath()));
+        assertEquals("1907", new String(Files.readAllBytes(out.toPath()), StandardCharsets.UTF_8));
     }
 }
