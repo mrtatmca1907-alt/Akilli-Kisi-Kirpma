@@ -42,4 +42,56 @@ public class FastLocalOpsTest {
         assertTrue(similarName.exists());
         assertTrue(nested.isDirectory());
     }
+
+    @Test public void collectsPhotosFrom1907AndSubfolders() throws Exception {
+        File sandbox = Files.createTempDirectory("atmaca-photo-collector").toFile();
+        File source = new File(sandbox, "Pictures/1907");
+        File deep = new File(source, "a/b/c");
+        File target = new File(sandbox, "Pictures/TUM_FOTOGRAFLAR");
+        assertTrue(deep.mkdirs());
+        assertTrue(target.mkdirs());
+
+        File jpg = new File(source, "foto.jpg");
+        File png = new File(deep, "resim.png");
+        File heic = new File(deep, "telefon.heic");
+        File video = new File(deep, "video.mp4");
+        File nomedia = new File(deep, ".nomedia");
+        Files.write(jpg.toPath(), "jpg".getBytes(StandardCharsets.UTF_8));
+        Files.write(png.toPath(), "png".getBytes(StandardCharsets.UTF_8));
+        Files.write(heic.toPath(), "heic".getBytes(StandardCharsets.UTF_8));
+        Files.write(video.toPath(), "video".getBytes(StandardCharsets.UTF_8));
+        assertTrue(nomedia.createNewFile());
+
+        PhotoCollector.Result result = PhotoCollector.movePhotos(source, target, null);
+
+        assertEquals(3, result.moved);
+        assertEquals(0, result.failed);
+        assertFalse(jpg.exists());
+        assertFalse(png.exists());
+        assertFalse(heic.exists());
+        assertTrue(video.exists());
+        assertTrue(nomedia.exists());
+        assertTrue(new File(target, "foto.jpg").isFile());
+        assertTrue(new File(target, "resim.png").isFile());
+        assertTrue(new File(target, "telefon.heic").isFile());
+    }
+
+    @Test public void keepsBothPhotosWhenNamesCollide() throws Exception {
+        File sandbox = Files.createTempDirectory("atmaca-photo-collision").toFile();
+        File source = new File(sandbox, "1907");
+        File one = new File(source, "one");
+        File two = new File(source, "two");
+        File target = new File(sandbox, "TUM_FOTOGRAFLAR");
+        assertTrue(one.mkdirs());
+        assertTrue(two.mkdirs());
+        assertTrue(target.mkdirs());
+        Files.write(new File(one, "aynı.jpg").toPath(), "1".getBytes(StandardCharsets.UTF_8));
+        Files.write(new File(two, "aynı.jpg").toPath(), "2".getBytes(StandardCharsets.UTF_8));
+
+        PhotoCollector.Result result = PhotoCollector.movePhotos(source, target, null);
+
+        assertEquals(2, result.moved);
+        assertTrue(new File(target, "aynı.jpg").isFile());
+        assertTrue(new File(target, "aynı (1).jpg").isFile());
+    }
 }
