@@ -12,7 +12,8 @@ public final class PhotoCollector {
     private PhotoCollector() {}
 
     public interface Progress {
-        void onProgress(int moved, int failed, File current);
+        /** destination is non-null only when one photo was successfully moved. */
+        void onProgress(int moved, int failed, File destination);
     }
 
     public static final class Result {
@@ -56,14 +57,16 @@ public final class PhotoCollector {
                     skipped++;
                     continue;
                 }
+                File movedDestination = null;
                 try {
                     File destination = uniqueTarget(targetDir, child.getName());
                     moveOne(child, destination);
+                    movedDestination = destination;
                     moved++;
                 } catch (Exception e) {
                     failed++;
                 }
-                if (progress != null) progress.onProgress(moved, failed, child);
+                if (progress != null) progress.onProgress(moved, failed, movedDestination);
             }
         }
         return new Result(moved, failed, skipped);
