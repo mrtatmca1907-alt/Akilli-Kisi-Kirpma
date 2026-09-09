@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public class FastFileManagerPolicyTest {
     @Test public void launcherUsesFastBrowser() {
-        assertEquals("MainActivity", FastFileManagerPolicy.launcherActivity());
+        assertEquals("FastFileActivity", FastFileManagerPolicy.launcherActivity());
     }
 
     @Test public void localMovePrefersRename() {
