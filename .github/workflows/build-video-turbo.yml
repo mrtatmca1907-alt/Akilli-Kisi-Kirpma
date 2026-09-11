@@ -1,0 +1,48 @@
+name: Build Video Kareleri Turbo APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'videoapp/**'
+      - '.github/workflows/build-video-turbo.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Kodu al
+        uses: actions/checkout@v5
+
+      - name: Java 17 kur
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK kur
+        uses: android-actions/setup-android@v3
+
+      - name: API 35 kur
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Gradle 8.11.1 kur
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Video app testleri
+        run: gradle :videoapp:testDebugUnitTest --stacktrace
+
+      - name: Video Turbo APK derle
+        run: gradle :videoapp:assembleDebug --stacktrace
+
+      - name: APK yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: Video-Kareleri-V6.2-TURBO
+          path: videoapp/build/outputs/apk/debug/videoapp-debug.apk
+          if-no-files-found: error
