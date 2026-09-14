@@ -3,8 +3,6 @@ plugins {
 }
 
 android {
-    // Akıllı Kişi Kırpma kaynağı kendi paketindeki R sınıfını bekliyor.
-    // Suite R sınıfını bu namespace'te üretiyoruz; diğer araçlara küçük R köprüleri var.
     namespace = "com.akillikisikirpma"
     compileSdk = 35
 
@@ -12,8 +10,8 @@ android {
         applicationId = "com.besliaraclar"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1-deneme"
+        versionCode = 2
+        versionName = "0.2-auto-media"
     }
 
     buildTypes {
@@ -51,9 +49,9 @@ dependencies {
     implementation("org.jsoup:jsoup:1.18.3")
     implementation("org.tensorflow:tensorflow-lite-task-vision:0.4.4")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
+    testImplementation("junit:junit:4.13.2")
 }
 
-// Hunter kaynağındaki Android org.json uyumluluğunu birleşik derlemede de garanti et.
 val patchSuiteHunterJson by tasks.registering {
     doLast {
         val source = file("../hunterapp/src/main/java/com/gorselavcisi/HunterService.java")
