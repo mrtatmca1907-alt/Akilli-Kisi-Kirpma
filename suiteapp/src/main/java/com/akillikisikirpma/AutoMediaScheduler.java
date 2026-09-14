@@ -6,13 +6,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.provider.MediaStore;
 
-final class AutoMediaScheduler {
+public final class AutoMediaScheduler {
     static final int WATCH_JOB_ID = 190701;
     static final int RUN_NOW_JOB_ID = 190702;
 
     private AutoMediaScheduler() {}
 
-    static void scheduleWatcher(Context context) {
+    public static void scheduleWatcher(Context context) {
         JobScheduler scheduler = context.getSystemService(JobScheduler.class);
         if (scheduler == null) return;
         JobInfo job = new JobInfo.Builder(WATCH_JOB_ID, new ComponentName(context, AutoMediaJobService.class))
@@ -26,7 +26,7 @@ final class AutoMediaScheduler {
         scheduler.schedule(job);
     }
 
-    static void scheduleRunNow(Context context) {
+    public static void scheduleRunNow(Context context) {
         JobScheduler scheduler = context.getSystemService(JobScheduler.class);
         if (scheduler == null) return;
         JobInfo job = new JobInfo.Builder(RUN_NOW_JOB_ID, new ComponentName(context, AutoMediaJobService.class))
