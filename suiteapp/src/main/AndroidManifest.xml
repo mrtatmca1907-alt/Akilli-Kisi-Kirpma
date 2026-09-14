@@ -8,6 +8,11 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
     <queries>
@@ -18,19 +23,23 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
-        android:label="5'li Araçlar"
+        android:label="ATMACA Otomatik Medya"
         android:supportsRtl="true"
         android:theme="@style/SuiteTheme"
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name="com.besliaraclar.LauncherActivity"
+            android:name="com.besliaraclar.AutoSetupActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.besliaraclar.LauncherActivity"
+            android:exported="false" />
 
         <activity
             android:name="com.akillikisikirpma.MainActivity"
@@ -57,6 +66,26 @@
             android:name="com.gorselavcisi.MainActivity"
             android:exported="false"
             android:theme="@style/SuiteTheme" />
+
+        <service
+            android:name="com.akillikisikirpma.AutoMediaService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <service
+            android:name="com.akillikisikirpma.AutoMediaJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver
+            android:name="com.akillikisikirpma.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name="com.gorselavcisi.HunterService"
