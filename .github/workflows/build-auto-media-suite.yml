@@ -54,6 +54,6 @@ jobs:
       - name: APK yukle
         uses: actions/upload-artifact@v4
         with:
-          name: ATMACA-Auto-Media-v0.2
+          name: ATMACA-Auto-Media-v0.3-lossless
           path: suiteapp/build/outputs/apk/debug/suiteapp-debug.apk
           if-no-files-found: error
