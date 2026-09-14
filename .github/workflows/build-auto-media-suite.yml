@@ -3,7 +3,8 @@ name: Build ATMACA Auto Media Suite
 on:
   workflow_dispatch:
   push:
-    branches: [ "feature/auto-media-suite" ]
+    branches:
+      - feature/auto-media-suite
 
 jobs:
   build:
@@ -21,12 +22,17 @@ jobs:
           java-version: '17'
 
       - name: Android SDK lisanslarini kabul et
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+        shell: bash
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
 
       - name: API 35 kur
-        run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+        shell: bash
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
 
       - name: Kisi kirpma modelini indir
+        shell: bash
         run: |
           mkdir -p app/src/main/assets
           curl -L --fail --retry 3 \
