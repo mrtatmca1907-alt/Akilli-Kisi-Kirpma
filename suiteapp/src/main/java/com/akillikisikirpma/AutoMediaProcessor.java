@@ -45,17 +45,20 @@ final class AutoMediaProcessor {
         do {
             if (control.shouldStop()) return false;
             didWork = false;
+
             MediaItem video = next(false);
             if (video != null) {
                 didWork = true;
-                processVideo(video);
+                if (!processVideo(video)) return false;
                 advance(false, video);
             }
+
             if (control.shouldStop()) return false;
             MediaItem image = next(true);
             if (image != null) {
                 didWork = true;
                 processImage(image);
+                if (control.shouldStop()) return false;
                 advance(true, image);
             }
         } while (didWork && !control.shouldStop());
@@ -149,14 +152,14 @@ final class AutoMediaProcessor {
         if (!generated.renameTo(target)) recordError("Fotoğraf klasörü adlandırılamadı: " + item.name);
     }
 
-    private void processVideo(MediaItem item) {
+    private boolean processVideo(MediaItem item) {
         control.onProgress("Video: " + item.name);
         if (item.path == null || item.path.isEmpty()) {
             recordError("Video yolu alınamadı: " + item.name);
-            return;
+            return !control.shouldStop();
         }
         File source = new File(item.path);
-        if (!source.isFile()) return;
+        if (!source.isFile()) return !control.shouldStop();
 
         long activeId = prefs.getLong("active_video_id", -1L);
         long activeAdded = prefs.getLong("active_video_added", -1L);
@@ -215,10 +218,11 @@ final class AutoMediaProcessor {
             recordError("Video hata: " + item.name + " / " + t.getMessage());
         } finally {
             try { retriever.release(); } catch (Throwable ignored) {}
-            if (complete || !control.shouldStop()) {
+            if (!control.shouldStop()) {
                 prefs.edit().remove("active_video_id").remove("active_video_added").remove("active_video_next_second").apply();
             }
         }
+        return !control.shouldStop();
     }
 
     private boolean saveFrame(Bitmap frame, File out) {
