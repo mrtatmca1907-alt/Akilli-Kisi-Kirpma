@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -15,18 +12,13 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
-    <queries>
-        <package android:name="org.reeldrop.reeldrop" />
-    </queries>
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
         android:label="ATMACA Otomatik Medya"
         android:supportsRtl="true"
-        android:theme="@style/SuiteTheme"
-        android:usesCleartextTraffic="true">
+        android:theme="@style/SuiteTheme">
 
         <activity
             android:name="com.besliaraclar.AutoSetupActivity"
@@ -40,32 +32,6 @@
         <activity
             android:name="com.besliaraclar.LauncherActivity"
             android:exported="false" />
-
-        <activity
-            android:name="com.akillikisikirpma.MainActivity"
-            android:exported="false"
-            android:theme="@style/SuiteTheme" />
-
-        <activity
-            android:name="com.videokareleri.MainActivity"
-            android:exported="false"
-            android:theme="@style/SuiteTheme" />
-
-        <activity
-            android:name="com.cokluvideoindirici.MainActivity"
-            android:exported="false"
-            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
-
-        <activity
-            android:name="com.cokluvideoindirici.StableBrowserActivity"
-            android:exported="false"
-            android:theme="@android:style/Theme.Material.Light.NoActionBar"
-            android:screenOrientation="unspecified" />
-
-        <activity
-            android:name="com.gorselavcisi.MainActivity"
-            android:exported="false"
-            android:theme="@style/SuiteTheme" />
 
         <service
             android:name="com.akillikisikirpma.AutoMediaService"
@@ -86,16 +52,6 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name="com.gorselavcisi.HunterService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
-
-        <service
-            android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync"
-            tools:node="merge" />
 
     </application>
 </manifest>
