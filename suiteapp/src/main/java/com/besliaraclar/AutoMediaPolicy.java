@@ -2,30 +2,30 @@ package com.besliaraclar;
 
 import java.util.Locale;
 
-final class AutoMediaPolicy {
+public final class AutoMediaPolicy {
     private AutoMediaPolicy() {}
 
-    static boolean isOwnOutputPath(String relativePath) {
+    public static boolean isOwnOutputPath(String relativePath) {
         if (relativePath == null) return false;
         String p = relativePath.replace('\\', '/').toLowerCase(Locale.ROOT);
         return p.contains("pictures/akillikisikirpma/") || p.contains("pictures/videokareleri/");
     }
 
-    static boolean isImage(String name) {
+    public static boolean isImage(String name) {
         if (name == null) return false;
         String n = name.toLowerCase(Locale.ROOT);
         return n.endsWith(".jpg") || n.endsWith(".jpeg") || n.endsWith(".png") || n.endsWith(".webp")
                 || n.endsWith(".bmp") || n.endsWith(".gif") || n.endsWith(".heic") || n.endsWith(".heif");
     }
 
-    static boolean isVideo(String name) {
+    public static boolean isVideo(String name) {
         if (name == null) return false;
         String n = name.toLowerCase(Locale.ROOT);
         return n.endsWith(".mp4") || n.endsWith(".mkv") || n.endsWith(".mov") || n.endsWith(".webm")
                 || n.endsWith(".3gp") || n.endsWith(".avi") || n.endsWith(".m4v") || n.endsWith(".ts");
     }
 
-    static String stableKey(long id, String name, long size, long modifiedSeconds) {
+    public static String stableKey(long id, String name, long size, long modifiedSeconds) {
         return id + "|" + (name == null ? "" : name) + "|" + size + "|" + modifiedSeconds;
     }
 }
