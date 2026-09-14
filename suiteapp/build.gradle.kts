@@ -37,6 +37,9 @@ android {
             "../downloaderapp/src/main/java",
             "../hunterapp/src/main/java"
         )
+        java.exclude("com/akillikisikirpma/MainActivity.java")
+        java.exclude("com/akillikisikirpma/CropForegroundService.java")
+        java.exclude("com/videokareleri/MainActivity.java")
         assets.srcDirs("../app/src/main/assets")
     }
 }
