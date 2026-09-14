@@ -32,46 +32,17 @@ android {
     sourceSets.getByName("main") {
         java.srcDirs(
             "src/main/java",
-            "../app/src/main/java",
-            "../videoapp/src/main/java",
-            "../downloaderapp/src/main/java",
-            "../hunterapp/src/main/java"
+            "../app/src/main/java"
         )
         java.exclude("com/akillikisikirpma/MainActivity.java")
         java.exclude("com/akillikisikirpma/CropForegroundService.java")
-        java.exclude("com/videokareleri/MainActivity.java")
         assets.srcDirs("../app/src/main/assets")
     }
 }
 
 dependencies {
     implementation("androidx.core:core:1.16.0")
-    implementation("androidx.documentfile:documentfile:1.1.0")
-    implementation("androidx.work:work-runtime:2.10.1")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.jsoup:jsoup:1.18.3")
     implementation("org.tensorflow:tensorflow-lite-task-vision:0.4.4")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
     testImplementation("junit:junit:4.13.2")
-}
-
-val patchSuiteHunterJson by tasks.registering {
-    doLast {
-        val source = file("../hunterapp/src/main/java/com/gorselavcisi/HunterService.java")
-        if (source.exists()) {
-            var text = source.readText()
-            val old = "for (String key : pages.keySet()) {"
-            if (text.contains(old)) {
-                text = text.replace(
-                    old,
-                    "java.util.Iterator<String> keys = pages.keys();\n                    while (keys.hasNext()) {\n                        String key = keys.next();"
-                )
-                source.writeText(text)
-            }
-        }
-    }
-}
-
-afterEvaluate {
-    tasks.named("compileDebugJavaWithJavac").configure { dependsOn(patchSuiteHunterJson) }
 }
