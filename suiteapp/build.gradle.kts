@@ -74,3 +74,8 @@ val patchSuiteHunterJson by tasks.registering {
 afterEvaluate {
     tasks.named("compileDebugJavaWithJavac").configure { dependsOn(patchSuiteHunterJson) }
 }
+
+// Uygulama Merkezi: yerel hata ve donma raporu, API anahtarı içermez.
+android {
+    sourceSets.getByName("main").java.srcDir(rootProject.file("center-sdk/src/main/java"))
+}

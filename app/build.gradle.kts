@@ -36,3 +36,8 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
     testImplementation("junit:junit:4.13.2")
 }
+
+// Uygulama Merkezi: yerel hata ve donma raporu, API anahtarı içermez.
+android {
+    sourceSets.getByName("main").java.srcDir(rootProject.file("center-sdk/src/main/java"))
+}

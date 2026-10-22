@@ -30,3 +30,8 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.core:core:1.16.0")
 }
+
+// Uygulama Merkezi: yerel hata ve donma raporu, API anahtarı içermez.
+android {
+    sourceSets.getByName("main").java.srcDir(rootProject.file("center-sdk/src/main/java"))
+}
