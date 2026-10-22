@@ -30,3 +30,8 @@ dependencies {
     implementation("androidx.work:work-runtime:2.10.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
+
+// Uygulama Merkezi: yerel hata ve donma raporu, API anahtarı içermez.
+android {
+    sourceSets.getByName("main").java.srcDir(rootProject.file("center-sdk/src/main/java"))
+}
