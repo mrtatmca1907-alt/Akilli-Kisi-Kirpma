@@ -1,0 +1,38 @@
+name: Yuz Bulucu Windows EXE
+on:
+  push:
+    paths:
+      - 'YuzBulucu/**'
+      - '.github/workflows/yuz-bulucu-windows.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
+      - name: Install dependencies
+        working-directory: YuzBulucu
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Download face models
+        working-directory: YuzBulucu
+        run: python download_models.py
+      - name: Build EXE
+        working-directory: YuzBulucu
+        run: |
+          pyinstaller --noconfirm --clean --windowed --onedir --name YuzBulucu --add-data "models;models" yuz_bulucu.py
+      - name: Package application
+        run: Compress-Archive -Path YuzBulucu\dist\YuzBulucu\* -DestinationPath YuzBulucu-Windows10-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YuzBulucu-Windows10-x64
+          path: YuzBulucu-Windows10-x64.zip
+          retention-days: 14
