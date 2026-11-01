@@ -1,4 +1,4 @@
-import os, sys, cv2, sqlite3, threading, queue, time
+import os, sys, cv2, sqlite3, threading, queue, time, shutil, base64
 from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
@@ -55,10 +55,17 @@ class App:
         self.go=ttk.Button(r,text="Taramayı başlat",command=self.start); self.go.pack(side="left")
         self.stop=ttk.Button(r,text="Durdur",command=self.stop_scan,state="disabled"); self.stop.pack(side="left",padx=8)
         self.bar=ttk.Progressbar(f,mode="determinate"); self.bar.pack(fill="x",pady=5)
-        self.status=tk.StringVar(value="Referans fotoğrafı ve klasörü seçin.")
+        self.status=tk.StringVar(value="Referans fotoğrafı seçin ve aranacak klasörü belirleyin.")
         ttk.Label(f,textvariable=self.status).pack(anchor="w",pady=5)
-        self.list=ttk.Treeview(f,columns=("score","path"),show="headings")
-        self.list.heading("score",text="Benzerlik"); self.list.heading("path",text="Fotoğraf yolu")
+        actions=ttk.Frame(f); actions.pack(fill="x",pady=3)
+        ttk.Button(actions,text="Seçileni taşı",command=self.move_selected).pack(side="left")
+        ttk.Button(actions,text="Tümünü seç",command=self.select_all).pack(side="left",padx=6)
+        ttk.Button(actions,text="Seçimi temizle",command=self.clear_selection).pack(side="left")
+        self.thumbs=[]
+        self.list=ttk.Treeview(f,columns=("score","path"),show="tree headings",selectmode="extended")
+        self.list.heading("#0",text="Önizleme")
+        self.list.heading("score",text="Benzerlik"); self.list.heading("path",text="Fotoğrafın tam konumu")
+        self.list.column("#0",width=105,minwidth=90,stretch=False,anchor="center")
         self.list.column("score",width=100,anchor="center"); self.list.column("path",width=700)
         self.list.pack(fill="both",expand=True,pady=5); self.list.bind("<Double-1>",self.open_item)
         ttk.Label(f,text="Puan, yüz benzerliği tahminidir; kesin kimlik doğrulaması değildir.",foreground="#666").pack(anchor="w")
@@ -114,8 +121,11 @@ class App:
                     _,i,n,c=x; self.bar["maximum"]=max(1,n); self.bar["value"]=i; self.status.set(f"Taranıyor {i:,}/{n:,} • Eşleşme {c:,}")
                 elif x[0]=="done":
                     _,items,stopped=x
-                    for score,path in items:self.list.insert("","end",values=(f"{score*100:.1f}%",path))
-                    self.status.set(("Durduruldu" if stopped else "Tamamlandı")+f" • {len(items):,} eşleşme")
+                    self.thumbs.clear()
+                    for score,path in items:
+                        thumb=self.make_thumbnail(path); self.thumbs.append(thumb)
+                        self.list.insert("","end",image=thumb,values=(f"{score*100:.1f}%",path))
+                    self.status.set(("Durduruldu" if stopped else "Tamamlandı")+f" • {len(items):,} eşleşme bulundu. Fotoğrafları seçip taşıyabilirsiniz.")
                     self.go.config(state="normal"); self.stop.config(state="disabled")
                 elif x[0]=="error":
                     messagebox.showerror("Hata",x[1]); self.go.config(state="normal"); self.stop.config(state="disabled")
@@ -126,6 +136,49 @@ class App:
         if sel:
             p=self.list.item(sel[0],"values")[1]
             if os.path.isfile(p):os.startfile(p)
+    def make_thumbnail(self,path):
+        try:
+            img=cv2.imread(str(path))
+            if img is None: raise ValueError("Görüntü okunamadı")
+            h,w=img.shape[:2]; scale=min(84/max(w,1),84/max(h,1))
+            img=cv2.resize(img,(max(1,int(w*scale)),max(1,int(h*scale))),interpolation=cv2.INTER_AREA)
+            ok,encoded=cv2.imencode(".png",img)
+            if not ok: raise ValueError("Önizleme oluşturulamadı")
+            return tk.PhotoImage(data=base64.b64encode(encoded.tobytes()).decode("ascii"))
+        except Exception:
+            return tk.PhotoImage(width=84,height=84)
+
+    def select_all(self):
+        self.list.selection_set(self.list.get_children())
+
+    def clear_selection(self):
+        self.list.selection_remove(self.list.selection())
+
+    def move_selected(self):
+        selected=self.list.selection()
+        if not selected:
+            messagebox.showinfo("Seçim yok","Önce taşımak istediğiniz fotoğrafları seçin."); return
+        target=filedialog.askdirectory(title="Fotoğrafların taşınacağı klasörü seçin")
+        if not target:return
+        if not messagebox.askyesno("Taşıma onayı",f"{len(selected)} fotoğrafı\\n{target}\\nklasörüne taşımak istiyor musunuz?"):
+            return
+        moved,failed=0,[]
+        for item in selected:
+            source=Path(self.list.item(item,"values")[1])
+            try:
+                if not source.is_file(): raise FileNotFoundError("Kaynak dosya bulunamadı")
+                dest=Path(target)/source.name
+                if dest.exists():
+                    i=1
+                    while dest.exists():
+                        dest=Path(target)/f"{source.stem}_{i}{source.suffix}"; i+=1
+                shutil.move(str(source),str(dest)); self.list.delete(item); moved+=1
+            except Exception as e: failed.append(f"{source}: {e}")
+        msg=f"{moved} fotoğraf taşındı."
+        if failed: msg+=f"\\n{len(failed)} dosya taşınamadı: "+ " | ".join(failed[:3])
+        messagebox.showinfo("Taşıma işlemi",msg)
+        self.status.set(msg.splitlines()[0])
+
     def close(self):
         self.stop_flag.set()
         with self.lock:self.db.close()
