@@ -290,7 +290,13 @@ public class MainActivity extends Activity {
 
     private String clean(String value) {
         String s=value==null?"video":value;
-        s=s.replaceAll("[\\\\/:*?\\"<>|]","_").trim();
+        StringBuilder cleaned=new StringBuilder();
+        for(int i=0;i<s.length();i++) {
+            char c=s.charAt(i);
+            boolean bad=c=='/' || c=='\\\\' || c==':' || c=='*' || c=='?' || c=='\"' || c=='<' || c=='>' || c=='|';
+            cleaned.append(bad?'_':c);
+        }
+        s=cleaned.toString().trim();
         return s.isEmpty()?"video":s;
     }
 
