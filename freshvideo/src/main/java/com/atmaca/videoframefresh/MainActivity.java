@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
     private final List<Uri> trees = new ArrayList<>();
     private final List<Video> videos = new ArrayList<>();
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
-    private final AtomicBoolean stop = new AtomicBoolean(false);
+
     private ArrayAdapter<Video> adapter;
     private ListView list;
     private TextView status, folders, count;
@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
         });
         list.setOnItemClickListener((p,v,pos,id)->updateCount());
         start.setOnClickListener(v -> begin());
-        cancel.setOnClickListener(v -> { stop.set(true); status.setText("Durdurma isteği alındı…"); });
+        cancel.setOnClickListener(v -> { Intent stopIntent=new Intent(this, VideoProcessingService.class); stopIntent.setAction(VideoProcessingService.ACTION_STOP); startService(stopIntent); status.setText("Durdurma isteği gönderildi…"); });
         updateFolders();
         updateCount();
     }
@@ -189,74 +189,22 @@ public class MainActivity extends Activity {
 
     private void begin() {
         if(busy) return;
-        List<Video> chosen=new ArrayList<>();
-        for(int i=0;i<videos.size();i++) if(list.isItemChecked(i)) chosen.add(videos.get(i));
-        if(chosen.isEmpty()) { Toast.makeText(this,"Önce video seç.",Toast.LENGTH_SHORT).show(); return; }
-        stop.set(false); progress.setProgress(0); setBusy(true,true);
-        status.setText("İşlem başlıyor…");
-        worker.execute(() -> process(chosen));
-    }
-
-    private void process(List<Video> chosen) {
-        int saved=0,deleted=0,failed=0;
-        for(int index=0;index<chosen.size()&&!stop.get();index++) {
-            Video video=chosen.get(index);
-            MediaMetadataRetriever retriever=new MediaMetadataRetriever();
-            long expected=0,done=0;
-            boolean failedThis=false;
-            try {
-                retriever.setDataSource(this,video.uri);
-                String durationValue=retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                if(durationValue==null) throw new IllegalStateException("Video süresi okunamadı");
-                long durationMs=Long.parseLong(durationValue);
-                if(durationMs<=0) throw new IllegalStateException("Video süresi geçersiz");
-                expected=(durationMs+999L)/1000L;
-                String folder=clean(video.name);
-                int dot=folder.lastIndexOf('.');
-                if(dot>0) folder=folder.substring(0,dot);
-                for(long second=0;second<expected&&!stop.get();second++) {
-                    Bitmap frame=null;
-                    try {
-                        frame=retriever.getFrameAtTime(second*1_000_000L,MediaMetadataRetriever.OPTION_CLOSEST);
-                        if(frame==null) throw new IllegalStateException("Kare "+(second+1)+" alınamadı");
-                        if(!savePng(frame,folder,second+1)) throw new IllegalStateException("Kare "+(second+1)+" kaydedilemedi");
-                        done++; saved++;
-                    } catch(Exception e) {
-                        failedThis=true; failed++;
-                    } finally {
-                        if(frame!=null&&!frame.isRecycled()) frame.recycle();
-                    }
-                    final int fSaved=saved, fIndex=index+1, fTotal=chosen.size();
-                    final long fSecond=second+1, fExpected=expected;
-                    runOnUiThread(() -> {
-                        progress.setProgress((int)(((fIndex-1)+(double)fSecond/fExpected)*100.0/fTotal));
-                        status.setText(fIndex+"/"+fTotal+" • "+video.name+"\nKare "+fSecond+"/"+fExpected+" • Kaydedilen: "+fSaved);
-                    });
-                    if(failedThis) break;
-                }
-            } catch(Exception e) {
-                failedThis=true; failed++;
-            } finally {
-                try { retriever.release(); } catch(Exception ignored) { }
-            }
-
-            // Silme koşulu: işlem kesilmemiş, beklenen her kare yazılmış ve hata oluşmamış olmalı.
-            if(!stop.get()&&!failedThis&&expected>0&&done==expected) {
-                try {
-                    if(video.file.delete()) deleted++;
-                    else { failed++; report("Video silinemedi; kaynak korundu: "+video.name); }
-                } catch(Exception e) { failed++; }
-            }
+        ArrayList<String> selectedUris=new ArrayList<>();
+        ArrayList<String> selectedNames=new ArrayList<>();
+        for(int i=0;i<videos.size();i++) if(list.isItemChecked(i)) {
+            selectedUris.add(videos.get(i).uri.toString());
+            selectedNames.add(videos.get(i).name);
         }
-        final int fSaved=saved,fDeleted=deleted,fFailed=failed;
-        final boolean wasStopped=stop.get();
-        runOnUiThread(() -> {
-            progress.setProgress(wasStopped?progress.getProgress():100);
-            status.setText((wasStopped?"Durduruldu":"Tamamlandı")+" • "+fSaved+" PNG • "+fDeleted+
-                    " kaynak video silindi • "+fFailed+" hata");
-            setBusy(false,false);
-            scanVideosAfterRun();
-        });
+        if(selectedUris.isEmpty()) { Toast.makeText(this,"Önce video seç.",Toast.LENGTH_SHORT).show(); return; }
+        Intent service=new Intent(this,VideoProcessingService.class);
+        service.setAction(VideoProcessingService.ACTION_START);
+        service.putStringArrayListExtra(VideoProcessingService.EXTRA_URIS,selectedUris);
+        service.putStringArrayListExtra(VideoProcessingService.EXTRA_NAMES,selectedNames);
+        if(Build.VERSION.SDK_INT>=26) startForegroundService(service); else startService(service);
+        setBusy(true,true);
+        progress.setProgress(0);
+        status.setText("Arka plan işlemi başlatıldı. Bildirimden takip edebilirsin.");
+        Toast.makeText(this,"İşlem arka planda sürüyor.",Toast.LENGTH_LONG).show();
     }
 
     private boolean savePng(Bitmap bitmap,String folder,long number) {
@@ -326,6 +274,6 @@ public class MainActivity extends Activity {
         start.setEnabled(!value); list.setEnabled(!value); cancel.setEnabled(value&&processing);
     }
     @Override protected void onDestroy() {
-        stop.set(true); worker.shutdownNow(); super.onDestroy();
+        worker.shutdownNow(); super.onDestroy();
     }
 }
