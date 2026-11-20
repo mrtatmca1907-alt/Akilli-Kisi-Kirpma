@@ -23,11 +23,10 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Android SDK kur
-        uses: android-actions/setup-android@v3
-
-      - name: API 35 kur
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Android SDK lisanslarini kabul et ve API 35 kur
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Gradle 8.11.1 kur
         uses: gradle/actions/setup-gradle@v4
