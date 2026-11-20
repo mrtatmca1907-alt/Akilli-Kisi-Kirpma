@@ -293,7 +293,7 @@ public class MainActivity extends Activity {
         StringBuilder cleaned=new StringBuilder();
         for(int i=0;i<s.length();i++) {
             char c=s.charAt(i);
-            boolean bad=c=='/' || c=='\\\\' || c==':' || c=='*' || c=='?' || c=='\"' || c=='<' || c=='>' || c=='|';
+                        boolean bad=c=='/' || c==92 || c==':' || c=='*' || c=='?' || c==34 || c=='<' || c=='>' || c=='|';
             cleaned.append(bad?'_':c);
         }
         s=cleaned.toString().trim();
