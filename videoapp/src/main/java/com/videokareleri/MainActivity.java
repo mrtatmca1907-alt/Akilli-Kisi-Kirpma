@@ -41,9 +41,11 @@ public class MainActivity extends Activity {
     private static final class VideoEntry {
         final Uri uri;
         final String name;
-        VideoEntry(Uri uri, String name) {
+        final DocumentFile documentFile;
+        VideoEntry(Uri uri, String name, DocumentFile documentFile) {
             this.uri = uri;
             this.name = name;
+            this.documentFile = documentFile;
         }
         @Override public String toString() { return name; }
     }
@@ -118,7 +120,8 @@ public class MainActivity extends Activity {
         if (requestCode != REQ_FOLDER || resultCode != RESULT_OK || data == null || data.getData() == null) return;
         Uri uri = data.getData();
         try {
-            getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            int grantFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            getContentResolver().takePersistableUriPermission(uri, grantFlags);
         } catch (Throwable ignored) {}
         if (!folders.contains(uri)) folders.add(uri);
         updateFolderText();
@@ -175,7 +178,7 @@ public class MainActivity extends Activity {
                 }
                 if (video) {
                     Uri uri = file.getUri();
-                    out.put(uri.toString(), new VideoEntry(uri, name == null ? "video" : name));
+                    out.put(uri.toString(), new VideoEntry(uri, name == null ? "video" : name, file));
                 }
                 return;
             }
@@ -256,24 +259,35 @@ public class MainActivity extends Activity {
         executor.submit(() -> {
             int totalSaved = 0;
             int errors = 0;
+            int deletedVideos = 0;
             for (int v = 0; v < targets.size() && !stopRequested.get(); v++) {
                 VideoEntry entry = targets.get(v);
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                int videoSaved = 0;
+                int videoErrors = 0;
+                long expectedFrames = 0;
                 try {
                     retriever.setDataSource(this, entry.uri);
                     String durationText = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
                     long durationMs = durationText == null ? 0 : Long.parseLong(durationText);
                     long seconds = Math.max(1L, (durationMs + 999L) / 1000L);
+                    expectedFrames = seconds;
                     String base = safeBase(entry.name);
 
                     for (long s = 0; s < seconds && !stopRequested.get(); s++) {
                         Bitmap frame = retriever.getFrameAtTime(s * 1_000_000L, MediaMetadataRetriever.OPTION_CLOSEST);
                         if (frame != null) {
-                            if (saveFrame(frame, base, s + 1)) totalSaved++;
-                            else errors++;
+                            if (saveFrame(frame, base, s + 1)) {
+                                totalSaved++;
+                                videoSaved++;
+                            } else {
+                                errors++;
+                                videoErrors++;
+                            }
                             frame.recycle();
                         } else {
                             errors++;
+                            videoErrors++;
                         }
                         final int fv = v;
                         final long fs = s + 1;
@@ -289,17 +303,30 @@ public class MainActivity extends Activity {
                     }
                 } catch (Throwable t) {
                     errors++;
+                    videoErrors++;
                 } finally {
                     try { retriever.release(); } catch (Throwable ignored) {}
+                }
+                // Kaynak video yalnızca beklenen bütün kareler başarıyla kaydedildiyse silinir.
+                if (!stopRequested.get() && videoErrors == 0 && expectedFrames > 0
+                        && videoSaved == expectedFrames) {
+                    if (entry.documentFile != null && entry.documentFile.delete()) {
+                        deletedVideos++;
+                    } else {
+                        errors++;
+                    }
                 }
             }
             final int saved = totalSaved;
             final int failed = errors;
+            final int deleted = deletedVideos;
             final boolean stopped = stopRequested.get();
             runOnUiThread(() -> {
                 if (!stopped) progress.setProgress(100);
                 txtStatus.setText((stopped ? "Durduruldu" : "Tamamlandı")
-                        + " • " + saved + " kare kaydedildi" + (failed > 0 ? " • " + failed + " hata" : ""));
+                        + " • " + saved + " kare kaydedildi"
+                        + " • " + deleted + " video silindi"
+                        + (failed > 0 ? " • " + failed + " hata" : ""));
                 setWorking(false, false);
             });
         });
@@ -314,19 +341,19 @@ public class MainActivity extends Activity {
     }
 
     private boolean saveFrame(Bitmap frame, String base, long number) {
-        String fileName = base + " " + number + ".jpg";
+        String fileName = base + " " + number + ".png";
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
                 values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/VideoKareleri/" + base);
                 values.put(MediaStore.Images.Media.IS_PENDING, 1);
                 Uri out = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 if (out == null) return false;
                 boolean ok;
                 try (OutputStream os = getContentResolver().openOutputStream(out)) {
-                    ok = os != null && frame.compress(Bitmap.CompressFormat.JPEG, 94, os);
+                    ok = os != null && frame.compress(Bitmap.CompressFormat.PNG, 100, os);
                 }
                 if (!ok) {
                     getContentResolver().delete(out, null, null);
@@ -342,9 +369,9 @@ public class MainActivity extends Activity {
             if (!dir.exists() && !dir.mkdirs()) return false;
             File out = new File(dir, fileName);
             try (FileOutputStream fos = new FileOutputStream(out)) {
-                if (!frame.compress(Bitmap.CompressFormat.JPEG, 94, fos)) return false;
+                if (!frame.compress(Bitmap.CompressFormat.PNG, 100, fos)) return false;
             }
-            android.media.MediaScannerConnection.scanFile(this, new String[]{out.getAbsolutePath()}, new String[]{"image/jpeg"}, null);
+            android.media.MediaScannerConnection.scanFile(this, new String[]{out.getAbsolutePath()}, new String[]{"image/png"}, null);
             return true;
         } catch (Throwable t) {
             return false;
