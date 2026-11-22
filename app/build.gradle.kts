@@ -1,3 +1,5 @@
+import java.net.URL
+
 plugins {
     id("com.android.application")
 }
@@ -44,11 +46,10 @@ val downloadPersonModel by tasks.registering {
         val target = personModelFile.asFile
         if (!target.exists() || target.length() < 1_000_000L) {
             target.parentFile.mkdirs()
-            val modelUrl = java.net.URL("https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_efficientdet_lite0_detection_metadata_1.tflite")
-            modelUrl.openConnection().apply {
-                connectTimeout = 30000
-                readTimeout = 120000
-            }.getInputStream().use { input ->
+            val connection = URL("https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_efficientdet_lite0_detection_metadata_1.tflite").openConnection()
+            connection.connectTimeout = 30000
+            connection.readTimeout = 120000
+            connection.getInputStream().use { input ->
                 target.outputStream().use { output -> input.copyTo(output) }
             }
         }
