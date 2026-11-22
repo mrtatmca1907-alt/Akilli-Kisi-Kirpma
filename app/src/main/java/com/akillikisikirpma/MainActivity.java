@@ -51,11 +51,10 @@ public class MainActivity extends Activity {
             txtStatus.setText(allFiles ? (running ? phase : (finished ? "Tamamlandı" : phase)) : "Tüm dosyalara erişim gerekli");
             txtFolder.setText(directPath == null || directPath.isEmpty() ? "Kaynak klasör: Seçilmedi" : "Kaynak klasör: " + directPath);
             txtLog.setText(
-                    "GERÇEK TURBO: doğrudan dosya sistemi" +
-                    "\nTek klasöre taşınan: " + gathered +
-                    "\nTeke düşürülen kopya: " + duplicates +
-                    "\nKırpma için işlenen: " + processed +
-                    "\nÇıktıya taşınan orijinal: " + moved +
+                    "Kaynak fotoğraflar korunur" +
+                    "\nBulunan görsel: " + gathered +
+                    "\nİşlenen görsel: " + processed +
+                    "\nSilinmeyen kaynak: " + (moved + processed) +
                     "\nBulunan kişi: " + people +
                     "\nKaydedilen kişi kırpımı: " + crops +
                     "\nHata: " + errors +
@@ -145,7 +144,7 @@ public class MainActivity extends Activity {
         Intent i = new Intent(this, CropForegroundService.class);
         i.setAction(CropForegroundService.ACTION_START);
         if (Build.VERSION.SDK_INT >= 26) startForegroundService(i); else startService(i);
-        Toast.makeText(this, "Gerçek turbo başladı", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Kişi kırpma başladı", Toast.LENGTH_SHORT).show();
     }
 
     @Override protected void onResume() { super.onResume(); handler.removeCallbacks(refresh); handler.post(refresh); }
