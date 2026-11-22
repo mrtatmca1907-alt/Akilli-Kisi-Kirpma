@@ -48,6 +48,6 @@ jobs:
       - name: APK yukle
         uses: actions/upload-artifact@v4
         with:
-          name: Akilli-Kisi-Kirpma-v1.7.0-GERCEK-TURBO
+          name: Auto-Person-Crop-v1.8.0
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
