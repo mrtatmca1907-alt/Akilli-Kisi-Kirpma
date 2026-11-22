@@ -147,6 +147,18 @@ public class MainActivity extends Activity {
         Toast.makeText(this, "Kişi kırpma başladı", Toast.LENGTH_SHORT).show();
     }
 
-    @Override protected void onResume() { super.onResume(); handler.removeCallbacks(refresh); handler.post(refresh); }
+    @Override protected void onResume() {
+        super.onResume();
+        if (hasAllFilesAccess()) {
+            SharedPreferences p = getSharedPreferences(CropForegroundService.PREFS, MODE_PRIVATE);
+            String path = p.getString(CropForegroundService.KEY_DIRECT_PATH, "");
+            if (path == null || path.isEmpty()) {
+                p.edit().putString(CropForegroundService.KEY_DIRECT_PATH,
+                        Environment.getExternalStorageDirectory().getAbsolutePath()).apply();
+            }
+        }
+        handler.removeCallbacks(refresh);
+        handler.post(refresh);
+    }
     @Override protected void onPause() { handler.removeCallbacks(refresh); super.onPause(); }
 }
