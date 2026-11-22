@@ -44,7 +44,7 @@ val downloadPersonModel by tasks.registering {
         val target = personModelFile.asFile
         if (!target.exists() || target.length() < 1_000_000L) {
             target.parentFile.mkdirs()
-            val modelUrl = java.net.URL("https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/rpi/lite-model_efficientdet_lite0_detection_metadata_1.tflite")
+            val modelUrl = java.net.URL("https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_efficientdet_lite0_detection_metadata_1.tflite")
             modelUrl.openConnection().apply {
                 connectTimeout = 30000
                 readTimeout = 120000
