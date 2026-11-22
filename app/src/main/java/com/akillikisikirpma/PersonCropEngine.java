@@ -31,14 +31,19 @@ final class PersonCropEngine implements AutoCloseable {
         int detected;
         int saved;
         int failed;
-        boolean originalSaved;
     }
 
     private final Context context;
     private final ObjectDetector detector;
+    private final File outputDir;
 
     PersonCropEngine(Context context) throws Exception {
         this.context = context.getApplicationContext();
+        File pictures = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        outputDir = new File(pictures, "AutoPersonCrop");
+        if (!outputDir.exists() && !outputDir.mkdirs()) {
+            throw new IllegalStateException("Çıktı klasörü oluşturulamadı");
+        }
         ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
                 .setMaxResults(100)
                 .setScoreThreshold(PERSON_SCORE)
@@ -49,13 +54,6 @@ final class PersonCropEngine implements AutoCloseable {
     ProcessResult process(Uri uri, long mediaId, String displayName, String mimeType) {
         ProcessResult result = new ProcessResult();
         String sourceBase = safeBase(displayName);
-        String folder = sourceBase + "_" + mediaId;
-        File outputDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "AkilliKisiKirpma/" + folder);
-        if (!outputDir.exists() && !outputDir.mkdirs()) {
-            result.failed++;
-            return result;
-        }
-
         Bitmap detectBitmap = null;
         Bitmap original = null;
         try {
@@ -90,7 +88,7 @@ final class PersonCropEngine implements AutoCloseable {
                         Bitmap crop = null;
                         try {
                             crop = Bitmap.createBitmap(original, r.left, r.top, r.width(), r.height());
-                            if (saveCropDirect(crop, outputDir, sourceBase, personNo)) result.saved++;
+                            if (saveCropDirect(crop, sourceBase, mediaId, personNo)) result.saved++;
                             else result.failed++;
                         } catch (Throwable t) {
                             result.failed++;
@@ -100,10 +98,6 @@ final class PersonCropEngine implements AutoCloseable {
                     }
                 }
             }
-
-            // Bütün okuma/kırpma bittikten sonra büyük orijinali KOPYALAMADAN hedefe taşı.
-            result.originalSaved = moveOriginalDirect(uri, outputDir, displayName);
-            if (!result.originalSaved) result.failed++;
         } catch (Throwable t) {
             result.failed++;
         } finally {
@@ -113,37 +107,16 @@ final class PersonCropEngine implements AutoCloseable {
         return result;
     }
 
-    private boolean moveOriginalDirect(Uri uri, File outputDir, String displayName) {
-        if (!"file".equalsIgnoreCase(uri.getScheme()) || uri.getPath() == null) return false;
-        File source = new File(uri.getPath());
-        if (!source.isFile()) return false;
-        String name = (displayName == null || displayName.trim().isEmpty()) ? source.getName() : displayName;
-        File out = new File(outputDir, name);
-
-        if (out.isFile()) {
-            if (out.length() == source.length() && source.length() > 0) return source.delete();
-            out = uniqueFile(outputDir, name);
-        }
-        return source.renameTo(out);
-    }
-
-    private File uniqueFile(File dir, String name) {
-        String base = name;
-        String ext = "";
-        int dot = name.lastIndexOf('.');
-        if (dot > 0) { base = name.substring(0, dot); ext = name.substring(dot); }
-        for (int i = 1; i < 1000000; i++) {
-            File f = new File(dir, base + " (" + i + ")" + ext);
-            if (!f.exists()) return f;
-        }
-        return new File(dir, base + "_" + System.currentTimeMillis() + ext);
-    }
-
-    private boolean saveCropDirect(Bitmap bitmap, File dir, String sourceBase, int personNo) {
-        File out = new File(dir, sourceBase + "_kisi_" + personNo + ".jpg");
-        if (out.isFile() && out.length() > 0) return true;
+    private boolean saveCropDirect(Bitmap bitmap, String sourceBase, long mediaId, int personNo) {
+        String base = sourceBase + "_" + Long.toUnsignedString(mediaId, 36) + "_kisi_" + personNo;
+        File out = new File(outputDir, base + ".jpg");
+        int suffix = 1;
+        while (out.exists()) out = new File(outputDir, base + "_" + (suffix++) + ".jpg");
         try (FileOutputStream fos = new FileOutputStream(out)) {
-            return bitmap.compress(Bitmap.CompressFormat.JPEG, 96, fos);
+            boolean ok = bitmap.compress(Bitmap.CompressFormat.JPEG, 96, fos);
+            fos.flush();
+            if (!ok) out.delete();
+            return ok;
         } catch (Throwable t) {
             try { out.delete(); } catch (Throwable ignored) {}
             return false;
@@ -225,7 +198,7 @@ final class PersonCropEngine implements AutoCloseable {
         if (name == null || name.trim().isEmpty()) name = "fotograf";
         int dot = name.lastIndexOf('.');
         if (dot > 0) name = name.substring(0, dot);
-        name = name.replaceAll("[\\/:*?\"<>|]", "_").trim();
+        name = name.replaceAll("[\\\\/:*?\\\"<>|]", "_").trim();
         return name.isEmpty() ? "fotograf" : name;
     }
 
