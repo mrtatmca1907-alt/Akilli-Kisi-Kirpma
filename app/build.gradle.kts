@@ -36,3 +36,25 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
     testImplementation("junit:junit:4.13.2")
 }
+
+val personModelFile = layout.projectDirectory.file("src/main/assets/efficientdet-lite0.tflite")
+val downloadPersonModel by tasks.registering {
+    outputs.file(personModelFile)
+    doLast {
+        val target = personModelFile.asFile
+        if (!target.exists() || target.length() < 1_000_000L) {
+            target.parentFile.mkdirs()
+            val modelUrl = java.net.URL("https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/rpi/lite-model_efficientdet_lite0_detection_metadata_1.tflite")
+            modelUrl.openConnection().apply {
+                connectTimeout = 30000
+                readTimeout = 120000
+            }.getInputStream().use { input ->
+                target.outputStream().use { output -> input.copyTo(output) }
+            }
+        }
+        check(target.exists() && target.length() > 1_000_000L) { "EfficientDet Lite0 modeli indirilemedi" }
+    }
+}
+tasks.named("preBuild").configure {
+    dependsOn(downloadPersonModel)
+}
